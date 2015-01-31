@@ -1,9 +1,17 @@
 Package: reghelper
 Type: Package
-Title: What the package does (short line)
-Version: 1.0
+Title: Helper functions for regression analysis
+Version: 0.0.0.9000
 Date: 2015-01-29
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author@R: person("Jeffrey", "Hughes", email="jeff.hughes@gmail.com",
+    role=c("aut", "cre"))
+Description: A set of functions used to automate commonly used methods in
+    regression analysis. This includes plotting interactions, calculating simple
+    slopes, calculating standardized coefficients, etc. See the reghelper
+    documentation for more information, documentation, and examples.
+License: GPL-3
+URL: 
+Depends: R (>= 3.1.0)
+LazyData: true
+Imports:
+    ggplot2
