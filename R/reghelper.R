@@ -55,13 +55,14 @@ beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL) {
     
     for (i in 1:length(vars)) {
         if (!(vars[i] %in% skip)) {
+            
             # handle factor variables specially
             if (data_classes[i] == 'factor') {
                 contrasts <- contrasts(data[, vars[i]])
                 var_replace <- ''
                 
-                # need to create each dummy variable separately in order to
-                # scale them
+                # need to break apart contrasts of factors, creating each dummy
+                # variable separately, in order to scale them
                 for (j in 1:ncol(contrasts)) {
                     # name each dummy code
                     if (is.null(colnames(contrasts))) {

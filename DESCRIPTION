@@ -13,5 +13,6 @@ License: GPL-3
 URL: 
 Depends: R (>= 3.1.0)
 LazyData: true
-Imports:
+Imports: 
     ggplot2
+Suggests: testthat
