@@ -55,37 +55,11 @@ simple_slopes.lm <- function(model, levels=NULL) {
     int_vars <- which(attr(terms(model), 'factors')[, int_term] == 1)
         # get location of variables in the interaction
     
-    factors <- list()
-    for (term in names(int_vars)) {
-        if (term %in% names(levels)) {  # if user specified levels, use those
-            factors[[term]] <- levels[[term]]
-        } else {
-            if (attr(terms(model), 'dataClasses')[term] == 'factor') {
-                # factors are plotted at all levels (plus 0)
-                factors[[term]] <- c('sstest', levels(mdata[[term]]))
-            } else {
-                # continuous vars are plotted at -1SD, mean, and +1 SD
-                factors[[term]] <- c(
-                    'sstest',
-                    .offset_point(mdata[[term]], -1),
-                    .offset_point(mdata[[term]], 0),
-                    .offset_point(mdata[[term]], 1)
-                )
-            }
-        }
-    }
+    # get points at which to test each variable
+    factors <- .set_factors(model, int_vars, levels)
     
-    # we only want to use the models that are testing one single variable at 0
-    grid <- with(mdata, expand.grid(factors))
-    find_zeros <- apply(grid, 1, function(x) {
-        length(which(suppressWarnings(x == 'sstest'))) == 1
-    })
-    grid <- grid[find_zeros, ]
-    
-    rownames(grid) <- seq(to=nrow(grid))
-    grid <- as.data.frame(lapply(grid, function(x) {
-        as.character(x)
-    }), stringsAsFactors=FALSE)  # remove factor levels from factor variables
+    # create grid of all tests to be done
+    grid <- .create_grid(mdata, factors)
     
     form <- format(formula(model))
     
@@ -121,6 +95,74 @@ simple_slopes.lm <- function(model, levels=NULL) {
         )
     }
     return(models)
+}
+
+
+#' Find points to test variables.
+#' 
+#' Helper function calculates points at which to test slopes of a variable. For
+#' categorical variables, this includes all its levels. For continuous
+#' variables, this is -1 SD, the mean, and +1 SD.
+#' 
+#' @param model The linear model being tested.
+#' @param int_vars The variables involved in the interaction being tested.
+#' @param user_levels Any user-specified levels to be used instead of the
+#'   defaults.
+#' @return A list with all the factor points for each variable in the
+#'   interaction.
+.set_factors <- function(model, int_vars, user_levels=NULL) {
+    factors <- list()
+    for (term in names(int_vars)) {
+        term_data <- model$model[[term]]
+        if (!is.null(user_levels) && term %in% names(user_levels)) {
+            # if user specified levels, use those
+            factors[[term]] <- user_levels[[term]]
+        } else {
+            if (attr(terms(model), 'dataClasses')[term] == 'factor') {
+                # factors are plotted at all levels (plus 0)
+                factors[[term]] <- c('sstest', levels(term_data))
+            } else {
+                # continuous vars are plotted at -1SD, mean, and +1 SD
+                factors[[term]] <- c(
+                    'sstest',
+                    .offset_point(term_data, -1),
+                    .offset_point(term_data, 0),
+                    .offset_point(term_data, 1)
+                )
+            }
+        }
+    }
+    return(factors)
+}
+
+
+#' Create grid of simple slope tests.
+#' 
+#' Helper function creates a data frame with a list of all simple slope tests to
+#' be done.
+#' 
+#' @param data Data from the linear model being tested.
+#' @param factors List of all points to test for each variable in the
+#'   interaction.
+#' @return A data frame with one line for each simple slope test, indicating
+#'   what point each variable is set to in the test.
+.create_grid <- function(data, factors) {
+    grid <- with(data, expand.grid(factors))
+    
+    # we only want to use the models that are testing a single variable
+    find_tests <- apply(grid, 1, function(x) {
+        length(which(suppressWarnings(x == 'sstest'))) == 1
+    })
+    grid <- grid[find_tests, ]
+    
+    rownames(grid) <- seq(to=nrow(grid))
+    
+    # remove factor levels from factor variables
+    grid <- as.data.frame(lapply(grid, function(x) {
+        as.character(x)
+    }), stringsAsFactors=FALSE)
+    
+    return(grid)
 }
 
 
