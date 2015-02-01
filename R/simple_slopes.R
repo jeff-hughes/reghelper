@@ -40,11 +40,11 @@ simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 #'   do not include 0 as one of these levels, the function will not test the
 #'   simple effects for that variable.
 #' @return A data frame with a row for each simple effect. The first few columns
-#   identify the level at which each variable in your model was set for that
-#   test. A 0 value in a particular column indicates that this was the variable
-#   being tested. After columns for each variable, the data frame has columns
-#   for the slope of the 0 variable, the standard error, t-value, p-value, and
-#   degrees of freedom for the model.
+#    identify the level at which each variable in your model was set for that
+#    test. A 0 value in a particular column indicates that this was the variable
+#    being tested. After columns for each variable, the data frame has columns
+#    for the slope of the 0 variable, the standard error, t-value, p-value, and
+#    degrees of freedom for the model.
 #' @examples TODO: Need to complete.
 #' @export
 simple_slopes.lm <- function(model, levels=NULL) {
@@ -62,14 +62,14 @@ simple_slopes.lm <- function(model, levels=NULL) {
         } else {
             if (attr(terms(model), 'dataClasses')[term] == 'factor') {
                 # factors are plotted at all levels (plus 0)
-                factors[[term]] <- c(0, levels(mdata[[term]]))
+                factors[[term]] <- c('sstest', levels(mdata[[term]]))
             } else {
-                # continuous vars are plotted at 0, -1SD, mean, and +1 SD
+                # continuous vars are plotted at -1SD, mean, and +1 SD
                 factors[[term]] <- c(
-                    0,
-                    mean(mdata[[term]], na.rm=TRUE)-sd(mdata[[term]], na.rm=TRUE),
-                    mean(mdata[[term]], na.rm=TRUE),
-                    mean(mdata[[term]], na.rm=TRUE)+sd(mdata[[term]], na.rm=TRUE)
+                    'sstest',
+                    .offset_point(mdata[[term]], -1),
+                    .offset_point(mdata[[term]], 0),
+                    .offset_point(mdata[[term]], 1)
                 )
             }
         }
@@ -78,32 +78,27 @@ simple_slopes.lm <- function(model, levels=NULL) {
     # we only want to use the models that are testing one single variable at 0
     grid <- with(mdata, expand.grid(factors))
     find_zeros <- apply(grid, 1, function(x) {
-        length(which(suppressWarnings(as.numeric(x) == 0))) == 1
+        length(which(suppressWarnings(x == 'sstest'))) == 1
     })
     grid <- grid[find_zeros, ]
     
     rownames(grid) <- seq(to=nrow(grid))
     grid <- as.data.frame(lapply(grid, function(x) {
-        if (is.factor(x)) {
-            as.character(x)
-        } else {
-            as.numeric(x)
-        }
+        as.character(x)
     }), stringsAsFactors=FALSE)  # remove factor levels from factor variables
     
     form <- format(formula(model))
     
     models <- grid
-    models[, c('Zero Var. Estimate', 'Std. Error',
+    models[, c('Test Estimate', 'Std. Error',
                't value', 'Pr(>|t|)', 'df')] <- NA
     for (i in 1:nrow(grid)) {
         new_form <- form
-        zero_var <- names(grid)[suppressWarnings(
-            which(as.numeric(grid[i, ]) == 0))]
+        test_var <- names(grid)[suppressWarnings(which(grid[i, ] == 'sstest'))]
         
         for (j in 1:ncol(grid)) {
             vname <- colnames(grid)[j]
-            if (vname != zero_var) {
+            if (vname != test_var) {
                 if (is.factor(mdata[[vname]])) {
                     # for factors, we set the contrast, with reference group as
                     # the one for that test
@@ -121,11 +116,31 @@ simple_slopes.lm <- function(model, levels=NULL) {
         }
         new_model <- lm(new_form, mdata)
         models[i, (ncol(models)-4):ncol(models)] <- c(
-            summary(new_model)$coefficients[int_vars[zero_var], ],
+            summary(new_model)$coefficients[int_vars[test_var], ],
             new_model$df.residual
         )
     }
     return(models)
+}
+
+
+# Helper Functions -------------------------------------------------------------
+
+#' Calculate points for testing simple slopes
+#' 
+#' Helper function calculates point at which to set a variable, based on its
+#' mean and standard deviation.
+#' 
+#' @param var A vector of the variable to test.
+#' @param offset_sd The value, in standard deviations, at which you wish to
+#'   offset the variable.
+#' @param digits Number of decimal places to round value.
+#' @return The value of the variable at the offset point. For example, for a
+#'   standard normal distribution, an offset point of -1 would return a value of
+#'   -1.
+.offset_point <- function(var, offset_sd, digits=6) {
+    point <- mean(var, na.rm=TRUE) + offset_sd * sd(var, na.rm=TRUE)
+    return(round(point, digits))
 }
 
 
