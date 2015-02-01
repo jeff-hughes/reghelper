@@ -202,6 +202,51 @@ test_that('skipping over variables works', {
 })
 
 
+test_that('aov with 2-level predictor works', {
+    x <- c(rep(0, 50), rep(1, 50))
+    
+    set.seed(234)
+    y <- x + rnorm(100)
+    x <- factor(x)
+    
+    model <- aov(y ~ x)
+    beta_model <- beta(model)
+    
+    expect_equal(get_var_names(beta_model), c('y.z', 'x1.z'))
+    
+    sum_sq <- summary(model)[[1]][['Sum Sq']]
+    r_sq <- 1 - sum_sq[2] / (sum_sq[1] + sum_sq[2])
+    
+    expect_equal(beta_model$r.squared, r_sq)
+    
+    expect_equal(get_coef(beta_model, 'x1.z'), 0.528)
+    expect_equal(coef(beta_model)[2, 4], summary(model)[[1]][1, 'Pr(>F)'])
+        # p-values should still match
+})
+
+
+test_that('aov with 3-level predictor works', {
+    x <- c(rep(0, 50), rep(1, 50), rep(2, 50))
+    
+    set.seed(234)
+    y <- x + rnorm(150)
+    x <- factor(x)
+    
+    model <- aov(y ~ x)
+    beta_model <- beta(model)
+    
+    expect_equal(get_var_names(beta_model), c('y.z', 'x1.z', 'x2.z'))
+    
+    sum_sq <- summary(model)[[1]][['Sum Sq']]
+    r_sq <- 1 - sum_sq[2] / (sum_sq[1] + sum_sq[2])
+    
+    expect_equal(beta_model$r.squared, r_sq)
+    
+    expect_equal(get_coef(beta_model, 'x1.z'), 0.450)
+    expect_equal(get_coef(beta_model, 'x2.z'), 0.722)
+})
+
+
 
 
 
