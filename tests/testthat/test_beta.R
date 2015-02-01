@@ -196,6 +196,9 @@ test_that('skipping over variables works', {
     
     beta_model6 <- beta(model, skip=c('x1', 'x2'))
     expect_equal(get_var_names(beta_model6), c('y.z', 'x1', 'x2'))
+    
+    beta_model7 <- beta(model, skip=c('y', 'x1', 'x2'))
+    expect_equal(get_var_names(beta_model7), c('y', 'x1', 'x2'))
 })
 
 

@@ -53,6 +53,11 @@ beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL) {
         data_classes <- data_classes[-lhs]
     }
     
+    # cover special case, where all variables are skipped
+    if (length(vars) == 0) {
+        return(summary(model))
+    }
+    
     for (i in 1:length(vars)) {
         if (!(vars[i] %in% skip)) {
             
@@ -100,7 +105,7 @@ beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL) {
             }
         }
     }
-    summary(lm(formula, data))
+    return(summary(lm(formula, data)))
 }
 
 #' Standardized coeffients of a model.
