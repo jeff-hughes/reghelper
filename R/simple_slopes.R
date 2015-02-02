@@ -31,6 +31,10 @@ simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 #' continuous variables, and at each level of categorical variables. This can be
 #' overridden with the \code{levels} parameter.
 #' 
+#' If a categorical variable with more than two levels is being tested, you may
+#' see multiple row for that test. One row will be shown for each contrast for
+#' that variable; the order is in the same order shown in \code{contrasts()}.
+#' 
 #' @param model A fitted linear model of type 'lm' with at least one interaction
 #'   term.
 #' @param levels A list with arguments names corresponding to some or all of the
