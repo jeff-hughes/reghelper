@@ -162,6 +162,29 @@ simple_slopes.lm <- function(model, levels=NULL) {
         as.character(x)
     }), stringsAsFactors=FALSE)
     
+    # look for factor variables with more than 2 levels -- they need extra
+    # columns
+    for (var in names(factors)) {
+        variable <- data[[var]]
+        if (is.factor(variable) && length(levels(variable)) > 2) {
+            contr <- contrasts(variable)
+            if (is.null(colnames(contr))) {
+                var_names <- paste0(var, 1:ncol(contr))
+            } else {
+                var_names <- paste0(var, colnames(contr))
+            }
+            old_col <- grid[, var]
+            col_num <- which(colnames(grid) == var)
+            
+            new_cols <- as.data.frame(lapply(var_names, function(x) {
+                old_col
+            }))
+            colnames(new_cols) <- var_names
+            
+            grid <- .df_splice(grid, col_num, num_remove=1, new_cols=new_cols)
+        }
+    }
+    
     return(grid)
 }
 
@@ -183,6 +206,60 @@ simple_slopes.lm <- function(model, levels=NULL) {
 .offset_point <- function(var, offset_sd, digits=6) {
     point <- mean(var, na.rm=TRUE) + offset_sd * sd(var, na.rm=TRUE)
     return(round(point, digits))
+}
+
+
+#' Remove and insert columns in data frame
+#' 
+#' Helper function allows columns to be removed and added at a particular splice
+#' point. This function works similar to the Javascript function splice().
+#' 
+#' @param df The data frame to modify
+#' @param splice_point The column at which to make changes. Removed columns will
+#'   start with this one, and new columns will be added after this one.
+#' @param num_remove The number of columns to remove.
+#' @param new_cols A data frame of new columns to be added.
+#' @param stringsAsFactors Logical. Whether or not to convert character vectors
+#'   to factors.
+#' @return A new data frame with the modifications made.
+.df_splice <- function(df, splice_point, num_remove=0, new_cols=NULL,
+                       stringsAsFactors=FALSE) {
+    old_colnames <- colnames(df)
+    
+    # remove columns
+    if (splice_point > 0 && splice_point <= ncol(df) &&
+        num_remove > 0 && (splice_point + num_remove - 1) <= ncol(df)) {
+        
+        new_df <- as.data.frame(df[,
+            -c(splice_point:(splice_point+num_remove-1))])
+        
+        colnames(new_df) <- old_colnames[
+            -c(splice_point:(splice_point+num_remove-1))]
+        
+        removed <- num_remove
+    } else {
+        new_df <- df
+        removed <- 0
+    }
+    
+    # add new columns
+    if (!is.null(new_cols)) {
+        new_cols <- as.data.frame(new_cols)
+        new_splice <- splice_point - removed  # need to adjust for the number of
+                                              # columns we just removed
+        new_colnames <- colnames(new_df)
+        new_df2 <- data.frame(
+            new_df[, 1:new_splice],
+            new_cols,
+            new_df[, -c(1:new_splice)],
+            stringsAsFactors=stringsAsFactors)
+        colnames(new_df2) <- c(new_colnames[1:new_splice],
+                               colnames(new_cols),
+                               new_colnames[-c(1:new_splice)])
+    } else {
+        new_df2 <- new_df
+    }
+    return(new_df2)
 }
 
 
