@@ -59,40 +59,69 @@ simple_slopes.lm <- function(model, levels=NULL) {
     factors <- .set_factors(model, int_vars, levels)
     
     # create grid of all tests to be done
-    grid <- .create_grid(mdata, factors)
+    grids <- .create_grids(mdata, factors)
     
     form <- format(formula(model))
     
-    models <- grid
+    template <- grids[[1]]
+    models <- grids[[2]]
     models[, c('Test Estimate', 'Std. Error',
                't value', 'Pr(>|t|)', 'df')] <- NA
-    for (i in 1:nrow(grid)) {
+    est_count <- 1
+    
+    for (i in 1:nrow(template)) {
         new_form <- form
-        test_var <- names(grid)[suppressWarnings(which(grid[i, ] == 'sstest'))]
+        #test_var <- names(template)[suppressWarnings(which(template[i, ] == 'sstest'))]
+        test_var_name <- names(template)[which(template[i, ] == 'sstest')]
+        test_var <- mdata[[test_var_name]]
         
-        for (j in 1:ncol(grid)) {
-            vname <- colnames(grid)[j]
-            if (vname != test_var) {
+        for (j in 1:ncol(template)) {
+            vname <- colnames(template)[j]
+            if (vname != test_var_name) {
                 if (is.factor(mdata[[vname]])) {
                     # for factors, we set the contrast, with reference group as
                     # the one for that test
                     contrasts(mdata[[vname]]) <- contr.treatment(
                         levels(mdata[[vname]]),
-                        base=which(levels(mdata[[vname]]) == grid[i, j])
+                        base=which(levels(mdata[[vname]]) == template[i, j])
                     )
                 } else {
                     # for continuous, we replace the name of the variable in the
                     # formula to shift the 0 point
-                    new_var <- paste0('I(', vname, ' - ', grid[i, j], ')')
+                    new_var <- paste0('I(', vname, ' - ', template[i, j], ')')
                     new_form <- gsub(vname, new_var, new_form)
                 }
             }
         }
         new_model <- lm(new_form, mdata)
-        models[i, (ncol(models)-4):ncol(models)] <- c(
-            summary(new_model)$coefficients[int_vars[test_var], ],
-            new_model$df.residual
-        )
+        
+        if (is.factor(test_var)) {
+            contr <- contrasts(test_var)
+            dummy_names <- paste0(test_var_name, colnames(contr))
+            
+            estimates <- as.data.frame(
+                summary(new_model)$coefficients[dummy_names, ])
+            
+            # when only one contrast, the coefficients will be a vector, not a
+            # matrix, so estimates ends up transposed
+            if (ncol(contr) < 2) {
+                estimates <- as.data.frame(t(estimates))
+                rownames(estimates) <- 1
+            }
+            
+            estimates$df <- new_model$df.residual
+            
+            for (est in 1:nrow(estimates)) {
+                models[est_count, (ncol(models)-4):ncol(models)] <- estimates[est, ]
+                est_count <- est_count + 1
+            }
+        } else {
+            models[est_count, (ncol(models)-4):ncol(models)] <- c(
+                summary(new_model)$coefficients[int_vars[test_var_name], ],
+                new_model$df.residual
+            )
+            est_count <- est_count + 1
+        }
     }
     return(models)
 }
@@ -146,7 +175,7 @@ simple_slopes.lm <- function(model, levels=NULL) {
 #'   interaction.
 #' @return A data frame with one line for each simple slope test, indicating
 #'   what point each variable is set to in the test.
-.create_grid <- function(data, factors) {
+.create_grids <- function(data, factors) {
     grid <- with(data, expand.grid(factors))
     
     # we only want to use the models that are testing a single variable
@@ -162,30 +191,41 @@ simple_slopes.lm <- function(model, levels=NULL) {
         as.character(x)
     }), stringsAsFactors=FALSE)
     
-    # look for factor variables with more than 2 levels -- they need extra
-    # columns
+    new_grid <- grid
+    
+    # look for factor variables with more than 2 levels -- they need extra rows
     for (var in names(factors)) {
         variable <- data[[var]]
         if (is.factor(variable) && length(levels(variable)) > 2) {
+            find_rows <- which(grid[, var] == 'sstest')
             contr <- contrasts(variable)
-            if (is.null(colnames(contr))) {
-                var_names <- paste0(var, 1:ncol(contr))
-            } else {
-                var_names <- paste0(var, colnames(contr))
+            
+            adj_find_rows <- find_rows +
+                (ncol(contr)-1) * 0:(length(find_rows)-1)
+                # adjust find_rows, since we are going to be adding rows in
+                # between as we loop through
+            
+            for (row in 1:length(find_rows)) {
+                old_row <- grid[find_rows[row], ]
+                new_rows <- as.data.frame(t(sapply(1:ncol(contr), function(x) {
+                    old_row
+                })))  # kind of hacky way to copy rows
+                
+                # change rownames to letter subscripts, e.g., '4a', '4b'
+                rownames(new_rows) <- paste0(
+                    rownames(old_row),
+                    letters[1:nrow(new_rows)])
+                
+                new_grid <- .df_row_splice(
+                    new_grid,
+                    adj_find_rows[row],
+                    num_remove=1,
+                    new_rows=new_rows)
             }
-            old_col <- grid[, var]
-            col_num <- which(colnames(grid) == var)
-            
-            new_cols <- as.data.frame(lapply(var_names, function(x) {
-                old_col
-            }))
-            colnames(new_cols) <- var_names
-            
-            grid <- .df_splice(grid, col_num, num_remove=1, new_cols=new_cols)
         }
     }
     
-    return(grid)
+    return(list(grid, new_grid))
 }
 
 
@@ -216,14 +256,12 @@ simple_slopes.lm <- function(model, levels=NULL) {
 #' 
 #' @param df The data frame to modify
 #' @param splice_point The column at which to make changes. Removed columns will
-#'   start with this one, and new columns will be added after this one.
+#'   start with this one, and new columns will be added starting at this column
+#'   index.
 #' @param num_remove The number of columns to remove.
 #' @param new_cols A data frame of new columns to be added.
-#' @param stringsAsFactors Logical. Whether or not to convert character vectors
-#'   to factors.
 #' @return A new data frame with the modifications made.
-.df_splice <- function(df, splice_point, num_remove=0, new_cols=NULL,
-                       stringsAsFactors=FALSE) {
+.df_splice <- function(df, splice_point, num_remove=0, new_cols=NULL) {
     old_colnames <- colnames(df)
     
     # remove columns
@@ -235,31 +273,74 @@ simple_slopes.lm <- function(model, levels=NULL) {
         
         colnames(new_df) <- old_colnames[
             -c(splice_point:(splice_point+num_remove-1))]
-        
-        removed <- num_remove
     } else {
         new_df <- df
-        removed <- 0
     }
     
     # add new columns
     if (!is.null(new_cols)) {
         new_cols <- as.data.frame(new_cols)
-        new_splice <- splice_point - removed  # need to adjust for the number of
-                                              # columns we just removed
-        new_colnames <- colnames(new_df)
-        new_df2 <- data.frame(
-            new_df[, 1:new_splice],
-            new_cols,
-            new_df[, -c(1:new_splice)],
-            stringsAsFactors=stringsAsFactors)
-        colnames(new_df2) <- c(new_colnames[1:new_splice],
-                               colnames(new_cols),
-                               new_colnames[-c(1:new_splice)])
+        
+        if (splice_point == 1) {
+            new_df2 <- cbind(new_cols, new_df)
+        } else {
+            new_df2 <- cbind(
+                new_df[, 1:(new_splice-1)],
+                new_cols,
+                new_df[, -c(1:(new_splice-1))])
+        }
     } else {
         new_df2 <- new_df
     }
     return(new_df2)
 }
+
+
+.df_row_splice <- function(df, splice_point, num_remove=0, new_rows=NULL,
+    reset_rownames=FALSE) {
+    old_rownames <- rownames(df)
+    
+    # remove rows
+    if (splice_point > 0 && splice_point <= nrow(df) &&
+            num_remove > 0 && (splice_point + num_remove - 1) <= nrow(df)) {
+        
+        new_df <- as.data.frame(
+            df[-c(splice_point:(splice_point+num_remove-1)), ])
+    } else {
+        new_df <- df
+    }
+    
+    # add new rows
+    if (!is.null(new_rows)) {
+        new_rows <- as.data.frame(new_rows)
+        new_rownames <- rownames(new_df)
+        
+        if (splice_point == 1) {
+            new_df2 <- rbind(new_rows, new_df)
+        } else {
+            new_df2 <- rbind(
+                new_df[1:(splice_point-1), ],
+                new_rows,
+                new_df[-c(1:(splice_point-1)), ])
+        }
+        
+        if (reset_rownames) {
+            rownames(new_df2) <- 1:nrow(new_df2)
+        } else {
+            # check for rowname conflicts
+            if (any(rownames(new_rows) %in% rownames(new_df))) {
+                warning('Rownames in new rows conflict with original rownames. Rownames will be reset.')
+                rownames(new_df2) <- 1:nrow(new_df2)
+            }
+        }
+    } else {
+        new_df2 <- new_df
+        if (reset_rownames) {
+            rownames(new_df2) <- 1:nrow(new_df2)
+        }
+    }
+    return(new_df2)
+}
+
 
 
