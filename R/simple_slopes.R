@@ -296,6 +296,18 @@ simple_slopes.lm <- function(model, levels=NULL) {
 }
 
 
+#' Remove and insert rows in data frame
+#' 
+#' Helper function allows rows to be removed and added at a particular splice
+#' point. This function works similar to the Javascript function splice().
+#' 
+#' @param df The data frame to modify
+#' @param splice_point The column at which to make changes. Removed rows will
+#'   start with this one, and new rows will be added starting at this row index.
+#' @param num_remove The number of rows to remove.
+#' @param new_rows A data frame of new rows to be added.
+#' @param reset_rownames Whether or not to renumber rownames when finished.
+#' @return A new data frame with the modifications made.
 .df_row_splice <- function(df, splice_point, num_remove=0, new_rows=NULL,
     reset_rownames=FALSE) {
     old_rownames <- rownames(df)
