@@ -131,3 +131,102 @@ test_that('lm with continuous x 3-level categorical int. works', {
 })
 
 
+test_that('lm with 3 continuous int. works', {
+    get_model <- function(points, test) {
+        if (is.na(points[1])) {
+            model <- lm(y ~ x1 * I(x2 - points[2]) * I(x3 - points[3]))
+        } else if (is.na(points[2])) {
+            model <- lm(y ~ I(x1 - points[1]) * x2 * I(x3 - points[3]))
+        } else {
+            model <- lm(y ~ I(x1 - points[1]) * I(x2 - points[2]) * x3)
+        }
+        return(get_coef(summary(model), test))
+    }
+    
+    set.seed(123)
+    x1 <- rnorm(100)
+    
+    set.seed(234)
+    x2 <- rnorm(100)
+    
+    set.seed(345)
+    x3 <- rnorm(100)
+    
+    set.seed(456)
+    y <- x1 * x2 * x3 + rnorm(100)
+    
+    model <- lm(y ~ x1 * x2 * x3)
+    slopes <- simple_slopes(model)
+    
+    pts <- list(
+        x1=c(mean(x1) - sd(x1), mean(x1), mean(x1) + sd(x1)),
+        x2=c(mean(x2) - sd(x2), mean(x2), mean(x2) + sd(x2)),
+        x3=c(mean(x3) - sd(x3), mean(x3), mean(x3) + sd(x3))
+    )
+    
+    expect_equal(round(slopes[1, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][1], pts[['x2']][1], NA), 'x3'))
+    expect_equal(round(slopes[2, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][2], pts[['x2']][1], NA), 'x3'))
+    expect_equal(round(slopes[3, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][3], pts[['x2']][1], NA), 'x3'))
+    
+    expect_equal(round(slopes[4, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][1], pts[['x2']][2], NA), 'x3'))
+    expect_equal(round(slopes[5, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][2], pts[['x2']][2], NA), 'x3'))
+    expect_equal(round(slopes[6, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][3], pts[['x2']][2], NA), 'x3'))
+    
+    expect_equal(round(slopes[7, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][1], pts[['x2']][3], NA), 'x3'))
+    expect_equal(round(slopes[8, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][2], pts[['x2']][3], NA), 'x3'))
+    expect_equal(round(slopes[9, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][3], pts[['x2']][3], NA), 'x3'))
+    
+    expect_equal(round(slopes[10, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][1], NA, pts[['x3']][1]), 'x2'))
+    expect_equal(round(slopes[11, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][2], NA, pts[['x3']][1]), 'x2'))
+    expect_equal(round(slopes[12, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][3], NA, pts[['x3']][1]), 'x2'))
+    
+    expect_equal(round(slopes[13, 'Test Estimate'], 3),
+        get_model(c(NA, pts[['x2']][1], pts[['x3']][1]), 'x1'))
+    expect_equal(round(slopes[14, 'Test Estimate'], 3),
+        get_model(c(NA, pts[['x2']][2], pts[['x3']][1]), 'x1'))
+    expect_equal(round(slopes[15, 'Test Estimate'], 3),
+        get_model(c(NA, pts[['x2']][3], pts[['x3']][1]), 'x1'))
+    
+    expect_equal(round(slopes[16, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][1], NA, pts[['x3']][2]), 'x2'))
+    expect_equal(round(slopes[17, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][2], NA, pts[['x3']][2]), 'x2'))
+    expect_equal(round(slopes[18, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][3], NA, pts[['x3']][2]), 'x2'))
+    
+    expect_equal(round(slopes[19, 'Test Estimate'], 3),
+        get_model(c(NA, pts[['x2']][1], pts[['x3']][2]), 'x1'))
+    expect_equal(round(slopes[20, 'Test Estimate'], 3),
+        get_model(c(NA, pts[['x2']][2], pts[['x3']][2]), 'x1'))
+    expect_equal(round(slopes[21, 'Test Estimate'], 3),
+        get_model(c(NA, pts[['x2']][3], pts[['x3']][2]), 'x1'))
+    
+    expect_equal(round(slopes[22, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][1], NA, pts[['x3']][3]), 'x2'))
+    expect_equal(round(slopes[23, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][2], NA, pts[['x3']][3]), 'x2'))
+    expect_equal(round(slopes[24, 'Test Estimate'], 3),
+        get_model(c(pts[['x1']][3], NA, pts[['x3']][3]), 'x2'))
+    
+    expect_equal(round(slopes[25, 'Test Estimate'], 3),
+        get_model(c(NA, pts[['x2']][1], pts[['x3']][3]), 'x1'))
+    expect_equal(round(slopes[26, 'Test Estimate'], 3),
+        get_model(c(NA, pts[['x2']][2], pts[['x3']][3]), 'x1'))
+    expect_equal(round(slopes[27, 'Test Estimate'], 3),
+        get_model(c(NA, pts[['x2']][3], pts[['x3']][3]), 'x1'))
+})
+
+
+
