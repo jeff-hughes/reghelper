@@ -177,7 +177,7 @@ print.block_lm_summary <- function(
                 na.print='NA', ...))
         
         # cut off significance codes for all but last model
-        if (m == num_models) {
+        if (m == num_models || !grepl('Signif. codes', coefs[length(coefs)])) {
             writeLines(coefs)
         } else {
             writeLines(coefs[1:(length(coefs)-2)])
