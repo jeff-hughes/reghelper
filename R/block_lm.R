@@ -200,5 +200,131 @@ print.block_lm_summary <- function(
 }
 
 
+#' Extract model coefficients.
+#' 
+#' \code{coef} method for class "\code{block_lm}".
+#' 
+#' @param model An object of class "\code{block_lm}", usually, a result of a
+#'   call to \code{\link{block_lm}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   coefficients.
+#' @param ... Further arguments passed to or from other methods.
+#' @seealso \code{\link{block_lm}}, \code{coef.block_lm_summary},
+#'   \code{\link{fitted.block_lm}}, \code{residuals.block_lm}
+#' @examples TODO: Need to complete.
+#' @export
+coef.block_lm <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(lapply(model$models[num], coef, ...))
+        } else {
+            return(coef(model$models[[num]], ...))
+        }
+    } else {
+        return(lapply(model$models, coef, ...))
+    }
+}
+
+
+#' Extract model coefficients.
+#' 
+#' \code{coef} method for class "\code{block_lm_summary}".
+#' 
+#' @param model An object of class "\code{block_lm_summary}", usually, a result
+#'   of a call to \code{\link{block_lm_summary}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   coefficients.
+#' @param ... Further arguments passed to or from other methods.
+#' @seealso \code{\link{summary.block_lm}}, \code{coef.block_lm},
+#'   \code{residuals.block_lm_summary}
+#' @examples TODO: Need to complete.
+#' @export
+coef.block_lm_summary <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(model$coefficients[num])
+        } else {
+            return(model$coefficients[[num]])
+        }
+    } else {
+        return(model$coefficients)
+    }
+}
+
+
+#' Extract model residuals.
+#' 
+#' \code{residuals} method for class "\code{block_lm}".
+#' 
+#' @param model An object of class "\code{block_lm}", usually, a result of a
+#'   call to \code{\link{block_lm}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   residuals.
+#' @param ... Further arguments passed to or from other methods.
+#' @seealso \code{\link{block_lm}}, \code{residuals.block_lm_summary},
+#'   \code{\link{fitted.block_lm}}, \code{coef.block_lm}
+#' @examples TODO: Need to complete.
+#' @export
+residuals.block_lm <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(lapply(model$models[num], residuals, ...))
+        } else {
+            return(residuals(model$models[[num]], ...))
+        }
+    } else {
+        return(lapply(model$models, residuals, ...))
+    }
+}
+
+
+#' Extract model residuals.
+#' 
+#' \code{residuals} method for class "\code{block_lm_summary}".
+#' 
+#' @param model An object of class "\code{block_lm_summary}", usually, a result
+#'   of a call to \code{\link{block_lm_summary}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   residuals.
+#' @param ... Further arguments passed to or from other methods.
+#' @seealso \code{\link{summary.block_lm}}, \code{residuals.block_lm},
+#'   \code{coef.block_lm_summary}
+#' @examples TODO: Need to complete.
+#' @export
+residuals.block_lm_summary <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        return(model$residuals[num, ])
+    } else {
+        return(model$residuals)
+    }
+}
+
+
+#' Extract model fitted values.
+#' 
+#' \code{fitted} method for class "\code{block_lm}".
+#' 
+#' @param model An object of class "\code{block_lm}", usually, a result of a
+#'   call to \code{\link{block_lm}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   fitted values.
+#' @param ... Further arguments passed to or from other methods.
+#' @seealso \code{\link{block_lm}}, \code{coef.block_lm},
+#'   \code{residuals.block_lm}
+#' @examples TODO: Need to complete.
+#' @export
+fitted.block_lm <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(lapply(model$models[num], fitted, ...))
+        } else {
+            return(fitted(model$models[[num]], ...))
+        }
+    } else {
+        return(lapply(model$models, fitted, ...))
+    }
+}
+
+
 
 
