@@ -24,9 +24,6 @@
 #' @examples TODO: Need to complete.
 #' @export
 block_lm <- function(dv, ..., data=NULL) {
-    formulas <- list()
-    models <- list()
-    
     if (length(list(...)) > 0) {
         # grab blocks of variable names and turn into strings
         dots <- substitute(list(...))[-1]
@@ -51,6 +48,7 @@ block_lm <- function(dv, ..., data=NULL) {
     } else {
         vars <- 1  # just the intercept
     }
+    block_q <- list()
     for (i in 1:length(vars)) {
         predictors <- ''
         for (j in 1:i) {  # include all previous blocks
@@ -64,8 +62,47 @@ block_lm <- function(dv, ..., data=NULL) {
                 )
             }
         }
-        formulas[[i]] <- as.formula(paste(deparse(substitute(dv)), '~',
-            predictors))
+        block_q[[i]] <- predictors
+    }
+    models <- block_lm_q(deparse(substitute(dv)), block_q, data)
+    return(models)
+}
+
+
+#' Incremental block modelling.
+#' 
+#' \code{block_lm_q} allows you to incrementally add terms to a linear
+#' regression model.
+#' 
+#' Given a list of names of variables at each step, this function will run a
+#' series of models, adding the terms for each block incrementally. Note that in
+#' most cases it is easier to use \code{\link{block_lm}} and pass variable names
+#' in directly instead of strings of variable names. \code{block_lm_q} uses
+#' standard evaluation in cases where such evaluation is easier.
+#' 
+#' @param dv String of the variable name to be used as the dependent variable.
+#' @param blocks List of variable names (or interaction terms) to add for each
+#'   block. Each list element should be a vector or list of strings with terms
+#'   for that block. Variables from previous blocks will be added to each
+#'   subsequent block.
+#' @param data An optional data frame containing the variables in the model. If
+#'   not found in \code{data}, the variables are taken from the environment from
+#'   which the function is called.
+#' @return A named list with the following elements:
+#' \tabular{ll}{
+#'   \code{formulas} \tab A list of the regression formulas used for each block.
+#'   \cr
+#'   \code{models} \tab A list of all regression models.\cr
+#' }
+#' @seealso \code{\link{block_lm}}
+#' @examples TODO: Need to complete.
+#' @export
+block_lm_q <- function(dv, blocks=NULL, data=NULL) {
+    formulas <- list()
+    models <- list()
+    
+    for (i in 1:length(blocks)) {
+        formulas[[i]] <- as.formula(paste(dv, '~', blocks[[i]]))
         models[[i]] <- lm(formula=formulas[[i]], data)
     }
     all_info <- list(
