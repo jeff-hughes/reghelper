@@ -6,9 +6,11 @@
 #' Given a list of names of variables at each step, this function will run a
 #' series of models, adding the terms for each block incrementally.
 #' 
-#' @param dv A string of the variable name to be used as the dependent variable.
-#' @param blocks A list of character vectors, one for each block, with the names
-#'   of variables (or interaction terms) to add for each block. Variables from
+#' @param dv The variable name to be used as the dependent variable.
+#' @param ... Pass through variable names (or interaction terms) to add for each
+#'   block. To add one term to a block, just pass it through directly; to
+#'   add multiple terms, pass it through in a vector or list. Blocks will be
+#'   added in the order they are passed to the function, and variables from
 #'   previous blocks will be added to each subsequent block.
 #' @param data An optional data frame containing the variables in the model. If
 #'   not found in \code{data}, the variables are taken from the environment from
