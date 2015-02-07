@@ -7,6 +7,29 @@ get_coef <- function(model, row, digits=3) {
 }
 
 
+test_that('lm with no predictors works', {
+    set.seed(345)
+    y <- rnorm(100)
+    
+    data <- data.frame(y)  # testthat doesn't seem to play nicely with
+                           # finding the variables in the parent
+                           # environment (with no data argument)
+    
+    model <- summary(lm(y ~ 1, data))
+    b_model <- block_lm(y, data=data)
+    
+    expect_equal(length(b_model$formulas), 1)
+    expect_equal(length(b_model$models), 1)
+    
+    b_summ <- summary(b_model)
+
+    expect_equal(nrow(b_summ$residuals), 1)
+    
+    # check coefficients
+    expect_equal(round(coef(b_summ, 1)[1, 1], 3), get_coef(model, 1))
+})
+
+
 test_that('2 block lm, no interaction, works', {
     set.seed(123)
     x1 <- rnorm(100)

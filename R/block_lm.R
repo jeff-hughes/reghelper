@@ -169,26 +169,32 @@ summary.block_lm <- function(model, ...) {
         summ <- summary(model$models[[m]])
         coefs[[m]] <- coef(summ)
         
-        f_data <- summ$fstatistic
-        r_sq[m] <- summ$r.squared
-        
-        if (m == 1) {
-            delta_r_sq <- NA
+        if (nrow(coefs[[m]]) > 1) {
+            f_data <- summ$fstatistic
+            r_sq[m] <- summ$r.squared
+            
+            if (m == 1) {
+                delta_r_sq <- NA
+            } else {
+                delta_r_sq <- summ$r.squared - r_sq[m-1]
+            }
+            
+            overall[m, ] <- c(
+                summ$r.squared,
+                summ$adj.r.squared,
+                f_data[1],
+                f_data[2],
+                f_data[3],
+                pf(f_data[1], f_data[2], f_data[3], lower.tail=FALSE),
+                delta_r_sq,
+                delta_anova[m, 'F'],
+                delta_anova[m, 'Pr(>F)']
+            )
         } else {
-            delta_r_sq <- summ$r.squared - r_sq[m-1]
+            # only one coefficient signals an intercept-only model, which means
+            # F and R-squared aren't calculated
+            overall[m, ] <- NA
         }
-        
-        overall[m, ] <- c(
-            summ$r.squared,
-            summ$adj.r.squared,
-            f_data[1],
-            f_data[2],
-            f_data[3],
-            pf(f_data[1], f_data[2], f_data[3], lower.tail=FALSE),
-            delta_r_sq,
-            delta_anova[m, 'F'],
-            delta_anova[m, 'Pr(>F)']
-        )
     }
     
     # reorganize residual information
@@ -250,16 +256,20 @@ print.block_lm_summary <- function(
         writeLines('')
     }
     
-    writeLines('Overall:')
-    
-    # add a vertical line between R-squared and delta R-squared
-    overall <- cbind(
-        model$overall[, 1:6],
-        rep('|', nrow(model$overall)),
-        model$overall[, 7:9])
-    colnames(overall)[7] <- '|'
-    
-    print(overall, digits=digits)
+    if (num_models > 1 || !is.na(model$overall[1, 'R Squared'])) {
+        # if statement covers intercept-only case
+        
+        writeLines('Overall:')
+        
+        # add a vertical line between R-squared and delta R-squared
+        overall <- cbind(
+            model$overall[, 1:6],
+            rep('|', nrow(model$overall)),
+            model$overall[, 7:9])
+        colnames(overall)[7] <- '|'
+        
+        print(overall, digits=digits)
+    }
     
     invisible(model)
 }
