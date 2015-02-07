@@ -34,12 +34,16 @@ block_lm <- function(dv, ..., data=NULL) {
         
         # because we can have vectors or lists of variables designating a block,
         # we need to pull out the individual variable names and store in a list
-        m <- regexec('^(?:c|list)\\((?:(\\w+),\\s*)*(\\w+)\\)$', blocks)
-        matches <- regmatches(blocks, m)
+        match1 <- regmatches(blocks, regexec('^(?:c|list)\\((.*)\\)$', blocks))
+            # matches a vector or list, pulls out contents inside
         vars <- list()
-        for (i in 1:length(matches)) {
-            if (length(matches[[i]]) > 0) {
-                vars[[i]] <- matches[[i]][-1]
+        for (i in 1:length(match1)) {
+            if (length(match1[[i]]) > 0) {
+                match2 <- regmatches(
+                    match1[[i]][-1],
+                    gregexpr('([^ ,](?:[^,])*[^ ,])', match1[[i]][-1]))
+                    # matches comma-separated values, removes whitespace
+                vars[[i]] <- match2[[1]]
             } else {
                 vars[[i]] <- blocks[[i]]
             }
