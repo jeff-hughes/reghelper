@@ -21,23 +21,45 @@
 #' }
 #' @examples TODO: Need to complete.
 #' @export
-block_lm <- function(dv, blocks, data=NULL) {
+block_lm <- function(dv, ..., data=NULL) {
     formulas <- list()
     models <- list()
-    for (i in 1:length(blocks)) {
+    
+    if (length(list(...)) > 0) {
+        # grab blocks of variable names and turn into strings
+        dots <- substitute(list(...))[-1]
+        blocks <- sapply(dots, deparse)
+        
+        # because we can have vectors or lists of variables designating a block,
+        # we need to pull out the individual variable names and store in a list
+        m <- regexec('^(?:c|list)\\((?:(\\w+),\\s*)*(\\w+)\\)$', blocks)
+        matches <- regmatches(blocks, m)
+        vars <- list()
+        for (i in 1:length(matches)) {
+            if (length(matches[[i]]) > 0) {
+                vars[[i]] <- matches[[i]][-1]
+            } else {
+                vars[[i]] <- blocks[[i]]
+            }
+        }
+    } else {
+        vars <- 1  # just the intercept
+    }
+    for (i in 1:length(vars)) {
         predictors <- ''
         for (j in 1:i) {  # include all previous blocks
             if (j == 1) {
-                predictors <- paste(blocks[[j]], collapse=' + ')
+                predictors <- paste(vars[[j]], collapse=' + ')
             } else {
                 predictors <- paste0(
                     predictors,
                     ' + ',
-                    paste(blocks[[j]], collapse=' + ')
+                    paste(vars[[j]], collapse=' + ')
                 )
             }
         }
-        formulas[[i]] <- paste0(dv, ' ~ ', predictors)
+        formulas[[i]] <- as.formula(paste(deparse(substitute(dv)), '~',
+            predictors))
         models[[i]] <- lm(formula=formulas[[i]], data)
     }
     all_info <- list(
@@ -170,7 +192,7 @@ print.block_lm_summary <- function(
     
     num_models <- length(model$coefficients)
     for (m in 1:num_models) {
-        writeLines(paste0('lm(formula = ', model$formulas[[m]], ')'))
+        writeLines(paste0('lm(formula = ', format(model$formulas[[m]]), ')'))
         coefs <- capture.output(printCoefmat(model$coefficients[[m]],
                 digits=digits,
                 signif.stars=signif.stars,

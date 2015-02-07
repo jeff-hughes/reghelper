@@ -17,10 +17,14 @@ test_that('2 block lm, no interaction, works', {
     set.seed(345)
     y <- x1 + x2 + rnorm(100)
     
-    model1 <- summary(lm(y ~ x1))
-    model2 <- summary(lm(y ~ x1 + x2))
+    data <- data.frame(x1, x2, y)  # testthat doesn't seem to play nicely with
+                                   # finding the variables in the parent
+                                   # environment (with no data argument)
     
-    b_model <- block_lm('y', blocks=list('x1', 'x2'))
+    model1 <- summary(lm(y ~ x1, data))
+    model2 <- summary(lm(y ~ x1 + x2, data))
+    
+    b_model <- block_lm(y, x1, x2, data=data)
     
     expect_equal(length(b_model$formulas), 2)
     expect_equal(length(b_model$models), 2)
@@ -52,10 +56,14 @@ test_that('2 block lm, with interaction, works', {
     set.seed(345)
     y <- x1 * x2 + rnorm(100)
     
-    model1 <- summary(lm(y ~ x1 + x2))
-    model2 <- summary(lm(y ~ x1 * x2))
+    data <- data.frame(x1, x2, y)  # testthat doesn't seem to play nicely with
+                                   # finding the variables in the parent
+                                   # environment (with no data argument)
     
-    b_model <- block_lm('y', blocks=list(c('x1', 'x2'), 'x1 * x2'))
+    model1 <- summary(lm(y ~ x1 + x2, data))
+    model2 <- summary(lm(y ~ x1 * x2, data))
+    
+    b_model <- block_lm(y, c(x1, x2), x1 * x2, data=data)
     
     expect_equal(length(b_model$formulas), 2)
     expect_equal(length(b_model$models), 2)
