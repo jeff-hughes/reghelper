@@ -120,7 +120,7 @@ graph_model.lm <- function(model, y, x, lines=NULL, split=NULL, errorbars='CI',
 #'   used to transform the y-axis (i.e., e to the power of y). Useful for
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
-#' @return A ggplot2 graph of the plotted variables in the model.
+#' @return A ggplot object of the plotted variables in the model.
 #' @examples TODO: Need to complete.
 #' @export
 graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
@@ -147,8 +147,7 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
         }
     }
     
-    # set up the grid of points to graph the model at, to use to predict
-    # cell means
+    # set up grid of points to graph the model at, to predict cell means
     if (is.null(lines) && is.null(split)) {
         grid <- with(data, expand.grid(
             x=factors[[1]],
@@ -160,38 +159,33 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
             x=factors[[1]],
             lines=factors[[2]]
         ))
-        names(grid)[names(grid) == 'x'] <- x
-        names(grid)[names(grid) == 'lines'] <- lines
+        names(grid) <- c(x, lines)
     } else {
         grid <- with(data, expand.grid(
             x=factors[[1]],
             lines=factors[[2]],
             split=factors[[3]]
         ))
-        names(grid)[names(grid) == 'x'] <- x
-        names(grid)[names(grid) == 'lines'] <- lines
-        names(grid)[names(grid) == 'split'] <- split
+        names(grid) <- c(x, lines, split)
     }
     
     # add in other variables that are in the model, but are not selected to be
     # graphed; these variables get plotted at their means
-    variables <- all.vars(formula(model))
-    factorName <- NULL
+    variables <- all.vars(formula(model))[-1]
+    factor_name <- NULL
     for (i in 1:length(variables)) {
-        if (i > 1) {  # skip over 1, which is the DV
-            if (!(variables[[i]] %in% colnames(grid))) {
-                if (is.factor(data[[variables[[i]]]])) {
-                    # if factor, must include all levels in model for
-                    # predict() to work properly
-                    tempList <- lapply(as.list(grid), unique)
+        if (!(variables[[i]] %in% colnames(grid))) {
+            if (is.factor(data[[variables[[i]]]])) {
+                # if factor, must include all levels in model for
+                # predict() to work properly
+                temp_list <- lapply(as.list(grid), unique)
                     # get unique values and put into list format
-                    tempList[[variables[[i]]]] <- levels(data[[variables[[i]]]])
-                    grid <- expand.grid(tempList)
-                    factorName <- variables[[i]]
-                } else {
-                    grid[[variables[[i]]]] <- mean(data[[variables[[i]]]],
-                        na.rm=TRUE)  # if continuous, include in model at mean
-                }
+                temp_list[[variables[[i]]]] <- levels(data[[variables[[i]]]])
+                grid <- expand.grid(temp_list)
+                factor_name <- variables[[i]]
+            } else {
+                grid[[variables[[i]]]] <- mean(data[[variables[[i]]]],
+                    na.rm=TRUE)  # if continuous, include in model at mean
             }
         }
     }
@@ -207,25 +201,25 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
     # add error bars, if desired
     errors <- FALSE
     if (errorbars == 'CI' || errorbars == 'ci') {
-        grid$error.upper <- predicted$fit + 1.96 * predicted$se.fit
-        grid$error.lower <- predicted$fit - 1.96 * predicted$se.fit
+        grid$error_upper <- predicted$fit + 1.96 * predicted$se.fit
+        grid$error_lower <- predicted$fit - 1.96 * predicted$se.fit
         errors <- TRUE
     } else if (errorbars == 'SE' || errorbars == 'se') {
-        grid$error.upper <- predicted$fit + predicted$se.fit
-        grid$error.lower <- predicted$fit - predicted$se.fit
+        grid$error_upper <- predicted$fit + predicted$se.fit
+        grid$error_lower <- predicted$fit - predicted$se.fit
         errors <- TRUE
     }
     if (exp == TRUE && errors == TRUE) {
-        grid$error.upper <- exp(grid$error.upper)
-        grid$error.lower <- exp(grid$error.lower)
+        grid$error_upper <- exp(grid$error_upper)
+        grid$error_lower <- exp(grid$error_lower)
     }
     
     # workaround to include factor covariates -- average across levels;
     # only works for one factor covariate
-    if (!is.null(factorName)) {
+    if (!is.null(factor_name)) {
         grid2 <- subset(grid, FALSE)
-        lev <- levels(data[[factorName]])
-        location <- which(names(grid) == factorName)
+        lev <- levels(data[[factor_name]])
+        location <- which(names(grid) == factor_name)
         for (i in 1:(nrow(grid)/length(lev))) {
             grid2[i, -location] <- apply(grid[seq(i, nrow(grid),
                 by=(nrow(grid)/length(lev))), -location], 2, mean, na.rm=TRUE)
@@ -247,8 +241,8 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
             levels(grid[[split]]) <- c(paste0(titles[5], ': -1 SD'),
                 paste0(titles[5], ': +1 SD'))
         } else {
-            numLevels <- length(levels(grid[[split]]))
-            levels(grid[[split]]) <- paste0(rep(titles[5], numLevels), ': ',
+            num_levels <- length(levels(grid[[split]]))
+            levels(grid[[split]]) <- paste0(rep(titles[5], num_levels), ': ',
                 levels(grid[[split]]))
         }
     }
@@ -257,6 +251,51 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
         lines <- 'g'  # dummy group so ggplot still draws lines
         draw.legend <- FALSE
     }
+    
+    # build and return graph
+    graph <- .build_plot(grid, y, x, lines, split, errorbars, ymin, ymax,
+        titles, bargraph, draw.legend, dodge, exp)
+    return(graph)
+}
+
+
+#' Build ggplot object.
+#' 
+#' Helper function takes care of building a ggplot object, given points and
+#' variables to plot.
+#' 
+#' @param grid Data frame with variables and points to plot.
+#' @param y The variable to be plotted on the y-axis. This variable is required
+#'   for the graph.
+#' @param x The variable to be plotted on the x-axis. This variable is required
+#'   for the graph.
+#' @param lines The variable to be plotted using separate lines (optional).
+#' @param split The variable to be split among separate graphs (optional).
+#' @param errorbars A string indicating what kind of error bars to show.
+#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
+#'   error of the predicted means), or NULL.
+#' @param ymin Number indicating the minimum value for the y-axis scale. Default
+#'   NULL value will adjust position to the lowest y value.
+#' @param ymax Number indicating the maximum value for the y-axis scale. Default
+#'   NULL value will adjust position to the highest y value.
+#' @param titles: A character vector with strings for the various plot titles.
+#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
+#'   If any position is NULL, the names of the variables will be used.
+#' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
+#'   will draw a line graph of the results.
+#' @param draw.legend Logical. Whether or not to draw legend on the graph.
+#' @param dodge A numeric value indicating the amount each point on the graph
+#'   should be shifted left or right, which can help for readability when points
+#'   are close together. Default value is 0, with .1 or .2 probably sufficient
+#'   in most cases.
+#' @param exp Logical. If TRUE, the exponential function \code{exp()} will be
+#'   used to transform the y-axis (i.e., e to the power of y). Useful for
+#'   logistic regressions or for converting log-transformed y-values to their
+#'   original units.
+#' @return A ggplot object of the plotted variables in the model.
+.build_plot <- function(grid, y, x, lines=NULL, split=NULL, errorbars='CI',
+    ymin=NULL, ymax=NULL, titles=NULL, bargraph=FALSE, draw.legend=TRUE,
+    dodge=0, exp=FALSE) {
     
     # draw line graph
     if (bargraph == FALSE) {
@@ -267,10 +306,10 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
         graph <- graph + ggplot2::geom_point(position=pd) +
             ggplot2::geom_line(position=pd, ggplot2::aes_string(group=lines))
         
-        # draw bar graph
+    # draw bar graph
     } else {
-        pd <- ggplot2::position_dodge(dodge + .9)
-        # default dodge value to separate bars
+        pd <- ggplot2::position_dodge(dodge + .9) # default dodge value to
+                                                  # separate bars
         graph <- ggplot2::ggplot(
             data=grid,
             ggplot2::aes_string(x=x, y=y, fill=lines, ymin=ymin, ymax=ymax))
@@ -288,7 +327,7 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
     # add in error bars
     if (errors) {
         graph <- graph + ggplot2::geom_errorbar(
-            ggplot2::aes(ymax=error.upper, ymin=error.lower),
+            ggplot2::aes(ymax=error_upper, ymin=error_lower),
             width=0.1,
             position=pd)
     }
