@@ -56,7 +56,7 @@ simple_slopes.lm <- function(model, levels=NULL) {
     
     int_term <- which.max(attr(terms(model), 'order'))
         # get location of highest interaction term
-    int_vars <- which(attr(terms(model), 'factors')[, int_term] == 1)
+    int_vars <- names(which(attr(terms(model), 'factors')[, int_term] == 1))
         # get location of variables in the interaction
     
     # get points at which to test each variable
@@ -121,7 +121,7 @@ simple_slopes.lm <- function(model, levels=NULL) {
             }
         } else {
             models[est_count, (ncol(models)-4):ncol(models)] <- c(
-                summary(new_model)$coefficients[int_vars[test_var_name], ],
+                summary(new_model)$coefficients[test_var_name, ],
                 new_model$df.residual
             )
             est_count <- est_count + 1
@@ -141,27 +141,40 @@ simple_slopes.lm <- function(model, levels=NULL) {
 #' @param int_vars The variables involved in the interaction being tested.
 #' @param user_levels Any user-specified levels to be used instead of the
 #'   defaults.
+#' @param sstest Logical. Whether or not to insert 'sstest' as a factor level.
 #' @return A list with all the factor points for each variable in the
 #'   interaction.
-.set_factors <- function(model, int_vars, user_levels=NULL) {
+.set_factors <- function(model, int_vars, user_levels=NULL, sstest=TRUE) {
     factors <- list()
-    for (term in names(int_vars)) {
+    for (term in int_vars) {
         term_data <- model$model[[term]]
         if (!is.null(user_levels) && term %in% names(user_levels)) {
             # if user specified levels, use those
             factors[[term]] <- user_levels[[term]]
         } else {
             if (attr(terms(model), 'dataClasses')[term] == 'factor') {
-                # factors are plotted at all levels (plus 0)
-                factors[[term]] <- c('sstest', levels(term_data))
+                # factors are plotted at all levels
+                if (sstest == TRUE) {
+                    factors[[term]] <- c('sstest', levels(term_data))
+                } else {
+                    factors[[term]] <- levels(term_data)
+                }
             } else {
                 # continuous vars are plotted at -1SD, mean, and +1 SD
-                factors[[term]] <- c(
-                    'sstest',
-                    .offset_point(term_data, -1),
-                    .offset_point(term_data, 0),
-                    .offset_point(term_data, 1)
-                )
+                if (sstest == TRUE) {
+                    factors[[term]] <- c(
+                        'sstest',
+                        .offset_point(term_data, -1),
+                        .offset_point(term_data, 0),
+                        .offset_point(term_data, 1)
+                    )
+                } else {
+                    factors[[term]] <- c(
+                        .offset_point(term_data, -1),
+                        .offset_point(term_data, 0),
+                        .offset_point(term_data, 1)
+                    )
+                }
             }
         }
     }
