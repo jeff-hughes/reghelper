@@ -37,18 +37,18 @@ simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 #' 
 #' @param model A fitted linear model of type 'lm' with at least one interaction
 #'   term.
-#' @param levels A list with arguments names corresponding to some or all of the
+#' @param levels A list with element names corresponding to some or all of the
 #'   variables in the model. Each list element should be a vector with the names
 #'   of factor levels (for categorical variables) or numeric points (for
 #'   continuous variables) at which to test that variable. \strong{Note:} If you
-#'   do not include 0 as one of these levels, the function will not test the
-#'   simple effects for that variable.
+#'   do not include 'sstest' as one of these levels, the function will not test
+#'   the simple effects for that variable.
 #' @return A data frame with a row for each simple effect. The first few columns
-#    identify the level at which each variable in your model was set for that
-#    test. A 0 value in a particular column indicates that this was the variable
-#    being tested. After columns for each variable, the data frame has columns
-#    for the slope of the 0 variable, the standard error, t-value, p-value, and
-#    degrees of freedom for the model.
+#'   identify the level at which each variable in your model was set for that
+#'   test. A 'sstest' value in a particular column indicates that this was the
+#'   variable being tested. After columns for each variable, the data frame has
+#'   columns for the slope of the test variable, the standard error, t-value,
+#'   p-value, and degrees of freedom for the model.
 #' @examples TODO: Need to complete.
 #' @export
 simple_slopes.lm <- function(model, levels=NULL) {
