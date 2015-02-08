@@ -253,7 +253,7 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
     }
     
     # build and return graph
-    graph <- .build_plot(grid, y, x, lines, split, errorbars, ymin, ymax,
+    graph <- .build_plot(grid, y, x, lines, split, errors, ymin, ymax,
         titles, bargraph, draw.legend, dodge, exp)
     return(graph)
 }
@@ -271,9 +271,7 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
 #'   for the graph.
 #' @param lines The variable to be plotted using separate lines (optional).
 #' @param split The variable to be split among separate graphs (optional).
-#' @param errorbars A string indicating what kind of error bars to show.
-#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
-#'   error of the predicted means), or NULL.
+#' @param errors Logical. Whether to plot error bars or not.
 #' @param ymin Number indicating the minimum value for the y-axis scale. Default
 #'   NULL value will adjust position to the lowest y value.
 #' @param ymax Number indicating the maximum value for the y-axis scale. Default
@@ -293,7 +291,7 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
 #' @return A ggplot object of the plotted variables in the model.
-.build_plot <- function(grid, y, x, lines=NULL, split=NULL, errorbars='CI',
+.build_plot <- function(grid, y, x, lines=NULL, split=NULL, errors=TRUE,
     ymin=NULL, ymax=NULL, titles=NULL, bargraph=FALSE, draw.legend=TRUE,
     dodge=0, exp=FALSE) {
     
