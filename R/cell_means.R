@@ -89,14 +89,52 @@ cell_means.lm <- function(model, ..., levels=NULL) {
 #' @export
 cell_means_q.lm <- function(model, vars=NULL, levels=NULL) {
     factors <- .set_factors(model, vars, levels, sstest=FALSE)
-    grid <- with(model$model, expand.grid(factors))
+    final_grid <- with(model$model, expand.grid(factors))
     
+    # deal with covariates
+    all_vars <- as.list(attr(terms(model), 'variables'))[-c(1:2)]
+    duplicate <- character(0)
+    for (i in 1:length(all_vars)) {
+        term <- as.character(all_vars[[i]])
+        if (!(term %in% vars)) {
+            if (is.factor(model$model[[term]])) {
+                # if we have categorical covariates, we must repeat the
+                # predictions for each level, then average across them
+                duplicate[length(duplicate)+1] <- term
+                factors[[term]] <- levels(model$model[[term]])
+            } else {
+                factors[[term]] <- mean(model$model[[term]])
+            }
+        }
+    }
+    
+    grid <- with(model$model, expand.grid(factors))
     predicted <- predict(model, newdata=grid, se=TRUE)
-    grid$value <- predicted$fit
-    grid$se <- predicted$se.fit
-    grid$ci.lower <- predicted$fit - 1.96 * predicted$se.fit
-    grid$ci.upper <- predicted$fit + 1.96 * predicted$se.fit
-    return(grid)
+    
+    if (length(duplicate) > 0) {
+        # deal with categorical covariates here
+        final_grid <- .aggregate_grid(grid, predicted, duplicate)
+        names(final_grid)[names(final_grid) == 'fit'] <- 'value'
+        names(final_grid)[names(final_grid) == 'se.fit'] <- 'se'
+    } else {
+        final_grid$value <- predicted$fit
+        final_grid$se <- predicted$se.fit
+    }
+    
+    final_grid$ci.lower <- final_grid$value - 1.96 * final_grid$se
+    final_grid$ci.upper <- final_grid$value + 1.96 * final_grid$se
+    return(final_grid)
+}
+
+
+.aggregate_grid <- function(grid, predicted, agg_vars) {
+    vars <- names(grid)
+    non_agg_vars <- vars[-match(agg_vars, vars)]
+    grid_predicted <- cbind(grid, predicted)
+    vars_list <- paste(non_agg_vars, collapse=' + ')
+    formula <- paste('cbind(fit, se.fit, df) ~', vars_list)
+    new_grid <- aggregate(as.formula(formula), grid_predicted, mean, na.rm=TRUE)
+    return(new_grid)
 }
 
 

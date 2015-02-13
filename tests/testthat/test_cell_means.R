@@ -216,4 +216,95 @@ test_that('collapsing over continuous variable works', {
 })
 
 
+test_that('collapsing over categorical variable works', {
+    set.seed(123)
+    x1 <- rnorm(100)
+    
+    set.seed(234)
+    x2 <- rnorm(100)
+    
+    x3 <- c(rep(0, 50), rep(1, 50))
+    
+    set.seed(456)
+    y <- x1 * x2 * x3 + rnorm(100)
+    
+    x3 <- factor(x3)
+    
+    model <- lm(y ~ x1 * x2 * x3)
+    means <- cell_means(model, x1, x2)
+    
+    pts <- list(
+        x1=c(mean(x1) - sd(x1), mean(x1), mean(x1) + sd(x1)),
+        x2=c(mean(x2) - sd(x2), mean(x2), mean(x2) + sd(x2))
+    )
+    
+    model_m1m10 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][1]) * I(x2 - pts[['x2']][1]) * x3))
+    model_0m10 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][2]) * I(x2 - pts[['x2']][1]) * x3))
+    model_p1m10 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][3]) * I(x2 - pts[['x2']][1]) * x3))
+    
+    model_m100 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][1]) * I(x2 - pts[['x2']][2]) * x3))
+    model_000 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][2]) * I(x2 - pts[['x2']][2]) * x3))
+    model_p100 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][3]) * I(x2 - pts[['x2']][2]) * x3))
+    
+    model_m1p10 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][1]) * I(x2 - pts[['x2']][3]) * x3))
+    model_0p10 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][2]) * I(x2 - pts[['x2']][3]) * x3))
+    model_p1p10 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][3]) * I(x2 - pts[['x2']][3]) * x3))
+    
+    contrasts(x3) <- c(1, 0)
+    model_m1m11 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][1]) * I(x2 - pts[['x2']][1]) * x3))
+    model_0m11 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][2]) * I(x2 - pts[['x2']][1]) * x3))
+    model_p1m11 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][3]) * I(x2 - pts[['x2']][1]) * x3))
+    
+    model_m101 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][1]) * I(x2 - pts[['x2']][2]) * x3))
+    model_001 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][2]) * I(x2 - pts[['x2']][2]) * x3))
+    model_p101 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][3]) * I(x2 - pts[['x2']][2]) * x3))
+    
+    model_m1p11 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][1]) * I(x2 - pts[['x2']][3]) * x3))
+    model_0p11 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][2]) * I(x2 - pts[['x2']][3]) * x3))
+    model_p1p11 <- summary(lm(
+        y ~ I(x1 - pts[['x1']][3]) * I(x2 - pts[['x2']][3]) * x3))
+    
+    averages <- c(
+        mean(c(get_coef(model_m1m10, 1, 6), get_coef(model_m1m11, 1, 6))),
+        mean(c(get_coef(model_0m10, 1, 6), get_coef(model_0m11, 1, 6))),
+        mean(c(get_coef(model_p1m10, 1, 6), get_coef(model_p1m11, 1, 6))),
+        mean(c(get_coef(model_m100, 1, 6), get_coef(model_m101, 1, 6))),
+        mean(c(get_coef(model_000, 1, 6), get_coef(model_001, 1, 6))),
+        mean(c(get_coef(model_p100, 1, 6), get_coef(model_p101, 1, 6))),
+        mean(c(get_coef(model_m1p10, 1, 6), get_coef(model_m1p11, 1, 6))),
+        mean(c(get_coef(model_0p10, 1, 6), get_coef(model_0p11, 1, 6))),
+        mean(c(get_coef(model_p1p10, 1, 6), get_coef(model_p1p11, 1, 6)))
+    )
+    
+    expect_equal(round(means[1, 'value'], 3), round(averages[1], 3))
+    expect_equal(round(means[2, 'value'], 3), round(averages[2], 3))
+    expect_equal(round(means[3, 'value'], 3), round(averages[3], 3))
+    
+    expect_equal(round(means[4, 'value'], 3), round(averages[4], 3))
+    expect_equal(round(means[5, 'value'], 3), round(averages[5], 3))
+    expect_equal(round(means[6, 'value'], 3), round(averages[6], 3))
+    
+    expect_equal(round(means[7, 'value'], 3), round(averages[7], 3))
+    expect_equal(round(means[8, 'value'], 3), round(averages[8], 3))
+    expect_equal(round(means[9, 'value'], 3), round(averages[9], 3))
+})
+
+
 
