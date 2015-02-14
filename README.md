@@ -6,13 +6,20 @@ reghelper
 
 The `reghelper` R package includes a set of functions used to automate commonly used methods in regression analysis. This includes plotting interactions, calculating simple slopes, calculating standardized coefficients, etc.
 
-This package is still in the development stages, and is not ready for general use. Functions and function parameters may still be subject to change.
+Version 0.1.0 has been released, but be aware that this package is still early in the development stages, and is not yet ready for general use. Functions and function parameters may still be subject to change.
 
-However, if you are interested in helping out with the development process, you can install the package in R with the following code:
+To install the most recent stable release, use the following code:
 
 ``` {.R}
 install.packages("devtools")
 devtools::install_github("jeff-hughes/reghelper")
+```
+
+If you are interested in helping out with the development process, you can install the development branch with the following code:
+
+``` {.R}
+install.packages("devtools")
+devtools::install_github("jeff-hughes/reghelper@develop")
 ```
 
 Current progress
@@ -20,13 +27,13 @@ Current progress
 
 So far, most functions that I had originally planned to include have been implemented for `lm` models. These functions include:
 
--   `beta`: Calculates standardized beta coefficients.
--   `block_lm`: Allows variables to be added to a series of regression models sequentially (similar to SPSS).
+-   `beta` Calculates standardized beta coefficients.
+-   `block_lm` Allows variables to be added to a series of regression models sequentially (similar to SPSS).
 -   `ICC` Calculates the intra-class correlation for a multi-level model (lme only at this point).
--   `cell_means`: Calculates the estimated means for a fitted model.
--   `graph_model`: Easily graph interactions at +/- 1 SD (uses ggplot2 package).
--   `simple_slopes`: Easily calculate the simple effects of an interaction.
--   `sig_regions`: Calculate the Johnson-Neyman regions of significance for an interaction.
+-   `cell_means` Calculates the estimated means for a fitted model.
+-   `graph_model` Easily graph interactions at +/- 1 SD (uses ggplot2 package).
+-   `simple_slopes` Easily calculate the simple effects of an interaction.
+-   `sig_regions` Calculate the Johnson-Neyman regions of significance for an interaction.
 
 Things to do
 ------------
