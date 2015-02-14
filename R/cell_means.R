@@ -127,6 +127,18 @@ cell_means_q.lm <- function(model, vars=NULL, levels=NULL) {
 }
 
 
+#' Aggregate grid over specific variables.
+#' 
+#' Helper function takes a grid and predicted values, and aggregates (averages)
+#' the values across a categorical variable(s).
+#' 
+#' @param grid Data frame with all points at which variables were tested.
+#' @param predicted Data frame with predicted values, a result of each test in
+#'   \code{grid}.
+#' @param agg_vars A character vector with the names of variables to be
+#'   aggregated over.
+#' @return A data frame combining the grid and predicted values, aggregated over
+#'   all variables in \code{agg_vars}.
 .aggregate_grid <- function(grid, predicted, agg_vars) {
     vars <- names(grid)
     non_agg_vars <- vars[-match(agg_vars, vars)]
