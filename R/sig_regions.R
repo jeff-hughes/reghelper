@@ -130,6 +130,14 @@ sig_regions.lm <- function(model, alpha=.05, precision=4) {
     factor_var_name <- names(int_vars[which(factor_var)])
     cont_var_name <- names(int_vars[which(!factor_var)])
     
+    factor_contrasts <- contrasts(model$model[, factor_var_name])
+    if (is.null(colnames(factor_contrasts))) {
+        dummy_name <- paste0(factor_var_name, '1')
+    } else {
+        dummy_name <- paste0(factor_var_name,
+            colnames(factor_contrasts)[1])
+    }
+    
     if (is.null(start)) {
         start <- min(model$model[cont_var_name], na.rm=TRUE)
     }
@@ -150,7 +158,7 @@ sig_regions.lm <- function(model, alpha=.05, precision=4) {
         new_form <- gsub(cont_var_name, new_var_name, form)
         
         new_model <- lm(new_form, model$model)
-        pvalues[counter] <- summary(new_model)$coefficients[factor_var_name, 4]
+        pvalues[counter] <- coef(summary(new_model))[dummy_name, 4]
             # pull out p-value for factor variable
         counter <- counter + 1
     }
@@ -169,7 +177,7 @@ sig_regions.lm <- function(model, alpha=.05, precision=4) {
                 (pvalues[j] < alpha && pvalues[j+1] > alpha)) {
                 
                 match <- 1
-                xvalue <- Recall(sequence[j], sequence[j+1],
+                xvalue <- Recall(model, int_vars, sequence[j], sequence[j+1],
                     alpha=alpha, precision=precision)
                     # recurse
             }
