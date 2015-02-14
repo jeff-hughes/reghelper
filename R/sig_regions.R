@@ -19,7 +19,7 @@ sig_regions <- function(model, ...) UseMethod('sig_regions')
 
 #' Regions of significance for an interaction.
 #' 
-#' \code{sig_regions.lm} calculate the Johnson-Neyman (J-N) regions of
+#' \code{sig_regions.lm} calculates the Johnson-Neyman (J-N) regions of
 #' significance for an interaction, the points at which the simple effect of the
 #' categorical predictor changes from non-significant to significant.
 #' 
@@ -29,6 +29,10 @@ sig_regions <- function(model, ...) UseMethod('sig_regions')
 #' and one as the categorical moderator. To see the J-N points for the other
 #' categorical predictor, just flip the order of the two variables in your
 #' model.
+#' 
+#' For more information about regions of significance, see
+#' \href{http://ssrn.com/abstract=2208103}{Spiller, Fitzsimons, Lynch, &
+#' McClelland (2012)}.
 #' 
 #' @param model A fitted linear model of type 'lm' with one two-way interaction
 #'   including at least one categorical predictor.
