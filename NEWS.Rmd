@@ -17,7 +17,9 @@ knitr::opts_chunk$set(
 
 * `simple_slopes` now includes `print` function to include significance stars.
 
-* `ICC` function now extended to include `merMod` models (from "lme4" package).
+* `ICC` function extended to include `merMod` models (from "lme4" package).
+
+* `beta` function extended to include `glm` models.
 
 # reghelper 0.1.0
 
