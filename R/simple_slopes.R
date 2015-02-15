@@ -131,7 +131,23 @@ simple_slopes.lm <- function(model, levels=NULL) {
     columns <- ncol(models)
     models <- models[, c(1:(columns-2), columns, columns-1)]
     
+    class(models) <- c('simple_slopes', 'data.frame')
     return(models)
+}
+
+
+print.simple_slopes <- function(
+    model,
+    digits=max(3L, getOption('digits') - 3L),
+    signif.stars=getOption('show.signif.stars'),
+    ...) {
+
+    suppressWarnings(printCoefmat(
+        model,
+        digits=digits,
+        signif.stars=signif.stars,
+        na.print='sstest'))
+    invisible(model)
 }
 
 
