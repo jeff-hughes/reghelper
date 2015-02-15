@@ -136,6 +136,19 @@ simple_slopes.lm <- function(model, levels=NULL) {
 }
 
 
+#' Print simple slopes.
+#' 
+#' \code{print} method for class "\code{simple_slopes}".
+#' 
+#' @param model An object of class "\code{simple_slopes}", usually, a result
+#'   of a call to \code{\link{simple_slopes}}.
+#' @param digits The number of significant digits to use when printing.
+#' @param signif.stars Logical. If \code{TRUE}, 'significance stars' are printed
+#'   for each coefficient.
+#' @param ... Further arguments passed to or from other methods.
+#' @seealso \code{\link{simple_slopes}}
+#' @examples TODO: Need to complete.
+#' @export
 print.simple_slopes <- function(
     model,
     digits=max(3L, getOption('digits') - 3L),
