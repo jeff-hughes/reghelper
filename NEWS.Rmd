@@ -13,6 +13,12 @@ knitr::opts_chunk$set(
   fig.path = "NEWS-"
 )
 ```
+# reghelper 0.2.0
+
+* `simple_slopes` now includes `print` function to include significance stars.
+
+* `ICC` function now extended to include `merMod` models (from "lme4" package).
+
 # reghelper 0.1.0
 
 NEW FEATURES

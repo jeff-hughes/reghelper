@@ -36,5 +36,27 @@ ICC.lme <- function(model) {
 }
 
 
+#' Intra-class correlation.
+#' 
+#' \code{ICC.merMod} calculates the intra-class correlation (ICC) from a fitted
+#' multi-level model using the 'lme4' package.
+#' 
+#' The ICC is the proportion of variance that is between-person variance. For
+#' more information, see
+#' \href{http://davidakenny.net/papers/k&h/MLM_R.pdf}{Hoyt & Kenny (2013)}.
+#' 
+#' @param model A fitted model of type 'merMod' (linear, generalized, or
+#'   nonlinear).
+#' @return The intra-class correlation of the model.
+#' @examples TODO: Need to complete.
+#' @export
+ICC.merMod <- function(model) {
+    variance <- as.data.frame(VarCorr(model))
+    var_total <- variance[is.na(variance$var2), 'vcov']
+    var_between <- var_total[1:(length(var_total)-1)]
+    return(sum(var_between)/sum(var_total))
+}
+
+
 
 
