@@ -29,8 +29,10 @@ ICC <- function(model, ...) UseMethod('ICC')
 #' @examples TODO: Need to complete.
 #' @export
 ICC.lme <- function(model) {
-    var_ests <- as.numeric(VarCorr(model)[1:2])  # pull variances from model
-    return(var_ests[1]/sum(var_ests))
+    variance <- VarCorr(model)
+    var_between <- as.numeric(variance[1:(nrow(variance)-1)])
+    var_total <- as.numeric(variance[1:nrow(variance)])
+    return(sum(var_between)/sum(var_total))
 }
 
 
