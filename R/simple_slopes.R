@@ -75,7 +75,6 @@ simple_slopes.lm <- function(model, levels=NULL) {
     
     for (i in 1:nrow(template)) {
         new_form <- form
-        #test_var <- names(template)[suppressWarnings(which(template[i, ] == 'sstest'))]
         test_var_name <- names(template)[which(template[i, ] == 'sstest')]
         test_var <- mdata[[test_var_name]]
         
@@ -127,6 +126,11 @@ simple_slopes.lm <- function(model, levels=NULL) {
             est_count <- est_count + 1
         }
     }
+    
+    # flip order so p-values come last
+    columns <- ncol(models)
+    models <- models[, c(1:(columns-2), columns, columns-1)]
+    
     return(models)
 }
 
