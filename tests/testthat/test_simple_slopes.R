@@ -288,4 +288,60 @@ test_that('binomial glm with interaction works', {
 })
 
 
+test_that('lme with interaction works', {
+    set.seed(123)
+    pre_treat <- rnorm(50)
+    
+    set.seed(234)
+    post_treat <- 2 + rnorm(50)
+    
+    set.seed(345)
+    pre_control <- rnorm(50)
+    
+    set.seed(456)
+    post_control <- rnorm(50)
+    
+    dv <- c(pre_treat, post_treat, pre_control, post_control)
+    
+    pre_post <- factor(rep(c(rep(0, 50), rep(1, 50)), 2))
+    condition <- factor(c(rep(0, 100), rep(1, 100)))
+    id <- c(rep(1:50, 2), rep(51:100, 2))
+    
+    data <- data.frame(id, condition, pre_post, dv)
+    
+    model <- lme(dv ~ condition * pre_post, random=~1|id, data)
+    slopes <- simple_slopes(model)
+    
+    model_x1_m1 <- summary(glm(y ~ I((x1 - mean(x1)) + sd(x1)) * x2,
+        family='binomial', data))
+    expect_equal(round(slopes[1, 'Test Estimate'], 3),
+        get_coef(model_x1_m1, 'x2'))
+    
+    model_x1_0 <- summary(glm(y ~ I(x1 - mean(x1)) * x2,
+        family='binomial', data))
+    expect_equal(round(slopes[2, 'Test Estimate'], 3),
+        get_coef(model_x1_0, 'x2'))
+    
+    model_x1_p1 <- summary(glm(y ~ I((x1 - mean(x1)) - sd(x1)) * x2,
+        family='binomial', data))
+    expect_equal(round(slopes[3, 'Test Estimate'], 3),
+        get_coef(model_x1_p1, 'x2'))
+    
+    model_x2_m1 <- summary(glm(y ~ x1 * I((x2 - mean(x2)) + sd(x2)),
+        family='binomial', data))
+    expect_equal(round(slopes[4, 'Test Estimate'], 3),
+        get_coef(model_x2_m1, 'x1'))
+    
+    model_x2_0 <- summary(glm(y ~ x1 * I(x2 - mean(x2)),
+        family='binomial', data))
+    expect_equal(round(slopes[5, 'Test Estimate'], 3),
+        get_coef(model_x2_0, 'x1'))
+    
+    model_x2_p1 <- summary(glm(y ~ x1 * I((x2 - mean(x2)) - sd(x2)),
+        family='binomial', data))
+    expect_equal(round(slopes[6, 'Test Estimate'], 3),
+        get_coef(model_x2_p1, 'x1'))
+})
+
+
 

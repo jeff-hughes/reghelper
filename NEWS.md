@@ -1,6 +1,17 @@
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
 
 
+reghelper 0.2.0
+===============
+
+-   `simple_slopes` now includes `print` function to include significance stars.
+
+-   `ICC` function extended to include `merMod` models (from "lme4" package).
+
+-   `beta` function extended to include `glm` models.
+
+-   `simple_slopes` function extended to include `aov`, `glm`, and `lme` models.
+
 reghelper 0.1.0
 ===============
 

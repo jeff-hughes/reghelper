@@ -88,7 +88,7 @@ cell_means.lm <- function(model, ..., levels=NULL) {
 #' @examples TODO: Need to complete.
 #' @export
 cell_means_q.lm <- function(model, vars=NULL, levels=NULL) {
-    factors <- .set_factors(model, vars, levels, sstest=FALSE)
+    factors <- .set_factors(model$model, vars, levels, sstest=FALSE)
     final_grid <- with(model$model, expand.grid(factors))
     
     # deal with covariates
