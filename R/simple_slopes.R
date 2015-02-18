@@ -52,6 +52,7 @@ simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 #' @examples TODO: Need to complete.
 #' @export
 simple_slopes.lm <- function(model, levels=NULL) {
+    call <- model$call
     mdata <- model$model
     
     int_term <- which.max(attr(terms(model), 'order'))
@@ -96,7 +97,9 @@ simple_slopes.lm <- function(model, levels=NULL) {
                 }
             }
         }
-        new_model <- lm(new_form, mdata)
+        call[['formula']] <- new_form
+        call[['data']] <- quote(mdata)
+        new_model <- eval(call)
         
         if (is.factor(test_var)) {
             contr <- contrasts(test_var)
@@ -133,6 +136,58 @@ simple_slopes.lm <- function(model, levels=NULL) {
     
     class(models) <- c('simple_slopes', 'data.frame')
     return(models)
+}
+
+
+#' Simple slopes of interaction.
+#' 
+#' \code{simple_slopes.aov} is an alias of simple_slopes.lm.
+#' 
+#' @seealso \code{\link{simple_slopes.lm}}
+#' @export
+simple_slopes.aov <- function(model, levels=NULL) {
+    simple_slopes.lm(model, levels)
+}
+
+
+#' Simple slopes of interaction.
+#' 
+#' \code{simple_slopes.glm} calculates all the simple effects of an interaction
+#' in a regression model.
+#' 
+#' If the model includes interactions at different levels (e.g., three two-way
+#' interactions and one three-way interaction), the function will test the
+#' simple effects of the highest-order interaction. If there are multiple
+#' interactions in the highest order, it will test the first one in the model.
+#' If you wish to test simple effects for a different interaction, simply switch
+#' the order in the formula.
+#' 
+#' By default, this function will provide slopes at -1SD, the mean, and +1SD for
+#' continuous variables, and at each level of categorical variables. This can be
+#' overridden with the \code{levels} parameter.
+#' 
+#' If a categorical variable with more than two levels is being tested, you may
+#' see multiple row for that test. One row will be shown for each contrast for
+#' that variable; the order is in the same order shown in \code{contrasts()}.
+#' 
+#' @param model A fitted linear model of type 'glm' with at least one
+#'   interaction term.
+#' @param levels A list with element names corresponding to some or all of the
+#'   variables in the model. Each list element should be a vector with the names
+#'   of factor levels (for categorical variables) or numeric points (for
+#'   continuous variables) at which to test that variable. \strong{Note:} If you
+#'   do not include 'sstest' as one of these levels, the function will not test
+#'   the simple effects for that variable.
+#' @return A data frame with a row for each simple effect. The first few columns
+#'   identify the level at which each variable in your model was set for that
+#'   test. A 'sstest' value in a particular column indicates that this was the
+#'   variable being tested. After columns for each variable, the data frame has
+#'   columns for the slope of the test variable, the standard error, t-value,
+#'   p-value, and degrees of freedom for the model.
+#' @examples TODO: Need to complete.
+#' @export
+simple_slopes.glm <- function(model, levels=NULL) {
+    simple_slopes.lm(model, levels)
 }
 
 
