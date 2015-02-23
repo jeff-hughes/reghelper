@@ -338,4 +338,51 @@ test_that('lme with interaction works', {
 })
 
 
+test_that('lmer with interaction works', {
+    set.seed(123)
+    pre_treat <- rnorm(50)
+    
+    set.seed(234)
+    post_treat <- 2 + rnorm(50)
+    
+    set.seed(345)
+    pre_control <- rnorm(50)
+    
+    set.seed(456)
+    post_control <- rnorm(50)
+    
+    dv <- c(pre_treat, post_treat, pre_control, post_control)
+    
+    pre_post <- factor(rep(c(rep(0, 50), rep(1, 50)), 2))
+    condition <- factor(c(rep(0, 100), rep(1, 100)))
+    id <- c(rep(1:50, 2), rep(51:100, 2))
+    
+    data <- data.frame(id, condition, pre_post, dv)
+    
+    model <- lmer(dv ~ condition * pre_post + (1|id), data)
+    slopes <- simple_slopes(model)
+    
+    
+    contrasts(data$condition) <- c(0, 1)
+    model_c_0 <- summary(lmer(dv ~ condition * pre_post + (1|id), data))
+    expect_equal(round(slopes[1, 'Test Estimate'], 3),
+        get_coef(model_c_0, 'pre_post1'))
+    
+    contrasts(data$condition) <- c(1, 0)
+    model_c_1 <- summary(lmer(dv ~ condition * pre_post + (1|id), data))
+    expect_equal(round(slopes[2, 'Test Estimate'], 3),
+        get_coef(model_c_1, 'pre_post1'))
+    
+    contrasts(data$pre_post) <- c(0, 1)
+    model_p_0 <- summary(lmer(dv ~ condition * pre_post + (1|id), data))
+    expect_equal(round(slopes[3, 'Test Estimate'], 3),
+        get_coef(model_p_0, 'condition1'))
+    
+    contrasts(data$pre_post) <- c(1, 0)
+    model_p_1 <- summary(lmer(dv ~ condition * pre_post + (1|id), data))
+    expect_equal(round(slopes[4, 'Test Estimate'], 3),
+        get_coef(model_p_1, 'condition1'))
+})
+
+
 

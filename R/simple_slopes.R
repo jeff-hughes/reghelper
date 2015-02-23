@@ -313,6 +313,122 @@ simple_slopes.lme <- function(model, levels=NULL) {
 }
 
 
+#' Simple slopes of interaction.
+#' 
+#' \code{simple_slopes.merMod} calculates all the simple effects of an
+#' interaction in a regression model.
+#' 
+#' If the model includes interactions at different levels (e.g., three two-way
+#' interactions and one three-way interaction), the function will test the
+#' simple effects of the highest-order interaction. If there are multiple
+#' interactions in the highest order, it will test the first one in the model.
+#' If you wish to test simple effects for a different interaction, simply switch
+#' the order in the formula.
+#' 
+#' By default, this function will provide slopes at -1SD, the mean, and +1SD for
+#' continuous variables, and at each level of categorical variables. This can be
+#' overridden with the \code{levels} parameter.
+#' 
+#' If a categorical variable with more than two levels is being tested, you may
+#' see multiple row for that test. One row will be shown for each contrast for
+#' that variable; the order is in the same order shown in \code{contrasts()}.
+#' 
+#' @param model A fitted linear model of type 'merMod' with at least one
+#'   interaction term.
+#' @param levels A list with element names corresponding to some or all of the
+#'   variables in the model. Each list element should be a vector with the names
+#'   of factor levels (for categorical variables) or numeric points (for
+#'   continuous variables) at which to test that variable. \strong{Note:} If you
+#'   do not include 'sstest' as one of these levels, the function will not test
+#'   the simple effects for that variable.
+#' @return A data frame with a row for each simple effect. The first few columns
+#'   identify the level at which each variable in your model was set for that
+#'   test. A 'sstest' value in a particular column indicates that this was the
+#'   variable being tested. After columns for each variable, the data frame has
+#'   columns for the slope of the test variable, the standard error, and t-value
+#'   for the model.
+#' @examples TODO: Need to complete.
+#' @export
+simple_slopes.merMod <- function(model, levels=NULL) {
+    call <- model@call
+    mdata <- model@frame
+    
+    int_term <- which.max(attr(terms(model), 'order'))
+    # get location of highest interaction term
+    int_vars <- names(which(attr(terms(model), 'factors')[, int_term] == 1))
+    # get location of variables in the interaction
+    
+    # get points at which to test each variable
+    factors <- .set_factors(mdata, int_vars, levels)
+    
+    # create grid of all tests to be done
+    grids <- .create_grids(mdata, factors)
+    
+    form <- format(formula(model))
+    
+    template <- grids[[1]]
+    models <- grids[[2]]
+    models[, c('Test Estimate', 'Std. Error', 't value')] <- NA
+    est_count <- 1
+    
+    for (i in 1:nrow(template)) {
+        new_form <- form
+        test_var_name <- names(template)[which(template[i, ] == 'sstest')]
+        test_var <- mdata[[test_var_name]]
+        
+        for (j in 1:ncol(template)) {
+            vname <- colnames(template)[j]
+            if (vname != test_var_name) {
+                if (is.factor(mdata[[vname]])) {
+                    # for factors, we set the contrast, with reference group as
+                    # the one for that test
+                    contrasts(mdata[[vname]]) <- contr.treatment(
+                        levels(mdata[[vname]]),
+                        base=which(levels(mdata[[vname]]) == template[i, j])
+                    )
+                } else {
+                    # for continuous, we replace the name of the variable in the
+                    # formula to shift the 0 point
+                    new_var <- paste0('I(', vname, ' - ', template[i, j], ')')
+                    new_form <- gsub(vname, new_var, new_form)
+                }
+            }
+        }
+        call[['formula']] <- as.formula(new_form)
+        call[['data']] <- quote(mdata)
+        new_model <- eval(call)
+        
+        if (is.factor(test_var)) {
+            contr <- contrasts(test_var)
+            dummy_names <- paste0(test_var_name, colnames(contr))
+            
+            estimates <- as.data.frame(
+                coef(summary(new_model))[dummy_names, ])
+            
+            # when only one contrast, the coefficients will be a vector, not a
+            # matrix, so estimates ends up transposed
+            if (ncol(contr) < 2) {
+                estimates <- as.data.frame(t(estimates))
+                rownames(estimates) <- 1
+            }
+            
+            for (est in 1:nrow(estimates)) {
+                models[est_count,
+                    (ncol(models)-2):ncol(models)] <- estimates[est, ]
+                est_count <- est_count + 1
+            }
+        } else {
+            models[est_count,
+                (ncol(models)-2):ncol(models)
+                ] <- coef(summary(new_model))[test_var_name, ]
+            est_count <- est_count + 1
+        }
+    }
+    class(models) <- c('simple_slopes', 'data.frame')
+    return(models)
+}
+
+
 #' Print simple slopes.
 #' 
 #' \code{print} method for class "\code{simple_slopes}".

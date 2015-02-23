@@ -21,7 +21,8 @@ knitr::opts_chunk$set(
 
 * `beta` function extended to include `glm` models.
 
-* `simple_slopes` function extended to include `aov`, `glm`, and `lme` models.
+* `simple_slopes` function extended to include `aov`, `glm`, `lme`, and `merMod`
+  models.
 
 # reghelper 0.1.0
 
