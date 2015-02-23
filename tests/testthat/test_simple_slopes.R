@@ -5,6 +5,9 @@ context('simple_slopes function')
 get_coef <- function(model, row, digits=3) {
     return(round(coef(model)[row, 1], digits))
 }
+get_coef.lme <- function(model, row, digits=3) {
+    return(round(model$tTable[row, 1], digits))
+}
 
 
 test_that('lm with 2 continuous int. works', {
@@ -312,35 +315,26 @@ test_that('lme with interaction works', {
     model <- lme(dv ~ condition * pre_post, random=~1|id, data)
     slopes <- simple_slopes(model)
     
-    model_x1_m1 <- summary(glm(y ~ I((x1 - mean(x1)) + sd(x1)) * x2,
-        family='binomial', data))
+
+    contrasts(data$condition) <- c(0, 1)
+    model_c_0 <- summary(lme(dv ~ condition * pre_post, random=~1|id, data))
     expect_equal(round(slopes[1, 'Test Estimate'], 3),
-        get_coef(model_x1_m1, 'x2'))
+        get_coef.lme(model_c_0, 'pre_post1'))
     
-    model_x1_0 <- summary(glm(y ~ I(x1 - mean(x1)) * x2,
-        family='binomial', data))
+    contrasts(data$condition) <- c(1, 0)
+    model_c_1 <- summary(lme(dv ~ condition * pre_post, random=~1|id, data))
     expect_equal(round(slopes[2, 'Test Estimate'], 3),
-        get_coef(model_x1_0, 'x2'))
+        get_coef.lme(model_c_1, 'pre_post1'))
     
-    model_x1_p1 <- summary(glm(y ~ I((x1 - mean(x1)) - sd(x1)) * x2,
-        family='binomial', data))
+    contrasts(data$pre_post) <- c(0, 1)
+    model_p_0 <- summary(lme(dv ~ condition * pre_post, random=~1|id, data))
     expect_equal(round(slopes[3, 'Test Estimate'], 3),
-        get_coef(model_x1_p1, 'x2'))
+        get_coef.lme(model_p_0, 'condition1'))
     
-    model_x2_m1 <- summary(glm(y ~ x1 * I((x2 - mean(x2)) + sd(x2)),
-        family='binomial', data))
+    contrasts(data$pre_post) <- c(1, 0)
+    model_p_1 <- summary(lme(dv ~ condition * pre_post, random=~1|id, data))
     expect_equal(round(slopes[4, 'Test Estimate'], 3),
-        get_coef(model_x2_m1, 'x1'))
-    
-    model_x2_0 <- summary(glm(y ~ x1 * I(x2 - mean(x2)),
-        family='binomial', data))
-    expect_equal(round(slopes[5, 'Test Estimate'], 3),
-        get_coef(model_x2_0, 'x1'))
-    
-    model_x2_p1 <- summary(glm(y ~ x1 * I((x2 - mean(x2)) - sd(x2)),
-        family='binomial', data))
-    expect_equal(round(slopes[6, 'Test Estimate'], 3),
-        get_coef(model_x2_p1, 'x1'))
+        get_coef.lme(model_p_1, 'condition1'))
 })
 
 
