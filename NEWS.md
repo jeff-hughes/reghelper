@@ -10,7 +10,9 @@ reghelper 0.2.0
 
 -   `beta` function extended to include `glm` models.
 
--   `simple_slopes` function extended to include `aov`, `glm`, and `lme` models.
+-   `simple_slopes` function extended to include `aov`, `glm`, `lme`, and `merMod` models.
+
+-   `cell_means` function extended to include `aov` models.
 
 reghelper 0.1.0
 ===============

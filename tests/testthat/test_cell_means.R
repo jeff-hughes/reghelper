@@ -307,4 +307,20 @@ test_that('collapsing over categorical variable works', {
 })
 
 
+test_that('aov with 2-level predictor works', {
+    x <- c(rep(0, 50), rep(1, 50))
+    
+    set.seed(234)
+    y <- x + rnorm(100)
+    x <- factor(x)
+    
+    model <- aov(y ~ x)
+    means <- cell_means(model, x)
+    table_means <- model.tables(model, type='means')$tables$x
+    
+    expect_equal(round(means[1, 'value'], 3), round(table_means[[1]], 3))
+    expect_equal(round(means[2, 'value'], 3), round(table_means[[2]], 3))
+})
+
+
 

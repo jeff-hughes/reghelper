@@ -127,6 +127,17 @@ cell_means_q.lm <- function(model, vars=NULL, levels=NULL) {
 }
 
 
+#' Estimated values of a linear model.
+#' 
+#' \code{cell_means.aov} is an alias of cell_means.lm.
+#' 
+#' @seealso \code{\link{cell_means.lm}}
+#' @export
+cell_means.aov <- function(model, ..., levels=NULL) {
+    cell_means.lm(model, ..., levels=levels)
+}
+
+
 #' Aggregate grid over specific variables.
 #' 
 #' Helper function takes a grid and predicted values, and aggregates (averages)

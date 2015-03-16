@@ -1,5 +1,8 @@
 context('simple_slopes function')
 
+library(nlme)
+library(lme4)
+
 # takes model and returns coefficient for a given variable/row number, rounded
 # to 'digits' decimal places
 get_coef <- function(model, row, digits=3) {

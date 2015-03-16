@@ -24,6 +24,8 @@ knitr::opts_chunk$set(
 * `simple_slopes` function extended to include `aov`, `glm`, `lme`, and `merMod`
   models.
 
+* `cell_means` function extended to include `aov` models.
+
 # reghelper 0.1.0
 
 NEW FEATURES
