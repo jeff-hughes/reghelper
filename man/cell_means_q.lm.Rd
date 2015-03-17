@@ -43,7 +43,10 @@ pass variable names in directly instead of strings of variable names.
 evaluation is easier.
 }
 \examples{
-TODO: Need to complete.
+# iris data
+model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+summary(model)
+cell_means_q.lm(model, 'Petal.Length')
 }
 \seealso{
 \code{\link{cell_means.lm}}

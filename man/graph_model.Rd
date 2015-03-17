@@ -21,7 +21,9 @@ models. Selected variables will be graphed at +/- 1 SD (if continuous) or at
 each level of the factor (if categorical).
 }
 \examples{
-TODO: Need to complete.
+# iris data
+model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
+graph_model(model, y=Sepal.Width, x=Sepal.Length, lines=Species)
 }
 \seealso{
 \code{\link{graph_model.lm}}

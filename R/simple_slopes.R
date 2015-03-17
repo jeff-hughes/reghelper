@@ -10,7 +10,14 @@
 #'   class of its argument. See the documentation of the particular methods for
 #'   details of what is produced by that method.
 #' @seealso \code{\link{simple_slopes.lm}}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # mtcars data
+#' mtcars$am <- factor(mtcars$am)  # make 'am' categorical
+#' model <- lm(mpg ~ wt * am, data=mtcars)
+#' summary(model)  # significant interaction
+#' simple_slopes(model)
+#' simple_slopes(model,
+#'     levels=list(wt=c(2, 3, 4, 'sstest'), am=c(0, 1, 'sstest')))  # test at specific levels
 #' @export
 simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 
@@ -49,7 +56,14 @@ simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 #'   variable being tested. After columns for each variable, the data frame has
 #'   columns for the slope of the test variable, the standard error, t-value,
 #'   p-value, and degrees of freedom for the model.
-#' @examples TODO: Need to complete.
+#' @examples
+#' # mtcars data
+#' mtcars$am <- factor(mtcars$am)  # make 'am' categorical
+#' model <- lm(mpg ~ wt * am, data=mtcars)
+#' summary(model)  # significant interaction
+#' simple_slopes(model)
+#' simple_slopes(model,
+#'     levels=list(wt=c(2, 3, 4, 'sstest'), am=c(0, 1, 'sstest')))  # test at specific levels
 #' @export
 simple_slopes.lm <- function(model, levels=NULL) {
     call <- model$call
@@ -184,7 +198,13 @@ simple_slopes.aov <- function(model, levels=NULL) {
 #'   variable being tested. After columns for each variable, the data frame has
 #'   columns for the slope of the test variable, the standard error, t-value,
 #'   p-value, and degrees of freedom for the model.
-#' @examples TODO: Need to complete.
+#' @examples
+#' # mtcars data
+#' model <- glm(vs ~ gear * wt, data=mtcars, family='binomial')
+#' summary(model)  # marginal interaction
+#' simple_slopes(model)
+#' simple_slopes(model,
+#'     levels=list(gear=c(2, 3, 4, 'sstest'), wt=c(2, 3, 'sstest')))  # test at specific levels
 #' @export
 simple_slopes.glm <- function(model, levels=NULL) {
     simple_slopes.lm(model, levels)
@@ -225,7 +245,13 @@ simple_slopes.glm <- function(model, levels=NULL) {
 #'   variable being tested. After columns for each variable, the data frame has
 #'   columns for the slope of the test variable, the standard error, t-value,
 #'   p-value, and degrees of freedom for the model.
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model <- lme(Sepal.Width ~ Sepal.Length * Petal.Length, random=~1|Species, data=iris)
+#' summary(model)  # significant interaction
+#' simple_slopes(model)
+#' simple_slopes(model,
+#'     levels=list(Sepal.Length=c(4, 5, 6, 'sstest'), Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
 #' @export
 simple_slopes.lme <- function(model, levels=NULL) {
     call <- model$call
@@ -347,7 +373,13 @@ simple_slopes.lme <- function(model, levels=NULL) {
 #'   variable being tested. After columns for each variable, the data frame has
 #'   columns for the slope of the test variable, the standard error, and t-value
 #'   for the model.
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model <- lmer(Sepal.Width ~ Sepal.Length * Petal.Length + (1|Species), data=iris)
+#' summary(model)
+#' simple_slopes(model)
+#' simple_slopes(model,
+#'     levels=list(Sepal.Length=c(4, 5, 6, 'sstest'), Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
 #' @export
 simple_slopes.merMod <- function(model, levels=NULL) {
     call <- model@call
@@ -440,7 +472,6 @@ simple_slopes.merMod <- function(model, levels=NULL) {
 #'   for each coefficient.
 #' @param ... Further arguments passed to or from other methods.
 #' @seealso \code{\link{simple_slopes}}
-#' @examples TODO: Need to complete.
 #' @export
 print.simple_slopes <- function(
     model,

@@ -14,6 +14,8 @@ reghelper 0.2.0
 
 -   `cell_means` function extended to include `aov` models.
 
+-   Added examples to documentation for all functions.
+
 reghelper 0.1.0
 ===============
 

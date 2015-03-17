@@ -22,7 +22,9 @@ The form of the value returned by \code{ICC} depends on the class of
 (ICC) for a fitted model.
 }
 \examples{
-TODO: Need to complete.
+# iris data
+model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
+ICC(model)  # .49 of variance is between-subjects
 }
 \seealso{
 \code{\link{sig_regions.lm}}

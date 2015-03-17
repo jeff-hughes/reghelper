@@ -46,6 +46,11 @@ see multiple row for that test. One row will be shown for each contrast for
 that variable; the order is in the same order shown in \code{contrasts()}.
 }
 \examples{
-TODO: Need to complete.
+# iris data
+model <- lme(Sepal.Width ~ Sepal.Length * Petal.Length, random=~1|Species, data=iris)
+summary(model)  # significant interaction
+simple_slopes(model)
+simple_slopes(model,
+    levels=list(Sepal.Length=c(4, 5, 6, 'sstest'), Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
 }
 

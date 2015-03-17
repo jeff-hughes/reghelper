@@ -22,7 +22,10 @@ The form of the value returned by \code{cell_means} depends on the
 of a linear model.
 }
 \examples{
-TODO: Need to complete.
+# iris data
+model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+summary(model)
+cell_means(model, Petal.Length)
 }
 \seealso{
 \code{\link{cell_means.lm}}

@@ -22,6 +22,8 @@ more information, see
 \href{http://davidakenny.net/papers/k&h/MLM_R.pdf}{Hoyt & Kenny (2013)}.
 }
 \examples{
-TODO: Need to complete.
+# iris data
+model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
+ICC(model)  # .49 of variance is between-subjects
 }
 

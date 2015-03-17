@@ -46,6 +46,12 @@ see multiple row for that test. One row will be shown for each contrast for
 that variable; the order is in the same order shown in \code{contrasts()}.
 }
 \examples{
-TODO: Need to complete.
+# mtcars data
+mtcars$am <- factor(mtcars$am)  # make 'am' categorical
+model <- lm(mpg ~ wt * am, data=mtcars)
+summary(model)  # significant interaction
+simple_slopes(model)
+simple_slopes(model,
+    levels=list(wt=c(2, 3, 4, 'sstest'), am=c(0, 1, 'sstest')))  # test at specific levels
 }
 

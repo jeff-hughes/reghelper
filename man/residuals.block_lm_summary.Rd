@@ -15,11 +15,21 @@ residuals.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
+\value{
+The residuals of block(s) `num`, or if `num` is NULL, a list of
+  residuals from all blocks.
+}
 \description{
 \code{residuals} method for class "\code{block_lm_summary}".
 }
 \examples{
-TODO: Need to complete.
+# 2 blocks: Petal.Length; Petal.Length + Petal.Width
+model1 <- block_lm(Sepal.Length, Petal.Length, Petal.Width, data=iris)
+residuals(summary(model1))  # returns both blocks 1 and 2
+
+# 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+model2 <- block_lm(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris)
+residuals(summary(model2), num=2)  # returns second block
 }
 \seealso{
 \code{\link{summary.block_lm}}, \code{residuals.block_lm},

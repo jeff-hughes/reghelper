@@ -34,6 +34,8 @@ Note: Unlike \code{\link{beta.lm}}, the \code{y} parameter is set to FALSE by
 default, to avoid issues with some family functions (e.g., binomial).
 }
 \examples{
-TODO: Need to complete.
+# mtcars data
+model1 <- glm(vs ~ wt + hp, data=mtcars, family='binomial')
+beta(model1)  # wt and hp standardized, vs is not by default
 }
 

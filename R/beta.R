@@ -10,7 +10,13 @@
 #'   its argument. See the documentation of the particular methods for details
 #'   of what is produced by that method.
 #' @seealso \code{\link{beta.lm}}, \code{\link{beta.aov}}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+#' beta(model1)  # all three variables standardized
+#' 
+#' model2 <- lm(Sepal.Width ~ Petal.Width + Species, iris)
+#' beta(model2, skip='Species')  # all variables except Species standardized
 #' @export
 beta <- function(model, ...) UseMethod('beta')
 
@@ -36,7 +42,13 @@ beta <- function(model, ...) UseMethod('beta')
 #' @return Returns the summary of a linear model, with the output showing the
 #'   beta coefficients, standard error, t-values, and p-values for each
 #'   predictor.
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+#' beta(model1)  # all three variables standardized
+#' 
+#' model2 <- lm(Sepal.Width ~ Petal.Width + Species, iris)
+#' beta(model2, skip='Species')  # all variables except Species standardized
 #' @export
 beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL) {
     call <- model$call
@@ -97,7 +109,10 @@ beta.aov <- function(model, x=TRUE, y=TRUE, skip=NULL) {
 #' @return Returns the summary of a generalized linear model, with the output
 #'   showing the beta coefficients, standard error, t-values, and p-values for
 #'   each predictor.
-#' @examples TODO: Need to complete.
+#' @examples
+#' # mtcars data
+#' model1 <- glm(vs ~ wt + hp, data=mtcars, family='binomial')
+#' beta(model1)  # wt and hp standardized, vs is not by default
 #' @export
 beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL) {
     beta.lm(model, x, y, skip)

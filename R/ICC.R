@@ -10,7 +10,10 @@
 #'   its argument. See the documentation of the particular methods for details
 #'   of what is produced by that method.
 #' @seealso \code{\link{sig_regions.lm}}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
+#' ICC(model)  # .49 of variance is between-subjects
 #' @export
 ICC <- function(model, ...) UseMethod('ICC')
 
@@ -26,7 +29,10 @@ ICC <- function(model, ...) UseMethod('ICC')
 #' 
 #' @param model A fitted model of type 'lme'.
 #' @return The intra-class correlation of the model.
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
+#' ICC(model)  # .49 of variance is between-subjects
 #' @export
 ICC.lme <- function(model) {
     variance <- VarCorr(model)
@@ -48,7 +54,10 @@ ICC.lme <- function(model) {
 #' @param model A fitted model of type 'merMod' (linear, generalized, or
 #'   nonlinear).
 #' @return The intra-class correlation of the model.
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model <- lmer(Sepal.Width ~ 1 + (1|Species), data=iris)
+#' ICC(model)  # .49 of variance is between-subjects
 #' @export
 ICC.merMod <- function(model) {
     variance <- as.data.frame(VarCorr(model))

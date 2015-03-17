@@ -21,9 +21,6 @@ for each coefficient.}
 \description{
 \code{print} method for class "\code{simple_slopes}".
 }
-\examples{
-TODO: Need to complete.
-}
 \seealso{
 \code{\link{simple_slopes}}
 }

@@ -38,7 +38,15 @@ in directly instead of strings of variable names. \code{block_lm_q} uses
 standard evaluation in cases where such evaluation is easier.
 }
 \examples{
-TODO: Need to complete.
+# 2 blocks: Petal.Length; Petal.Length + Petal.Width
+model1 <- block_lm_q('Sepal.Length', list('Petal.Length', 'Petal.Width'), data=iris)
+summary(model1)
+coef(model1)
+
+# 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+model2 <- block_lm_q('Sepal.Length', list('Species', 'Petal.Length * Petal.Width')), data=iris)
+summary(model2)
+coef(model2)
 }
 \seealso{
 \code{\link{block_lm}}

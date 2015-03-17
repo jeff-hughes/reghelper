@@ -21,7 +21,16 @@
 #'   \cr
 #'   \code{models} \tab A list of all regression models.\cr
 #' }
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- block_lm(Sepal.Length, Petal.Length, Petal.Width, data=iris)
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- block_lm(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris)
+#' summary(model2)
+#' coef(model2)
 #' @export
 block_lm <- function(dv, ..., data=NULL) {
     if (length(list(...)) > 0) {
@@ -95,7 +104,16 @@ block_lm <- function(dv, ..., data=NULL) {
 #'   \code{models} \tab A list of all regression models.\cr
 #' }
 #' @seealso \code{\link{block_lm}}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- block_lm_q('Sepal.Length', list('Petal.Length', 'Petal.Width'), data=iris)
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- block_lm_q('Sepal.Length', list('Species', 'Petal.Length * Petal.Width')), data=iris)
+#' summary(model2)
+#' coef(model2)
 #' @export
 block_lm_q <- function(dv, blocks=NULL, data=NULL) {
     formulas <- list()
@@ -138,7 +156,16 @@ block_lm_q <- function(dv, blocks=NULL, data=NULL) {
 #'   \cr
 #' }
 #' @seealso \code{\link{block_lm}}, \code{\link{print.block_lm_summary}}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- block_lm(Sepal.Length, Petal.Length, Petal.Width, data=iris)
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- block_lm(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris)
+#' summary(model2)
+#' coef(model2)
 #' @export
 summary.block_lm <- function(model, ...) {
     obj <- list()
@@ -226,7 +253,16 @@ summary.block_lm <- function(model, ...) {
 #'   for each coefficient.
 #' @param ... Further arguments passed to or from other methods.
 #' @seealso \code{\link{block_lm}}, \code{\link{summary.block_lm}}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- block_lm(Sepal.Length, Petal.Length, Petal.Width, data=iris)
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- block_lm(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris)
+#' summary(model2)
+#' coef(model2)
 #' @export
 print.block_lm_summary <- function(
     model,
@@ -284,9 +320,20 @@ print.block_lm_summary <- function(
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   coefficients.
 #' @param ... Further arguments passed to or from other methods.
+#' @return The coefficients of block(s) `num`, or if `num` is NULL, a list of
+#'   coefficients from all blocks.
 #' @seealso \code{\link{block_lm}}, \code{coef.block_lm_summary},
 #'   \code{\link{fitted.block_lm}}, \code{residuals.block_lm}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- block_lm(Sepal.Length, Petal.Length, Petal.Width, data=iris)
+#' summary(model1)
+#' coef(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- block_lm(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris)
+#' summary(model2)
+#' coef(model2, num=2)  # returns second block
 #' @export
 coef.block_lm <- function(model, num=NULL, ...) {
     if (!is.null(num)) {
@@ -310,9 +357,18 @@ coef.block_lm <- function(model, num=NULL, ...) {
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   coefficients.
 #' @param ... Further arguments passed to or from other methods.
+#' @return The coefficients of block(s) `num`, or if `num` is NULL, a list of
+#'   coefficients from all blocks.
 #' @seealso \code{\link{summary.block_lm}}, \code{coef.block_lm},
 #'   \code{residuals.block_lm_summary}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- block_lm(Sepal.Length, Petal.Length, Petal.Width, data=iris)
+#' coef(summary(model1))  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- block_lm(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris)
+#' coef(summary(model2), num=2)  # returns second block
 #' @export
 coef.block_lm_summary <- function(model, num=NULL, ...) {
     if (!is.null(num)) {
@@ -336,9 +392,20 @@ coef.block_lm_summary <- function(model, num=NULL, ...) {
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   residuals.
 #' @param ... Further arguments passed to or from other methods.
+#' @return The residuals of block(s) `num`, or if `num` is NULL, a list of
+#'   residuals from all blocks.
 #' @seealso \code{\link{block_lm}}, \code{residuals.block_lm_summary},
 #'   \code{\link{fitted.block_lm}}, \code{coef.block_lm}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- block_lm(Sepal.Length, Petal.Length, Petal.Width, data=iris)
+#' summary(model1)
+#' residuals(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- block_lm(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris)
+#' summary(model2)
+#' residuals(model2, num=2)  # returns second block
 #' @export
 residuals.block_lm <- function(model, num=NULL, ...) {
     if (!is.null(num)) {
@@ -362,9 +429,18 @@ residuals.block_lm <- function(model, num=NULL, ...) {
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   residuals.
 #' @param ... Further arguments passed to or from other methods.
+#' @return The residuals of block(s) `num`, or if `num` is NULL, a list of
+#'   residuals from all blocks.
 #' @seealso \code{\link{summary.block_lm}}, \code{residuals.block_lm},
 #'   \code{coef.block_lm_summary}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- block_lm(Sepal.Length, Petal.Length, Petal.Width, data=iris)
+#' residuals(summary(model1))  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- block_lm(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris)
+#' residuals(summary(model2), num=2)  # returns second block
 #' @export
 residuals.block_lm_summary <- function(model, num=NULL, ...) {
     if (!is.null(num)) {
@@ -384,9 +460,20 @@ residuals.block_lm_summary <- function(model, num=NULL, ...) {
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   fitted values.
 #' @param ... Further arguments passed to or from other methods.
+#' @return The fitted values of block(s) `num`, or if `num` is NULL, a list of
+#'   fitted values from all blocks.
 #' @seealso \code{\link{block_lm}}, \code{coef.block_lm},
 #'   \code{residuals.block_lm}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- block_lm(Sepal.Length, Petal.Length, Petal.Width, data=iris)
+#' summary(model1)
+#' fitted(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- block_lm(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris)
+#' summary(model2)
+#' fitted(model2, num=2)  # returns second block
 #' @export
 fitted.block_lm <- function(model, num=NULL, ...) {
     if (!is.null(num)) {

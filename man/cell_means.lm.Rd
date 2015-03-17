@@ -38,7 +38,10 @@ In the case of a categorical covariate, the results will be averaged across
 all its levels.
 }
 \examples{
-TODO: Need to complete.
+# iris data
+model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+summary(model)
+cell_means(model, Petal.Length)
 }
 \seealso{
 \code{\link{cell_means}}

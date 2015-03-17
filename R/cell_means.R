@@ -10,7 +10,11 @@
 #'   class of its argument. See the documentation of the particular methods for
 #'   details of what is produced by that method.
 #' @seealso \code{\link{cell_means.lm}}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+#' summary(model)
+#' cell_means(model, Petal.Length)
 #' @export
 cell_means <- function(model, ...) UseMethod('cell_means')
 
@@ -41,7 +45,11 @@ cell_means <- function(model, ...) UseMethod('cell_means')
 #'   predicted value, the standard error of the predicted mean, and the 95%
 #'   confidence interval.
 #' @seealso \code{\link{cell_means}}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+#' summary(model)
+#' cell_means(model, Petal.Length)
 #' @export
 cell_means.lm <- function(model, ..., levels=NULL) {
     var_names <- NULL
@@ -85,7 +93,11 @@ cell_means.lm <- function(model, ..., levels=NULL) {
 #'   predicted value, the standard error of the predicted mean, and the 95%
 #'   confidence interval.
 #' @seealso \code{\link{cell_means.lm}}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+#' summary(model)
+#' cell_means_q.lm(model, 'Petal.Length')
 #' @export
 cell_means_q.lm <- function(model, vars=NULL, levels=NULL) {
     factors <- .set_factors(model$model, vars, levels, sstest=FALSE)
