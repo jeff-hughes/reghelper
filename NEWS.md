@@ -16,6 +16,8 @@ reghelper 0.2.0
 
 -   Added examples to documentation for all functions.
 
+-   Changed `block_lm` function to `build_model`.
+
 reghelper 0.1.0
 ===============
 

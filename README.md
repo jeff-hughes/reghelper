@@ -28,12 +28,24 @@ Current progress
 So far, most functions that I had originally planned to include have been implemented for `lm` models. These functions include:
 
 -   `beta` Calculates standardized beta coefficients.
--   `block_lm` Allows variables to be added to a series of regression models sequentially (similar to SPSS).
+-   `build_model` Allows variables to be added to a series of regression models sequentially (similar to SPSS).
 -   `ICC` Calculates the intra-class correlation for a multi-level model (lme only at this point).
 -   `cell_means` Calculates the estimated means for a fitted model.
 -   `graph_model` Easily graph interactions at +/- 1 SD (uses ggplot2 package).
--   `simple_slopes` Easily calculate the simple effects of an interaction.
 -   `sig_regions` Calculate the Johnson-Neyman regions of significance for an interaction.
+-   `simple_slopes` Easily calculate the simple effects of an interaction.
+
+The table below shows the current types of models for which each function has been implemented:
+
+|Function|lm|glm|aov|lme|lmer|
+|:-------|:-:|:-:|:-:|:-:|:--:|
+|beta|✓|✓|✓|||
+|build\_model|✓|||||
+|ICC||||✓|✓|
+|cell\_means|✓||✓|||
+|graph\_model|✓|||||
+|sig\_regions|✓|||||
+|simple\_slopes|✓|✓|✓|✓|✓|
 
 Things to do
 ------------
@@ -41,5 +53,4 @@ Things to do
 There is still much work to be done. Below is a list of areas yet to be completed, so if you are interested in helping out, these may be good places to start:
 
 -   At minimum, I would like to extend these functions to `aov`, `glm`, `lme`, and `lmer` models.
--   None of the documentation includes example code, which needs to be included.
 -   The package does include test cases, but more thorough testing needs to be done to ensure these functions work on a variety of models.
