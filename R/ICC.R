@@ -3,13 +3,13 @@
 #' \code{ICC} is a generic function for calculating the intra-class correlation
 #' (ICC) for a fitted model.
 #' 
-#' @param model A fitted linear model of type 'lme'.
+#' @param model A fitted linear model of type 'lme' (nlme) or 'merMod' (lme4).
 #' @param ... Additional arguments to be passed to the particular method for the
 #'   given model.
 #' @return The form of the value returned by \code{ICC} depends on the class of
 #'   its argument. See the documentation of the particular methods for details
 #'   of what is produced by that method.
-#' @seealso \code{\link{sig_regions.lm}}
+#' @seealso \code{\link{ICC.lme}}, \code{\link{ICC.merMod}}
 #' @examples
 #' # iris data
 #' model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
@@ -29,6 +29,7 @@ ICC <- function(model, ...) UseMethod('ICC')
 #' 
 #' @param model A fitted model of type 'lme'.
 #' @return The intra-class correlation of the model.
+#' @seealso \code{\link{ICC.merMod}}
 #' @examples
 #' # iris data
 #' model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
@@ -54,6 +55,7 @@ ICC.lme <- function(model) {
 #' @param model A fitted model of type 'merMod' (linear, generalized, or
 #'   nonlinear).
 #' @return The intra-class correlation of the model.
+#' @seealso \code{\link{ICC.lme}}
 #' @examples
 #' # iris data
 #' model <- lmer(Sepal.Width ~ 1 + (1|Species), data=iris)

@@ -27,4 +27,7 @@ more information, see
 model <- lmer(Sepal.Width ~ 1 + (1|Species), data=iris)
 ICC(model)  # .49 of variance is between-subjects
 }
+\seealso{
+\code{\link{ICC.lme}}
+}
 

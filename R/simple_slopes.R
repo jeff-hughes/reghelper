@@ -3,13 +3,16 @@
 #' \code{simple_slopes} is a generic function for calculating the simple effects
 #' of an interaction in a regression model.
 #' 
-#' @param model A fitted linear model of type 'lm'.
+#' @param model A fitted linear model of type 'lm', 'glm', 'aov', 'lme' (nlme),
+#'   or 'merMod' (lme4).
 #' @param ... Additional arguments to be passed to the particular method for the
 #'   given model.
 #' @return The form of the value returned by \code{simple_slopes} depends on the
 #'   class of its argument. See the documentation of the particular methods for
 #'   details of what is produced by that method.
-#' @seealso \code{\link{simple_slopes.lm}}
+#' @seealso \code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.glm}},
+#'   \code{\link{simple_slopes.aov}}, \code{\link{simple_slopes.lme}},
+#'   \code{\link{simple_slopes.merMod}}
 #' @examples
 #' # mtcars data
 #' mtcars$am <- factor(mtcars$am)  # make 'am' categorical
@@ -56,6 +59,8 @@ simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 #'   variable being tested. After columns for each variable, the data frame has
 #'   columns for the slope of the test variable, the standard error, t-value,
 #'   p-value, and degrees of freedom for the model.
+#' @seealso \code{\link{simple_slopes.glm}},\code{\link{simple_slopes.lme}},
+#'   \code{\link{simple_slopes.merMod}}
 #' @examples
 #' # mtcars data
 #' mtcars$am <- factor(mtcars$am)  # make 'am' categorical
@@ -198,6 +203,8 @@ simple_slopes.aov <- function(model, levels=NULL) {
 #'   variable being tested. After columns for each variable, the data frame has
 #'   columns for the slope of the test variable, the standard error, t-value,
 #'   p-value, and degrees of freedom for the model.
+#' @seealso \code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.lme}},
+#'   \code{\link{simple_slopes.merMod}}
 #' @examples
 #' # mtcars data
 #' model <- glm(vs ~ gear * wt, data=mtcars, family='binomial')
@@ -245,6 +252,8 @@ simple_slopes.glm <- function(model, levels=NULL) {
 #'   variable being tested. After columns for each variable, the data frame has
 #'   columns for the slope of the test variable, the standard error, t-value,
 #'   p-value, and degrees of freedom for the model.
+#' @seealso \code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.glm}},
+#'   \code{\link{simple_slopes.merMod}}
 #' @examples
 #' # iris data
 #' model <- lme(Sepal.Width ~ Sepal.Length * Petal.Length, random=~1|Species, data=iris)
@@ -373,6 +382,8 @@ simple_slopes.lme <- function(model, levels=NULL) {
 #'   variable being tested. After columns for each variable, the data frame has
 #'   columns for the slope of the test variable, the standard error, and t-value
 #'   for the model.
+#' @seealso \code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.glm}},
+#'   \code{\link{simple_slopes.lme}}
 #' @examples
 #' # iris data
 #' model <- lmer(Sepal.Width ~ Sepal.Length * Petal.Length + (1|Species), data=iris)

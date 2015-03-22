@@ -38,4 +38,7 @@ default, to avoid issues with some family functions (e.g., binomial).
 model1 <- glm(vs ~ wt + hp, data=mtcars, family='binomial')
 beta(model1)  # wt and hp standardized, vs is not by default
 }
+\seealso{
+\code{\link{beta.glm}}
+}
 

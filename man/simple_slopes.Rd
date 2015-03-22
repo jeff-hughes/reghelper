@@ -7,7 +7,8 @@
 simple_slopes(model, ...)
 }
 \arguments{
-\item{model}{A fitted linear model of type 'lm'.}
+\item{model}{A fitted linear model of type 'lm', 'glm', 'aov', 'lme' (nlme),
+or 'merMod' (lme4).}
 
 \item{...}{Additional arguments to be passed to the particular method for the
 given model.}
@@ -31,6 +32,8 @@ simple_slopes(model,
     levels=list(wt=c(2, 3, 4, 'sstest'), am=c(0, 1, 'sstest')))  # test at specific levels
 }
 \seealso{
-\code{\link{simple_slopes.lm}}
+\code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.glm}},
+  \code{\link{simple_slopes.aov}}, \code{\link{simple_slopes.lme}},
+  \code{\link{simple_slopes.merMod}}
 }
 

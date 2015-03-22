@@ -15,7 +15,7 @@
 #' @param data An optional data frame containing the variables in the model. If
 #'   not found in \code{data}, the variables are taken from the environment from
 #'   which the function is called.
-#' @param model The type of model to use; default 'lm'.
+#' @param model The type of model to use; only supports 'lm' at this time.
 #' @return A named list with the following elements:
 #' \tabular{ll}{
 #'   \code{formulas} \tab A list of the regression formulas used for each block.

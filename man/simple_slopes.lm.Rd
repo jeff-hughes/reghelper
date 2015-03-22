@@ -54,4 +54,8 @@ simple_slopes(model)
 simple_slopes(model,
     levels=list(wt=c(2, 3, 4, 'sstest'), am=c(0, 1, 'sstest')))  # test at specific levels
 }
+\seealso{
+\code{\link{simple_slopes.glm}},\code{\link{simple_slopes.lme}},
+  \code{\link{simple_slopes.merMod}}
+}
 

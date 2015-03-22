@@ -53,4 +53,8 @@ simple_slopes(model)
 simple_slopes(model,
     levels=list(Sepal.Length=c(4, 5, 6, 'sstest'), Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
 }
+\seealso{
+\code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.glm}},
+  \code{\link{simple_slopes.merMod}}
+}
 

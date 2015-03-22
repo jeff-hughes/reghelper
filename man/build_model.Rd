@@ -19,7 +19,7 @@ previous blocks will be added to each subsequent block.}
 not found in \code{data}, the variables are taken from the environment from
 which the function is called.}
 
-\item{model}{The type of model to use; default 'lm'.}
+\item{model}{The type of model to use; only supports 'lm' at this time.}
 }
 \value{
 A named list with the following elements:

@@ -7,7 +7,7 @@
 beta(model, ...)
 }
 \arguments{
-\item{model}{A fitted linear model of type 'lm' or 'aov'.}
+\item{model}{A fitted linear model of type 'lm', 'glm' or 'aov'.}
 
 \item{...}{Additional arguments to be passed to the particular method for the
 given model.}
@@ -30,6 +30,7 @@ model2 <- lm(Sepal.Width ~ Petal.Width + Species, iris)
 beta(model2, skip='Species')  # all variables except Species standardized
 }
 \seealso{
-\code{\link{beta.lm}}, \code{\link{beta.aov}}
+\code{\link{beta.lm}}, \code{\link{beta.glm}},
+  \code{\link{beta.aov}}
 }
 

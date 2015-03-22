@@ -3,13 +3,13 @@
 #' \code{cell_means} is a generic function for calculating the estimated means
 #' of a linear model.
 #' 
-#' @param model A fitted linear model of type 'lm'.
+#' @param model A fitted linear model of type 'lm' or 'aov'.
 #' @param ... Additional arguments to be passed to the particular method for the
 #'   given model.
 #' @return The form of the value returned by \code{cell_means} depends on the
 #'   class of its argument. See the documentation of the particular methods for
 #'   details of what is produced by that method.
-#' @seealso \code{\link{cell_means.lm}}
+#' @seealso \code{\link{cell_means.lm}}, \code{\link{cell_means.aov}}
 #' @examples
 #' # iris data
 #' model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)

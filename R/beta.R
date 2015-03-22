@@ -3,13 +3,14 @@
 #' \code{beta} is a generic function for producing standardized coefficients
 #' from regression models.
 #' 
-#' @param model A fitted linear model of type 'lm' or 'aov'.
+#' @param model A fitted linear model of type 'lm', 'glm' or 'aov'.
 #' @param ... Additional arguments to be passed to the particular method for the
 #'   given model.
 #' @return The form of the value returned by \code{beta} depends on the class of
 #'   its argument. See the documentation of the particular methods for details
 #'   of what is produced by that method.
-#' @seealso \code{\link{beta.lm}}, \code{\link{beta.aov}}
+#' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}},
+#'   \code{\link{beta.aov}}
 #' @examples
 #' # iris data
 #' model1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
@@ -42,6 +43,7 @@ beta <- function(model, ...) UseMethod('beta')
 #' @return Returns the summary of a linear model, with the output showing the
 #'   beta coefficients, standard error, t-values, and p-values for each
 #'   predictor.
+#' @seealso \code{\link{beta.glm}}
 #' @examples
 #' # iris data
 #' model1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
@@ -80,7 +82,7 @@ beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL) {
 #' 
 #' \code{beta.aov} is an alias of beta.lm.
 #' 
-#' @seealso \code{\link{beta.lm}}
+#' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}}
 #' @export
 beta.aov <- function(model, x=TRUE, y=TRUE, skip=NULL) {
     model$call[[1]] <- quote(lm)  # need to change this so lm is returned
@@ -109,6 +111,7 @@ beta.aov <- function(model, x=TRUE, y=TRUE, skip=NULL) {
 #' @return Returns the summary of a generalized linear model, with the output
 #'   showing the beta coefficients, standard error, t-values, and p-values for
 #'   each predictor.
+#' @seealso \code{\link{beta.glm}}
 #' @examples
 #' # mtcars data
 #' model1 <- glm(vs ~ wt + hp, data=mtcars, family='binomial')

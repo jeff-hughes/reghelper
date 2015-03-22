@@ -26,4 +26,7 @@ more information, see
 model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
 ICC(model)  # .49 of variance is between-subjects
 }
+\seealso{
+\code{\link{ICC.merMod}}
+}
 

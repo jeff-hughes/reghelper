@@ -7,7 +7,7 @@
 cell_means(model, ...)
 }
 \arguments{
-\item{model}{A fitted linear model of type 'lm'.}
+\item{model}{A fitted linear model of type 'lm' or 'aov'.}
 
 \item{...}{Additional arguments to be passed to the particular method for the
 given model.}
@@ -28,6 +28,6 @@ summary(model)
 cell_means(model, Petal.Length)
 }
 \seealso{
-\code{\link{cell_means.lm}}
+\code{\link{cell_means.lm}}, \code{\link{cell_means.aov}}
 }
 

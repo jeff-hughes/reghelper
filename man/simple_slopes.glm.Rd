@@ -53,4 +53,8 @@ simple_slopes(model)
 simple_slopes(model,
     levels=list(gear=c(2, 3, 4, 'sstest'), wt=c(2, 3, 'sstest')))  # test at specific levels
 }
+\seealso{
+\code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.lme}},
+  \code{\link{simple_slopes.merMod}}
+}
 

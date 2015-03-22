@@ -7,7 +7,7 @@
 ICC(model, ...)
 }
 \arguments{
-\item{model}{A fitted linear model of type 'lme'.}
+\item{model}{A fitted linear model of type 'lme' (nlme) or 'merMod' (lme4).}
 
 \item{...}{Additional arguments to be passed to the particular method for the
 given model.}
@@ -27,6 +27,6 @@ model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
 ICC(model)  # .49 of variance is between-subjects
 }
 \seealso{
-\code{\link{sig_regions.lm}}
+\code{\link{ICC.lme}}, \code{\link{ICC.merMod}}
 }
 

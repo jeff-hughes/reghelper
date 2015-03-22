@@ -42,4 +42,7 @@ beta(model1)  # all three variables standardized
 model2 <- lm(Sepal.Width ~ Petal.Width + Species, iris)
 beta(model2, skip='Species')  # all variables except Species standardized
 }
+\seealso{
+\code{\link{beta.glm}}
+}
 
