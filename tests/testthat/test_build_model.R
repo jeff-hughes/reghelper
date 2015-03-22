@@ -1,4 +1,4 @@
-context('block_model function')
+context('build_model function')
 
 # takes model and returns coefficient for a given variable/row number, rounded
 # to 'digits' decimal places
@@ -16,7 +16,7 @@ test_that('lm with no predictors works', {
                            # environment (with no data argument)
     
     model <- summary(lm(y ~ 1, data))
-    b_model <- block_lm(y, data=data)
+    b_model <- build_model(y, data=data)
     
     expect_equal(length(b_model$formulas), 1)
     expect_equal(length(b_model$models), 1)
@@ -47,7 +47,7 @@ test_that('2 block lm, no interaction, works', {
     model1 <- summary(lm(y ~ x1, data))
     model2 <- summary(lm(y ~ x1 + x2, data))
     
-    b_model <- block_lm(y, x1, x2, data=data)
+    b_model <- build_model(y, x1, x2, data=data)
     
     expect_equal(length(b_model$formulas), 2)
     expect_equal(length(b_model$models), 2)
@@ -86,7 +86,7 @@ test_that('2 block lm, with interaction, works', {
     model1 <- summary(lm(y ~ x1 + x2, data))
     model2 <- summary(lm(y ~ x1 * x2, data))
     
-    b_model <- block_lm(y, c(x1, x2), x1 * x2, data=data)
+    b_model <- build_model(y, c(x1, x2), x1 * x2, data=data)
     
     expect_equal(length(b_model$formulas), 2)
     expect_equal(length(b_model$models), 2)
@@ -132,7 +132,7 @@ test_that('3 block lm, with interaction, works', {
     model2 <- summary(lm(y ~ x1 * x2 + x1 * x3 + x2 * x3, data))
     model3 <- summary(lm(y ~ x1 * x2 * x3, data))
     
-    b_model <- block_lm(y, c(x1, x2, x3), c(x1 * x2, x1 * x3, x2 * x3),
+    b_model <- build_model(y, c(x1, x2, x3), c(x1 * x2, x1 * x3, x2 * x3),
         x1 * x2 * x3, data=data)
     
     expect_equal(length(b_model$formulas), 3)
