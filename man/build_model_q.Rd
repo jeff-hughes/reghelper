@@ -4,7 +4,7 @@
 \alias{build_model_q}
 \title{Incremental block modelling.}
 \usage{
-build_model_q(dv, blocks = NULL, data = NULL, model = "lm")
+build_model_q(dv, blocks = NULL, data = NULL, opts = NULL, model = "lm")
 }
 \arguments{
 \item{dv}{String of the variable name to be used as the dependent variable.}
@@ -18,7 +18,9 @@ subsequent block.}
 not found in \code{data}, the variables are taken from the environment from
 which the function is called.}
 
-\item{model}{The type of model to use; default 'lm'.}
+\item{opts}{List of arguments to be passed to the model function.}
+
+\item{model}{The type of model to use; only supports 'lm' at this time.}
 }
 \value{
 A named list with the following elements:

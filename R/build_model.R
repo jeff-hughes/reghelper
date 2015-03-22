@@ -15,6 +15,7 @@
 #' @param data An optional data frame containing the variables in the model. If
 #'   not found in \code{data}, the variables are taken from the environment from
 #'   which the function is called.
+#' @param opts List of arguments to be passed to the model function.
 #' @param model The type of model to use; only supports 'lm' at this time.
 #' @return A named list with the following elements:
 #' \tabular{ll}{
@@ -33,7 +34,7 @@
 #' summary(model2)
 #' coef(model2)
 #' @export
-build_model <- function(dv, ..., data=NULL, model='lm') {
+build_model <- function(dv, ..., data=NULL, opts=NULL, model='lm') {
     if (length(list(...)) > 0) {
         # grab blocks of variable names and turn into strings
         dots <- substitute(list(...))[-1]
@@ -74,7 +75,7 @@ build_model <- function(dv, ..., data=NULL, model='lm') {
         }
         block_q[[i]] <- predictors
     }
-    models <- build_model_q(model=model, deparse(substitute(dv)), block_q, data)
+    models <- build_model_q(deparse(substitute(dv)), block_q, data, opts=opts, model=model)
     return(models)
 }
 
@@ -98,7 +99,8 @@ build_model <- function(dv, ..., data=NULL, model='lm') {
 #' @param data An optional data frame containing the variables in the model. If
 #'   not found in \code{data}, the variables are taken from the environment from
 #'   which the function is called.
-#' @param model The type of model to use; default 'lm'.
+#' @param opts List of arguments to be passed to the model function.
+#' @param model The type of model to use; only supports 'lm' at this time.
 #' @return A named list with the following elements:
 #' \tabular{ll}{
 #'   \code{formulas} \tab A list of the regression formulas used for each block.
@@ -117,13 +119,19 @@ build_model <- function(dv, ..., data=NULL, model='lm') {
 #' summary(model2)
 #' coef(model2)
 #' @export
-build_model_q <- function(dv, blocks=NULL, data=NULL, model='lm') {
+build_model_q <- function(dv, blocks=NULL, data=NULL, opts=NULL, model='lm') {
     formulas <- list()
     models <- list()
     
     for (i in 1:length(blocks)) {
         formulas[[i]] <- as.formula(paste(dv, '~', blocks[[i]]))
-        models[[i]] <- eval(call(model, formula=formulas[[i]], data))
+        
+        if (is.null(opts)) {
+            args <- list(formula=formulas[[i]], data=data)
+        } else {
+            args <- c(list(formula=formulas[[i]], data=data), opts)
+        }
+        models[[i]] <- do.call(model, args)
     }
     all_info <- list(
         formulas=formulas,

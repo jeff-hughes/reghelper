@@ -4,7 +4,7 @@
 \alias{build_model}
 \title{Incremental block modelling.}
 \usage{
-build_model(dv, ..., data = NULL, model = "lm")
+build_model(dv, ..., data = NULL, opts = NULL, model = "lm")
 }
 \arguments{
 \item{dv}{The variable name to be used as the dependent variable.}
@@ -18,6 +18,8 @@ previous blocks will be added to each subsequent block.}
 \item{data}{An optional data frame containing the variables in the model. If
 not found in \code{data}, the variables are taken from the environment from
 which the function is called.}
+
+\item{opts}{List of arguments to be passed to the model function.}
 
 \item{model}{The type of model to use; only supports 'lm' at this time.}
 }
