@@ -7,7 +7,8 @@
 simple_slopes(model, ...)
 }
 \arguments{
-\item{model}{A fitted linear model of type 'lm'.}
+\item{model}{A fitted linear model of type 'lm', 'glm', 'aov', 'lme' (nlme),
+or 'merMod' (lme4).}
 
 \item{...}{Additional arguments to be passed to the particular method for the
 given model.}
@@ -22,9 +23,17 @@ The form of the value returned by \code{simple_slopes} depends on the
 of an interaction in a regression model.
 }
 \examples{
-TODO: Need to complete.
+# mtcars data
+mtcars$am <- factor(mtcars$am)  # make 'am' categorical
+model <- lm(mpg ~ wt * am, data=mtcars)
+summary(model)  # significant interaction
+simple_slopes(model)
+simple_slopes(model,
+    levels=list(wt=c(2, 3, 4, 'sstest'), am=c(0, 1, 'sstest')))  # test at specific levels
 }
 \seealso{
-\code{\link{simple_slopes.lm}}
+\code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.glm}},
+  \code{\link{simple_slopes.aov}}, \code{\link{simple_slopes.lme}},
+  \code{\link{simple_slopes.merMod}}
 }
 

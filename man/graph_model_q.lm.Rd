@@ -70,6 +70,8 @@ pass variable names in directly instead of strings of variable names.
 evaluation is easier.
 }
 \examples{
-TODO: Need to complete.
+# iris data
+model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
+graph_model_q.lm(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
 }
 

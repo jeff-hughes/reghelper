@@ -7,7 +7,7 @@
 beta(model, ...)
 }
 \arguments{
-\item{model}{A fitted linear model of type 'lm' or 'aov'.}
+\item{model}{A fitted linear model of type 'lm', 'glm' or 'aov'.}
 
 \item{...}{Additional arguments to be passed to the particular method for the
 given model.}
@@ -22,9 +22,15 @@ The form of the value returned by \code{beta} depends on the class of
 from regression models.
 }
 \examples{
-TODO: Need to complete.
+# iris data
+model1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+beta(model1)  # all three variables standardized
+
+model2 <- lm(Sepal.Width ~ Petal.Width + Species, iris)
+beta(model2, skip='Species')  # all variables except Species standardized
 }
 \seealso{
-\code{\link{beta.lm}}, \code{\link{beta.aov}}
+\code{\link{beta.lm}}, \code{\link{beta.glm}},
+  \code{\link{beta.aov}}
 }
 

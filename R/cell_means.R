@@ -3,14 +3,18 @@
 #' \code{cell_means} is a generic function for calculating the estimated means
 #' of a linear model.
 #' 
-#' @param model A fitted linear model of type 'lm'.
+#' @param model A fitted linear model of type 'lm' or 'aov'.
 #' @param ... Additional arguments to be passed to the particular method for the
 #'   given model.
 #' @return The form of the value returned by \code{cell_means} depends on the
 #'   class of its argument. See the documentation of the particular methods for
 #'   details of what is produced by that method.
-#' @seealso \code{\link{cell_means.lm}}
-#' @examples TODO: Need to complete.
+#' @seealso \code{\link{cell_means.lm}}, \code{\link{cell_means.aov}}
+#' @examples
+#' # iris data
+#' model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+#' summary(model)
+#' cell_means(model, Petal.Length)
 #' @export
 cell_means <- function(model, ...) UseMethod('cell_means')
 
@@ -41,14 +45,21 @@ cell_means <- function(model, ...) UseMethod('cell_means')
 #'   predicted value, the standard error of the predicted mean, and the 95%
 #'   confidence interval.
 #' @seealso \code{\link{cell_means}}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+#' summary(model)
+#' cell_means(model, Petal.Length)
 #' @export
 cell_means.lm <- function(model, ..., levels=NULL) {
+    # grab variable names
+    call_list <- as.list(match.call())[-1]
+    call_list[which(names(call_list) %in% c('model', 'levels'))] <- NULL
+    
     var_names <- NULL
-    if (length(list(...)) > 0) {
-        # grab variable names and turn into strings
-        dots <- substitute(list(...))[-1]
-        var_names <- sapply(dots, deparse)
+    if (length(call_list) > 0) {
+        # turn variable names into strings
+        var_names <- sapply(call_list, deparse)
     }    
     return(cell_means_q.lm(model, var_names, levels))
 }
@@ -85,10 +96,14 @@ cell_means.lm <- function(model, ..., levels=NULL) {
 #'   predicted value, the standard error of the predicted mean, and the 95%
 #'   confidence interval.
 #' @seealso \code{\link{cell_means.lm}}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+#' summary(model)
+#' cell_means_q.lm(model, 'Petal.Length')
 #' @export
 cell_means_q.lm <- function(model, vars=NULL, levels=NULL) {
-    factors <- .set_factors(model, vars, levels, sstest=FALSE)
+    factors <- .set_factors(model$model, vars, levels, sstest=FALSE)
     final_grid <- with(model$model, expand.grid(factors))
     
     # deal with covariates
@@ -124,6 +139,17 @@ cell_means_q.lm <- function(model, vars=NULL, levels=NULL) {
     final_grid$ci.lower <- final_grid$value - 1.96 * final_grid$se
     final_grid$ci.upper <- final_grid$value + 1.96 * final_grid$se
     return(final_grid)
+}
+
+
+#' Estimated values of a linear model.
+#' 
+#' \code{cell_means.aov} is an alias of cell_means.lm.
+#' 
+#' @seealso \code{\link{cell_means.lm}}
+#' @export
+cell_means.aov <- function(model, ..., levels=NULL) {
+    cell_means.lm(model, ..., levels=levels)
 }
 
 

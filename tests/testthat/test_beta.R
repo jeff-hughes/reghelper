@@ -247,6 +247,28 @@ test_that('aov with 3-level predictor works', {
 })
 
 
+test_that('binomial glm with continuous predictor works', {
+    set.seed(123)
+    x <- rnorm(100)
+    
+    set.seed(234)
+    rand <- rnorm(100)
+    
+    y <- as.numeric(x > mean(x) & rand > mean(rand))
+    
+    model <- glm(y ~ x, family='binomial')
+    beta_model <- beta(model)
+    
+    expect_equal(get_var_names(beta_model), c('y', 'x.z'))
+    
+    expect_equal(beta_model$r.squared, summary(model)$r.squared)
+    
+    expect_equal(get_coef(beta_model, 'x.z'), 1.822)
+    expect_equal(coef(beta_model)[2, 4], coef(summary(model))[2, 4])
+        # p-values should still match
+})
+
+
 
 
 

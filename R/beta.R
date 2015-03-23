@@ -3,14 +3,21 @@
 #' \code{beta} is a generic function for producing standardized coefficients
 #' from regression models.
 #' 
-#' @param model A fitted linear model of type 'lm' or 'aov'.
+#' @param model A fitted linear model of type 'lm', 'glm' or 'aov'.
 #' @param ... Additional arguments to be passed to the particular method for the
 #'   given model.
 #' @return The form of the value returned by \code{beta} depends on the class of
 #'   its argument. See the documentation of the particular methods for details
 #'   of what is produced by that method.
-#' @seealso \code{\link{beta.lm}}, \code{\link{beta.aov}}
-#' @examples TODO: Need to complete.
+#' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}},
+#'   \code{\link{beta.aov}}
+#' @examples
+#' # iris data
+#' model1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+#' beta(model1)  # all three variables standardized
+#' 
+#' model2 <- lm(Sepal.Width ~ Petal.Width + Species, iris)
+#' beta(model2, skip='Species')  # all variables except Species standardized
 #' @export
 beta <- function(model, ...) UseMethod('beta')
 
@@ -36,21 +43,25 @@ beta <- function(model, ...) UseMethod('beta')
 #' @return Returns the summary of a linear model, with the output showing the
 #'   beta coefficients, standard error, t-values, and p-values for each
 #'   predictor.
-#' @examples TODO: Need to complete.
+#' @seealso \code{\link{beta.glm}}
+#' @examples
+#' # iris data
+#' model1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+#' beta(model1)  # all three variables standardized
+#' 
+#' model2 <- lm(Sepal.Width ~ Petal.Width + Species, iris)
+#' beta(model2, skip='Species')  # all variables except Species standardized
 #' @export
 beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL) {
-    data <- model$model
-    vars <- names(data)
-    data_classes <- attr(terms(model), 'dataClasses')
+    call <- model$call
+    vars <- names(model$model)
     formula <- format(formula(model))
     lhs <- attr(terms(model), 'response')  # index of criterion variable(s)
     if (x == FALSE) {
         vars <- vars[lhs]  # get only variables on left-hand side
-        data_classes <- data_classes[lhs]
     }
     if (y == FALSE) {
         vars <- vars[-lhs]  # get only variables on right-hand side
-        data_classes <- data_classes[-lhs]
     }
     
     # cover special case, where all variables are skipped
@@ -58,11 +69,76 @@ beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL) {
         return(summary(model))
     }
     
+    formula <- .create_formula(model, vars, skip)
+    data <- formula[['data']]
+    call[['formula']] <- formula[['formula']]
+    call[['data']] <- quote(data)  # need this so data doesn't get output
+                                   # directly in the summary
+    return(summary(eval(call)))
+}
+
+
+#' Standardized coeffients of a model.
+#' 
+#' \code{beta.aov} is an alias of beta.lm.
+#' 
+#' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}}
+#' @export
+beta.aov <- function(model, x=TRUE, y=TRUE, skip=NULL) {
+    model$call[[1]] <- quote(lm)  # need to change this so lm is returned
+                                  # instead of aov
+    beta.lm(model, x, y, skip)
+}
+
+
+#' Standardized coeffients of a model.
+#' 
+#' \code{beta.glm} returns the summary of a linear model where all variables
+#' have been standardized.
+#' 
+#' This function takes a generalized linear regression model and standardizes
+#' the variables, in order to produce standardized (i.e., beta) coefficients
+#' rather than unstandardized (i.e., B) coefficients.
+#' 
+#' Note: Unlike \code{\link{beta.lm}}, the \code{y} parameter is set to FALSE by
+#' default, to avoid issues with some family functions (e.g., binomial).
+#' 
+#' @param model A fitted generalized linear model of type 'glm'.
+#' @param x Logical. Whether or not to standardize predictor variables.
+#' @param y Logical. Whether or not to standardize criterion variables.
+#' @param skip A string vector indicating any variables you do \emph{not} wish
+#'   to be standarized.
+#' @return Returns the summary of a generalized linear model, with the output
+#'   showing the beta coefficients, standard error, t-values, and p-values for
+#'   each predictor.
+#' @seealso \code{\link{beta.glm}}
+#' @examples
+#' # mtcars data
+#' model1 <- glm(vs ~ wt + hp, data=mtcars, family='binomial')
+#' beta(model1)  # wt and hp standardized, vs is not by default
+#' @export
+beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL) {
+    beta.lm(model, x, y, skip)
+}
+
+
+#' Create formula for standardized estimates.
+#' 
+#' Helper function creates a new formula and data with scales variables.
+#' 
+#' @param model A fitted linear model.
+#' @param vars Character vector with names of variables.
+#' @param skip A string vector indicating any variables you do \emph{not} wish
+#'   to be standarized.
+#' @return Returns a list with new formula and new data.
+.create_formula <- function(model, vars, skip) {
+    data <- model$model
+    formula <- format(formula(model))
     for (i in 1:length(vars)) {
         if (!(vars[i] %in% skip)) {
             
             # handle factor variables specially
-            if (data_classes[i] == 'factor') {
+            if (is.factor(data[, vars[i]])) {
                 contrasts <- contrasts(data[, vars[i]])
                 var_replace <- ''
                 
@@ -86,36 +162,26 @@ beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL) {
                     levels(data[, var_name]) <- contrasts[, j]
                     data[, var_name] <- as.numeric(
                         as.character(data[, var_name]))
-                    # unfactor the dummy code
+                        # unfactor the dummy code
                     data[, var_name] <- scale(data[, var_name])
                 }
                 
                 if (ncol(contrasts) > 1) {
                     var_replace <- paste0('(', var_replace, ')')
-                    # add individual dummy codes to formula
+                        # add individual dummy codes to formula
                 }
                 formula <- gsub(vars[i], var_replace, formula)
                 
-                # all other variables
+            # all other variables
             } else {
                 var_name <- paste0(vars[i], '.z')
                 formula <- gsub(vars[i], var_name, formula)
                 data[, var_name] <- scale(data[, vars[i]])
-                # add scaled variable to data frame
+                    # add scaled variable to data frame
             }
         }
     }
-    return(summary(lm(formula, data)))
-}
-
-#' Standardized coeffients of a model.
-#' 
-#' \code{beta.aov} is an alias of beta.lm.
-#' 
-#' @seealso \code{\link{beta.lm}}
-#' @export
-beta.aov <- function(model, x=TRUE, y=TRUE, skip=NULL) {
-    beta.lm(model, x, y, skip)
+    return(list(data=data, formula=formula))
 }
 
 

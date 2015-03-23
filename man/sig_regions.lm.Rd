@@ -40,6 +40,10 @@ For more information about regions of significance, see
 McClelland (2012)}.
 }
 \examples{
-TODO: Need to complete.
+# mtcars data
+mtcars$am <- factor(mtcars$am)  # make 'am' categorical
+model <- lm(mpg ~ wt * am, data=mtcars)
+summary(model)  # significant interaction
+sig_regions(model)
 }
 

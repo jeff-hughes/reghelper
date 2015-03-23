@@ -10,6 +10,6 @@
 \code{beta.aov} is an alias of beta.lm.
 }
 \seealso{
-\code{\link{beta.lm}}
+\code{\link{beta.lm}}, \code{\link{beta.glm}}
 }
 

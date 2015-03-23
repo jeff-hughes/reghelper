@@ -24,7 +24,11 @@ effect of the categorical predictor changes from non-significant to
 significant.
 }
 \examples{
-TODO: Need to complete.
+# mtcars data
+mtcars$am <- factor(mtcars$am)  # make 'am' categorical
+model <- lm(mpg ~ wt * am, data=mtcars)
+summary(model)  # significant interaction
+sig_regions(model)
 }
 \seealso{
 \code{\link{sig_regions.lm}}

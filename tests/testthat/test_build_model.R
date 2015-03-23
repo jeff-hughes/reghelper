@@ -1,4 +1,4 @@
-context('block_model function')
+context('build_model function')
 
 # takes model and returns coefficient for a given variable/row number, rounded
 # to 'digits' decimal places
@@ -16,7 +16,7 @@ test_that('lm with no predictors works', {
                            # environment (with no data argument)
     
     model <- summary(lm(y ~ 1, data))
-    b_model <- block_lm(y, data=data)
+    b_model <- build_model(y, data=data)
     
     expect_equal(length(b_model$formulas), 1)
     expect_equal(length(b_model$models), 1)
@@ -47,7 +47,7 @@ test_that('2 block lm, no interaction, works', {
     model1 <- summary(lm(y ~ x1, data))
     model2 <- summary(lm(y ~ x1 + x2, data))
     
-    b_model <- block_lm(y, x1, x2, data=data)
+    b_model <- build_model(y, x1, x2, data=data)
     
     expect_equal(length(b_model$formulas), 2)
     expect_equal(length(b_model$models), 2)
@@ -86,7 +86,7 @@ test_that('2 block lm, with interaction, works', {
     model1 <- summary(lm(y ~ x1 + x2, data))
     model2 <- summary(lm(y ~ x1 * x2, data))
     
-    b_model <- block_lm(y, c(x1, x2), x1 * x2, data=data)
+    b_model <- build_model(y, c(x1, x2), x1 * x2, data=data)
     
     expect_equal(length(b_model$formulas), 2)
     expect_equal(length(b_model$models), 2)
@@ -132,7 +132,7 @@ test_that('3 block lm, with interaction, works', {
     model2 <- summary(lm(y ~ x1 * x2 + x1 * x3 + x2 * x3, data))
     model3 <- summary(lm(y ~ x1 * x2 * x3, data))
     
-    b_model <- block_lm(y, c(x1, x2, x3), c(x1 * x2, x1 * x3, x2 * x3),
+    b_model <- build_model(y, c(x1, x2, x3), c(x1 * x2, x1 * x3, x2 * x3),
         x1 * x2 * x3, data=data)
     
     expect_equal(length(b_model$formulas), 3)
@@ -176,6 +176,35 @@ test_that('3 block lm, with interaction, works', {
         round(model2$r.squared, 3))
     expect_equal(round(b_summ$overall[3, 1], 3),
         round(model3$r.squared, 3))
+})
+
+
+test_that('opts parameter passes along arguments', {
+    set.seed(123)
+    x1 <- rnorm(100)
+    
+    set.seed(234)
+    x2 <- rnorm(100)
+    
+    set.seed(345)
+    y <- x1 + x2 + rnorm(100)
+    
+    data <- data.frame(x1, x2, y)
+
+    model1 <- summary(lm(y ~ x1 + x2, data))
+    model2 <- summary(lm(y ~ x1 + x2, data, subset=1:50))
+    
+    b_model1 <- build_model(y, x1, x2, data=data)
+    b_model2 <- build_model(y, x1, x2, data=data, opts=list(subset=1:50))
+    
+    b_summ1 <- summary(b_model1)
+    b_summ2 <- summary(b_model2)
+    
+    # check coefficients
+    expect_equal(round(coef(b_summ1, 2)['x1', 1], 3), get_coef(model1, 'x1'))
+    expect_equal(round(coef(b_summ1, 2)['x2', 1], 3), get_coef(model1, 'x2'))
+    expect_equal(round(coef(b_summ2, 2)['x1', 1], 3), get_coef(model2, 'x1'))
+    expect_equal(round(coef(b_summ2, 2)['x2', 1], 3), get_coef(model2, 'x2'))
 })
 
 

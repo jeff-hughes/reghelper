@@ -13,6 +13,32 @@ knitr::opts_chunk$set(
   fig.path = "NEWS-"
 )
 ```
+# reghelper 0.2.0
+
+MAJOR CHANGES
+
+* Changed `block_lm` function name to `build_model`.
+
+NEW FEATURES
+
+* Added examples to documentation for all functions.
+
+* `beta` function extended to include `glm` models.
+
+* `cell_means` function extended to include `aov` models.
+
+* `ICC` function extended to include `merMod` models (from "lme4" package).
+
+* `simple_slopes` function extended to include `aov`, `glm`, `lme`, and `merMod`
+  models.
+
+* `simple_slopes` now includes `print` function to include significance stars.
+
+BUG FIXES
+
+* Fixed bug with passing variables names to `build_model`, `cell_means`, and
+  `graph_model`. Resolves Issue #1.
+
 # reghelper 0.1.0
 
 NEW FEATURES

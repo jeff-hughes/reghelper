@@ -35,6 +35,14 @@ estimates for interaciton terms (by first standardizing each of the
 individual predictor variables).
 }
 \examples{
-TODO: Need to complete.
+# iris data
+model1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
+beta(model1)  # all three variables standardized
+
+model2 <- lm(Sepal.Width ~ Petal.Width + Species, iris)
+beta(model2, skip='Species')  # all variables except Species standardized
+}
+\seealso{
+\code{\link{beta.glm}}
 }
 

@@ -1,6 +1,6 @@
 #' Incremental block modelling.
 #' 
-#' \code{block_lm} allows you to incrementally add terms to a linear regression
+#' \code{build_model} allows you to incrementally add terms to a linear regression
 #' model.
 #' 
 #' Given a list of names of variables at each step, this function will run a
@@ -15,19 +15,33 @@
 #' @param data An optional data frame containing the variables in the model. If
 #'   not found in \code{data}, the variables are taken from the environment from
 #'   which the function is called.
+#' @param opts List of arguments to be passed to the model function.
+#' @param model The type of model to use; only supports 'lm' at this time.
 #' @return A named list with the following elements:
 #' \tabular{ll}{
 #'   \code{formulas} \tab A list of the regression formulas used for each block.
 #'   \cr
 #'   \code{models} \tab A list of all regression models.\cr
 #' }
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2)
 #' @export
-block_lm <- function(dv, ..., data=NULL) {
-    if (length(list(...)) > 0) {
-        # grab blocks of variable names and turn into strings
-        dots <- substitute(list(...))[-1]
-        blocks <- sapply(dots, deparse)
+build_model <- function(dv, ..., data=NULL, opts=NULL, model='lm') {
+    # grab blocks of variable names
+    call_list <- as.list(match.call())[-1]
+    call_list[which(names(call_list) %in% c('dv', 'data', 'opts', 'model'))] <- NULL
+    
+    if (length(call_list) > 0) {
+        # turn variable names into strings
+        blocks <- sapply(call_list, deparse)
         
         # because we can have vectors or lists of variables designating a block,
         # we need to pull out the individual variable names and store in a list
@@ -64,20 +78,20 @@ block_lm <- function(dv, ..., data=NULL) {
         }
         block_q[[i]] <- predictors
     }
-    models <- block_lm_q(deparse(substitute(dv)), block_q, data)
+    models <- build_model_q(deparse(substitute(dv)), block_q, data, opts=opts, model=model)
     return(models)
 }
 
 
 #' Incremental block modelling.
 #' 
-#' \code{block_lm_q} allows you to incrementally add terms to a linear
+#' \code{build_model_q} allows you to incrementally add terms to a linear
 #' regression model.
 #' 
 #' Given a list of names of variables at each step, this function will run a
 #' series of models, adding the terms for each block incrementally. Note that in
-#' most cases it is easier to use \code{\link{block_lm}} and pass variable names
-#' in directly instead of strings of variable names. \code{block_lm_q} uses
+#' most cases it is easier to use \code{\link{build_model}} and pass variable names
+#' in directly instead of strings of variable names. \code{build_model_q} uses
 #' standard evaluation in cases where such evaluation is easier.
 #' 
 #' @param dv String of the variable name to be used as the dependent variable.
@@ -88,28 +102,45 @@ block_lm <- function(dv, ..., data=NULL) {
 #' @param data An optional data frame containing the variables in the model. If
 #'   not found in \code{data}, the variables are taken from the environment from
 #'   which the function is called.
+#' @param opts List of arguments to be passed to the model function.
+#' @param model The type of model to use; only supports 'lm' at this time.
 #' @return A named list with the following elements:
 #' \tabular{ll}{
 #'   \code{formulas} \tab A list of the regression formulas used for each block.
 #'   \cr
 #'   \code{models} \tab A list of all regression models.\cr
 #' }
-#' @seealso \code{\link{block_lm}}
-#' @examples TODO: Need to complete.
+#' @seealso \code{\link{build_model}}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model_q('Sepal.Length', list('Petal.Length', 'Petal.Width'), data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model_q('Sepal.Length', list('Species', 'Petal.Length * Petal.Width')), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2)
 #' @export
-block_lm_q <- function(dv, blocks=NULL, data=NULL) {
+build_model_q <- function(dv, blocks=NULL, data=NULL, opts=NULL, model='lm') {
     formulas <- list()
     models <- list()
     
     for (i in 1:length(blocks)) {
         formulas[[i]] <- as.formula(paste(dv, '~', blocks[[i]]))
-        models[[i]] <- lm(formula=formulas[[i]], data)
+        
+        if (is.null(opts)) {
+            args <- list(formula=formulas[[i]], data=data)
+        } else {
+            args <- c(list(formula=formulas[[i]], data=data), opts)
+        }
+        models[[i]] <- do.call(model, args)
     }
     all_info <- list(
         formulas=formulas,
         models=models
     )
-    class(all_info) <- 'block_lm'
+    class(all_info) <- paste0('block_', model)
     return(all_info)
 }
 
@@ -119,7 +150,7 @@ block_lm_q <- function(dv, blocks=NULL, data=NULL) {
 #' \code{summary} method for class "\code{block_lm}".
 #' 
 #' @param model An object of class "\code{block_lm}", usually, a result of a
-#'   call to \code{\link{block_lm}}.
+#'   call to \code{\link{build_model}}.
 #' @param ... Further arguments passed to or from other methods.
 #' @return The function computes and returns a named list of summary statistics
 #'   of the fitted linear models given in \code{model}. The list has the
@@ -137,8 +168,17 @@ block_lm_q <- function(dv, blocks=NULL, data=NULL) {
 #'   R-squared (change in R-squared) and its associated F-statistic and p-value.
 #'   \cr
 #' }
-#' @seealso \code{\link{block_lm}}, \code{\link{print.block_lm_summary}}
-#' @examples TODO: Need to complete.
+#' @seealso \code{\link{build_model}}, \code{\link{print.block_lm_summary}}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2)
 #' @export
 summary.block_lm <- function(model, ...) {
     obj <- list()
@@ -225,8 +265,17 @@ summary.block_lm <- function(model, ...) {
 #' @param signif.stars Logical. If \code{TRUE}, 'significance stars' are printed
 #'   for each coefficient.
 #' @param ... Further arguments passed to or from other methods.
-#' @seealso \code{\link{block_lm}}, \code{\link{summary.block_lm}}
-#' @examples TODO: Need to complete.
+#' @seealso \code{\link{build_model}}, \code{\link{summary.block_lm}}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2)
 #' @export
 print.block_lm_summary <- function(
     model,
@@ -280,13 +329,24 @@ print.block_lm_summary <- function(
 #' \code{coef} method for class "\code{block_lm}".
 #' 
 #' @param model An object of class "\code{block_lm}", usually, a result of a
-#'   call to \code{\link{block_lm}}.
+#'   call to \code{\link{build_model}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   coefficients.
 #' @param ... Further arguments passed to or from other methods.
-#' @seealso \code{\link{block_lm}}, \code{coef.block_lm_summary},
+#' @return The coefficients of block(s) `num`, or if `num` is NULL, a list of
+#'   coefficients from all blocks.
+#' @seealso \code{\link{build_model}}, \code{coef.block_lm_summary},
 #'   \code{\link{fitted.block_lm}}, \code{residuals.block_lm}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2, num=2)  # returns second block
 #' @export
 coef.block_lm <- function(model, num=NULL, ...) {
     if (!is.null(num)) {
@@ -310,9 +370,18 @@ coef.block_lm <- function(model, num=NULL, ...) {
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   coefficients.
 #' @param ... Further arguments passed to or from other methods.
+#' @return The coefficients of block(s) `num`, or if `num` is NULL, a list of
+#'   coefficients from all blocks.
 #' @seealso \code{\link{summary.block_lm}}, \code{coef.block_lm},
 #'   \code{residuals.block_lm_summary}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' coef(summary(model1))  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' coef(summary(model2), num=2)  # returns second block
 #' @export
 coef.block_lm_summary <- function(model, num=NULL, ...) {
     if (!is.null(num)) {
@@ -332,13 +401,24 @@ coef.block_lm_summary <- function(model, num=NULL, ...) {
 #' \code{residuals} method for class "\code{block_lm}".
 #' 
 #' @param model An object of class "\code{block_lm}", usually, a result of a
-#'   call to \code{\link{block_lm}}.
+#'   call to \code{\link{build_model}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   residuals.
 #' @param ... Further arguments passed to or from other methods.
-#' @seealso \code{\link{block_lm}}, \code{residuals.block_lm_summary},
+#' @return The residuals of block(s) `num`, or if `num` is NULL, a list of
+#'   residuals from all blocks.
+#' @seealso \code{\link{build_model}}, \code{residuals.block_lm_summary},
 #'   \code{\link{fitted.block_lm}}, \code{coef.block_lm}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' residuals(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' residuals(model2, num=2)  # returns second block
 #' @export
 residuals.block_lm <- function(model, num=NULL, ...) {
     if (!is.null(num)) {
@@ -362,9 +442,18 @@ residuals.block_lm <- function(model, num=NULL, ...) {
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   residuals.
 #' @param ... Further arguments passed to or from other methods.
+#' @return The residuals of block(s) `num`, or if `num` is NULL, a list of
+#'   residuals from all blocks.
 #' @seealso \code{\link{summary.block_lm}}, \code{residuals.block_lm},
 #'   \code{coef.block_lm_summary}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' residuals(summary(model1))  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' residuals(summary(model2), num=2)  # returns second block
 #' @export
 residuals.block_lm_summary <- function(model, num=NULL, ...) {
     if (!is.null(num)) {
@@ -380,13 +469,24 @@ residuals.block_lm_summary <- function(model, num=NULL, ...) {
 #' \code{fitted} method for class "\code{block_lm}".
 #' 
 #' @param model An object of class "\code{block_lm}", usually, a result of a
-#'   call to \code{\link{block_lm}}.
+#'   call to \code{\link{build_model}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   fitted values.
 #' @param ... Further arguments passed to or from other methods.
-#' @seealso \code{\link{block_lm}}, \code{coef.block_lm},
+#' @return The fitted values of block(s) `num`, or if `num` is NULL, a list of
+#'   fitted values from all blocks.
+#' @seealso \code{\link{build_model}}, \code{coef.block_lm},
 #'   \code{residuals.block_lm}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' fitted(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' fitted(model2, num=2)  # returns second block
 #' @export
 fitted.block_lm <- function(model, num=NULL, ...) {
     if (!is.null(num)) {

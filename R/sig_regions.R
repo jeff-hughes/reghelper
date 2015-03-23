@@ -12,7 +12,12 @@
 #'   class of its argument. See the documentation of the particular methods for
 #'   details of what is produced by that method.
 #' @seealso \code{\link{sig_regions.lm}}
-#' @examples TODO: Need to complete.
+#' @examples
+#' # mtcars data
+#' mtcars$am <- factor(mtcars$am)  # make 'am' categorical
+#' model <- lm(mpg ~ wt * am, data=mtcars)
+#' summary(model)  # significant interaction
+#' sig_regions(model)
 #' @export
 sig_regions <- function(model, ...) UseMethod('sig_regions')
 
@@ -44,7 +49,12 @@ sig_regions <- function(model, ...) UseMethod('sig_regions')
 #'   more of the J-N points fall outside the range of your predictor, the
 #'   function will return NA for that point. If your interaction is not
 #'   significant, both J-N points will be NA.
-#' @examples TODO: Need to complete.
+#' @examples
+#' # mtcars data
+#' mtcars$am <- factor(mtcars$am)  # make 'am' categorical
+#' model <- lm(mpg ~ wt * am, data=mtcars)
+#' summary(model)  # significant interaction
+#' sig_regions(model)
 #' @export
 sig_regions.lm <- function(model, alpha=.05, precision=4) {
     int_term <- which(attr(terms(model), 'order') == 2)
