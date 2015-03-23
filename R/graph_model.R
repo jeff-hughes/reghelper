@@ -68,10 +68,10 @@ graph_model.lm <- function(model, y, x, lines=NULL, split=NULL, errorbars='CI',
     # convert variable names to strings
     call$y <- deparse(substitute(y))
     call$x <- deparse(substitute(x))
-    if (!is.null(lines)) {
+    if (!is.null(call$lines)) {
         call$lines <- deparse(substitute(lines))
     }
-    if (!is.null(split)) {
+    if (!is.null(call$split)) {
         call$split <- deparse(substitute(split))
     }
     

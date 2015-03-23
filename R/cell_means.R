@@ -52,11 +52,14 @@ cell_means <- function(model, ...) UseMethod('cell_means')
 #' cell_means(model, Petal.Length)
 #' @export
 cell_means.lm <- function(model, ..., levels=NULL) {
+    # grab variable names
+    call_list <- as.list(match.call())[-1]
+    call_list[which(names(call_list) %in% c('model', 'levels'))] <- NULL
+    
     var_names <- NULL
-    if (length(list(...)) > 0) {
-        # grab variable names and turn into strings
-        dots <- substitute(list(...))[-1]
-        var_names <- sapply(dots, deparse)
+    if (length(call_list) > 0) {
+        # turn variable names into strings
+        var_names <- sapply(call_list, deparse)
     }    
     return(cell_means_q.lm(model, var_names, levels))
 }

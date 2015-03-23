@@ -35,10 +35,13 @@
 #' coef(model2)
 #' @export
 build_model <- function(dv, ..., data=NULL, opts=NULL, model='lm') {
-    if (length(list(...)) > 0) {
-        # grab blocks of variable names and turn into strings
-        dots <- substitute(list(...))[-1]
-        blocks <- sapply(dots, deparse)
+    # grab blocks of variable names
+    call_list <- as.list(match.call())[-1]
+    call_list[which(names(call_list) %in% c('dv', 'data', 'opts', 'model'))] <- NULL
+    
+    if (length(call_list) > 0) {
+        # turn variable names into strings
+        blocks <- sapply(call_list, deparse)
         
         # because we can have vectors or lists of variables designating a block,
         # we need to pull out the individual variable names and store in a list

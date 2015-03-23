@@ -18,6 +18,8 @@ reghelper 0.2.0
 
 -   Changed `block_lm` function to `build_model`.
 
+-   Fixed bug with passing variables names to `build_model`, `cell_means`, and `graph_model`. Resolves \#1.
+
 reghelper 0.1.0
 ===============
 
