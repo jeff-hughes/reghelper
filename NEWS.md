@@ -4,21 +4,27 @@
 reghelper 0.2.0
 ===============
 
--   `simple_slopes` now includes `print` function to include significance stars.
+MAJOR CHANGES
 
--   `ICC` function extended to include `merMod` models (from "lme4" package).
+-   Changed `block_lm` function name to `build_model`.
 
--   `beta` function extended to include `glm` models.
-
--   `simple_slopes` function extended to include `aov`, `glm`, `lme`, and `merMod` models.
-
--   `cell_means` function extended to include `aov` models.
+NEW FEATURES
 
 -   Added examples to documentation for all functions.
 
--   Changed `block_lm` function to `build_model`.
+-   `beta` function extended to include `glm` models.
 
--   Fixed bug with passing variables names to `build_model`, `cell_means`, and `graph_model`. Resolves \#1.
+-   `cell_means` function extended to include `aov` models.
+
+-   `ICC` function extended to include `merMod` models (from "lme4" package).
+
+-   `simple_slopes` function extended to include `aov`, `glm`, `lme`, and `merMod` models.
+
+-   `simple_slopes` now includes `print` function to include significance stars.
+
+BUG FIXES
+
+-   Fixed bug with passing variables names to `build_model`, `cell_means`, and `graph_model`. Resolves Issue \#1.
 
 reghelper 0.1.0
 ===============
