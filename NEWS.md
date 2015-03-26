@@ -1,6 +1,11 @@
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
 
 
+reghelper 0.3.0
+===============
+
+-   `graph_model` function extended to include `glm` models.
+
 reghelper 0.2.0
 ===============
 

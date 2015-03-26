@@ -7,7 +7,7 @@
 graph_model(model, ...)
 }
 \arguments{
-\item{model}{A fitted linear model of type 'lm'.}
+\item{model}{A fitted linear model of type 'lm' or 'glm'.}
 
 \item{...}{Additional arguments to be passed to the particular method for the
 given model.}
@@ -26,6 +26,6 @@ model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
 graph_model(model, y=Sepal.Width, x=Sepal.Length, lines=Species)
 }
 \seealso{
-\code{\link{graph_model.lm}}
+\code{\link{graph_model.lm}}, \code{\link{graph_model.glm}}
 }
 
