@@ -57,7 +57,10 @@ graph_model <- function(model, ...) UseMethod('graph_model')
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
 #' @return A ggplot2 graph of the plotted variables in the model.
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
+#' graph_model(model, y=Sepal.Width, x=Sepal.Length, lines=Species)
 #' @export
 graph_model.lm <- function(model, y, x, lines=NULL, split=NULL, errorbars='CI',
     ymin=NULL, ymax=NULL, titles=NULL, bargraph=FALSE, draw.legend=TRUE,

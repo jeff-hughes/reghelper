@@ -65,6 +65,8 @@ respective means. In the case of a categorical covariate, the results will be
 averaged across all its levels.
 }
 \examples{
-TODO: Need to complete.
+# iris data
+model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
+graph_model(model, y=Sepal.Width, x=Sepal.Length, lines=Species)
 }
 
