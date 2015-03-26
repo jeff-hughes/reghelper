@@ -149,7 +149,16 @@ cell_means_q.lm <- function(model, vars=NULL, levels=NULL) {
 #' @seealso \code{\link{cell_means.lm}}
 #' @export
 cell_means.aov <- function(model, ..., levels=NULL) {
-    cell_means.lm(model, ..., levels=levels)
+    # grab variable names
+    call_list <- as.list(match.call())[-1]
+    call_list[which(names(call_list) %in% c('model', 'levels'))] <- NULL
+    
+    var_names <- NULL
+    if (length(call_list) > 0) {
+        # turn variable names into strings
+        var_names <- sapply(call_list, deparse)
+    }    
+    return(cell_means_q.lm(model, var_names, levels))
 }
 
 
