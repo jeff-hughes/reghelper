@@ -6,7 +6,7 @@ reghelper 0.3.0
 
 -   `graph_model` function extended to include `aov` and `glm` models.
 
--   `build_model` function extended to include `aov` models.
+-   `build_model` function extended to include `aov` and `glm` models.
 
 reghelper 0.2.0
 ===============
