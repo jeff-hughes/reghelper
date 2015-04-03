@@ -501,5 +501,231 @@ fitted.block_lm <- function(model, num=NULL, ...) {
 }
 
 
+#' Summarizing block ANOVA.
+#' 
+#' \code{summary} method for class "\code{block_aov}".
+#' 
+#' @param model An object of class "\code{block_aov}", usually, a result of a
+#'   call to \code{\link{build_model}}.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The function computes and returns a named list of summary statistics
+#'   of the fitted aov models given in \code{model}. The list has the following
+#'   elements:
+#' \tabular{ll}{
+#'   \code{formulas} \tab A list of the aov formulas used for each block.
+#'   \cr
+#'   \code{residuals} \tab A matrix with quantiles of the residuals for each
+#'   model.\cr
+#'   \code{summaries} \tab A list with an ANOVA table for each model, including
+#'   the sums of squares, mean squares, F values, and p-values.\cr
+#' }
+#' @seealso \code{\link{build_model}}, \code{\link{print.block_aov_summary}}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2)
+#' @export
+summary.block_aov <- function(model, ...) {
+    obj <- list()
+    obj$formulas <- model$formulas
+    
+    model_names <- paste('Model', 1:length(model$models))
+    delta_anova <- do.call(anova, model$models) 
+    
+    resids <- list()
+    summ <- list()
+    
+    # pull out residuals, coefficients, and R-squared and F
+    for (m in 1:length(model$models)) {
+        # calculate residuals for model
+        resids[[m]] <- quantile(residuals(model$models[[m]]))
+        
+        summ[[m]] <- summary(model$models[[m]])
+    }
+    
+    # reorganize residual information
+    resids <- matrix(unlist(resids), ncol=5, byrow=TRUE)
+    colnames(resids) <- c('Min', '1Q', 'Median', '3Q', 'Max')
+    rownames(resids) <- model_names
+    obj$residuals <- resids  
+    
+    obj$summaries <- summ
+    class(obj) <- 'block_aov_summary'
+    
+    return(obj)
+}
+
+
+#' Summarizing block ANOVA.
+#' 
+#' \code{print} method for class "\code{block_aov_summary}".
+#' 
+#' @param model An object of class "\code{block_aov_summary}", usually, a result
+#'   of a call to \code{\link{summary.block_aov}}.
+#' @param digits The number of significant digits to use when printing.
+#' @param signif.stars Logical. If \code{TRUE}, 'significance stars' are printed
+#'   for each coefficient.
+#' @param ... Further arguments passed to or from other methods.
+#' @seealso \code{\link{build_model}}, \code{\link{summary.block_aov}}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2)
+#' @export
+print.block_aov_summary <- function(
+    model,
+    digits=max(3L, getOption('digits') - 3L),
+    signif.stars=getOption('show.signif.stars'),
+    ...) {
+    
+    writeLines('Residuals:')
+    print(model$residuals, digits=digits, ...)
+    
+    writeLines('\nTables:')
+    
+    num_models <- length(model$summaries)
+    for (m in 1:num_models) {
+        writeLines(paste0('aov(formula = ', format(model$formulas[[m]]), ')'))
+        summ <- capture.output(print(model$summaries[[m]],
+            digits=digits,
+            signif.stars=signif.stars,
+            na.print='NA', ...))
+        
+        # cut off significance codes for all but last model
+        if (m == num_models || !grepl('Signif. codes', summ[length(summ)])) {
+            writeLines(summ)
+        } else {
+            writeLines(summ[1:(length(summ)-2)])
+        }
+        writeLines('')
+    }
+    
+    invisible(model)
+}
+
+
+#' Extract model coefficients.
+#' 
+#' \code{coef} method for class "\code{block_aov}".
+#' 
+#' @param model An object of class "\code{block_aov}", usually, a result of a
+#'   call to \code{\link{build_model}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   coefficients.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The coefficients of block(s) `num`, or if `num` is NULL, a list of
+#'   coefficients from all blocks.
+#' @seealso \code{\link{build_model}}, \code{\link{fitted.block_aov}},
+#'   \code{residuals.block_aov}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2, num=2)  # returns second block
+#' @export
+coef.block_aov <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(lapply(model$models[num], coef, ...))
+        } else {
+            return(coef(model$models[[num]], ...))
+        }
+    } else {
+        return(lapply(model$models, coef, ...))
+    }
+}
+
+
+#' Extract model residuals.
+#' 
+#' \code{residuals} method for class "\code{block_aov}".
+#' 
+#' @param model An object of class "\code{block_aov}", usually, a result of a
+#'   call to \code{\link{build_model}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   residuals.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The residuals of block(s) `num`, or if `num` is NULL, a list of
+#'   residuals from all blocks.
+#' @seealso \code{\link{build_model}}, \code{\link{fitted.block_aov}},
+#'   \code{coef.block_aov}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' residuals(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' residuals(model2, num=2)  # returns second block
+#' @export
+residuals.block_aov <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(lapply(model$models[num], residuals, ...))
+        } else {
+            return(residuals(model$models[[num]], ...))
+        }
+    } else {
+        return(lapply(model$models, residuals, ...))
+    }
+}
+
+
+#' Extract model fitted values.
+#' 
+#' \code{fitted} method for class "\code{block_aov}".
+#' 
+#' @param model An object of class "\code{block_aov}", usually, a result of a
+#'   call to \code{\link{build_model}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   fitted values.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The fitted values of block(s) `num`, or if `num` is NULL, a list of
+#'   fitted values from all blocks.
+#' @seealso \code{\link{build_model}}, \code{coef.block_aov},
+#'   \code{residuals.block_aov}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' fitted(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' fitted(model2, num=2)  # returns second block
+#' @export
+fitted.block_aov <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(lapply(model$models[num], fitted, ...))
+        } else {
+            return(fitted(model$models[[num]], ...))
+        }
+    } else {
+        return(lapply(model$models, fitted, ...))
+    }
+}
+
+
 
 
