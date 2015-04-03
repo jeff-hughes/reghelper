@@ -137,4 +137,31 @@ test_that('binomial glm works', {
 })
 
 
+test_that('aov with 2-way interaction works', {
+    x1 <- c(rep(0, 50), rep(1, 50))
+    x2 <- rep(c(rep(0, 25), rep(1, 25)), 2)
+    
+    set.seed(345)
+    y <- x1 * x2 + rnorm(100)
+    
+    x1 <- factor(x1)
+    x2 <- factor(x2)
+    
+    data <- data.frame(x1, x2, y)
+    
+    model <- aov(y ~ x1 * x2, data)
+    graph <- graph_model(model, y=y, x=x1, lines=x2, bargraph=TRUE)
+    
+    expect_is(graph, 'ggplot')
+    expect_equal(length(graph$layers), 2)  # geom_bar, geom_errorbar
+    
+    expect_equal(as.character(graph$mapping$x), 'x1')
+    expect_equal(as.character(graph$mapping$y), 'y')
+    expect_equal(as.character(graph$mapping$fill), 'x2')
+    
+    expect_equal(levels(graph$data$x1), c('0', '1'))
+    expect_equal(levels(graph$data$x2), c('0', '1'))
+})
+
+
 

@@ -144,6 +144,48 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
 }
 
 
+#' Graph linear interactions.
+#' 
+#' \code{graph_model.aov}  is an alias of graph_model.lm.
+#' 
+#' @seealso \code{\link{graph_model.lm}}, \code{\link{graph_model.glm}}
+#' @export
+graph_model.aov <- function(model, y, x, lines=NULL, split=NULL, errorbars='CI',
+    ymin=NULL, ymax=NULL, titles=NULL, bargraph=FALSE, draw.legend=TRUE,
+    dodge=0, exp=FALSE) {
+    
+    call <- as.list(match.call())[-1]
+    
+    # convert variable names to strings
+    call$y <- deparse(substitute(y))
+    call$x <- deparse(substitute(x))
+    if (!is.null(call$lines)) {
+        call$lines <- deparse(substitute(lines))
+    }
+    if (!is.null(call$split)) {
+        call$split <- deparse(substitute(split))
+    }
+    
+    return(do.call(graph_model_q.aov, call))
+}
+
+
+#' Graph linear interactions.
+#' 
+#' \code{graph_model_q.aov}  is an alias of graph_model_q.lm.
+#' 
+#' @seealso \code{\link{graph_model_q.lm}}, \code{\link{graph_model_q.glm}}
+#' @export
+graph_model_q.aov <- function(model, y, x, lines=NULL, split=NULL,
+    errorbars='CI', ymin=NULL, ymax=NULL, titles=NULL, bargraph=FALSE,
+    draw.legend=TRUE, dodge=0, exp=FALSE) {
+    
+    call <- as.list(match.call())[-1]
+    
+    return(do.call(graph_model_q.lm, call))
+}
+
+
 #' Graph general linear interactions.
 #' 
 #' \code{graph_model.glm} provides an easy way to graph interactions in general

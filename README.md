@@ -54,7 +54,7 @@ The table below shows the current types of models for which each function has be
 |build\_model|✓|||||
 |ICC||||✓|✓|
 |cell\_means|✓||✓|||
-|graph\_model|✓|✓||||
+|graph\_model|✓|✓|✓|||
 |sig\_regions|✓|||||
 |simple\_slopes|✓|✓|✓|✓|✓|
 
