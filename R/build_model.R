@@ -366,7 +366,7 @@ coef.block_lm <- function(model, num=NULL, ...) {
 #' \code{coef} method for class "\code{block_lm_summary}".
 #' 
 #' @param model An object of class "\code{block_lm_summary}", usually, a result
-#'   of a call to \code{\link{block_lm_summary}}.
+#'   of a call to \code{\link{summary.block_lm}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   coefficients.
 #' @param ... Further arguments passed to or from other methods.
@@ -438,7 +438,7 @@ residuals.block_lm <- function(model, num=NULL, ...) {
 #' \code{residuals} method for class "\code{block_lm_summary}".
 #' 
 #' @param model An object of class "\code{block_lm_summary}", usually, a result
-#'   of a call to \code{\link{block_lm_summary}}.
+#'   of a call to \code{\link{summary.block_lm}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   residuals.
 #' @param ... Further arguments passed to or from other methods.

@@ -8,7 +8,7 @@
 }
 \arguments{
 \item{model}{An object of class "\code{block_lm_summary}", usually, a result
-of a call to \code{\link{block_lm_summary}}.}
+of a call to \code{\link{summary.block_lm}}.}
 
 \item{num}{Numeric vector with the index of model(s) from which to return the
 coefficients.}
