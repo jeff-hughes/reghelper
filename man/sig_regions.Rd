@@ -31,6 +31,6 @@ summary(model)  # significant interaction
 sig_regions(model)
 }
 \seealso{
-\code{\link{sig_regions.lm}}
+\code{\link{sig_regions.lm}}, \code{\link{simple_slopes}}
 }
 

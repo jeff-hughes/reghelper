@@ -4,7 +4,7 @@
 \alias{coef.block_glm}
 \title{Extract model coefficients.}
 \usage{
-\method{coef}{block_glm}(model, num = NULL, ...)
+coef.block_glm(model, num = NULL, ...)
 }
 \arguments{
 \item{model}{An object of class "\code{block_glm}", usually, a result of a

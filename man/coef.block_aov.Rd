@@ -4,7 +4,7 @@
 \alias{coef.block_aov}
 \title{Extract model coefficients.}
 \usage{
-\method{coef}{block_aov}(model, num = NULL, ...)
+coef.block_aov(model, num = NULL, ...)
 }
 \arguments{
 \item{model}{An object of class "\code{block_aov}", usually, a result of a
