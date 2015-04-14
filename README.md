@@ -52,10 +52,10 @@ The table below shows the current types of models for which each function has be
 |:-------|:-:|:-:|:-:|:-:|:--:|
 |beta|✓|✓|✓|||
 |build\_model|✓|✓|✓|||
-|ICC||||✓|✓|
+|ICC|–|–|–|✓|✓|
 |cell\_means|✓|✓|✓|||
 |graph\_model|✓|✓|✓|||
-|sig\_regions|✓|||||
+|sig\_regions|✓||–|||
 |simple\_slopes|✓|✓|✓|✓|✓|
 
 Things to do
