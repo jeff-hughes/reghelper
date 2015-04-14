@@ -131,6 +131,17 @@ sig_regions.lm <- function(model, alpha=.05, precision=4) {
 }
 
 
+#' Regions of significance for an interaction.
+#' 
+#' \code{sig_regions.glm} is an alias of sig_regions.lm.
+#' 
+#' @seealso \code{\link{sig_regions.lm}}
+#' @export
+sig_regions.glm <- function(model, alpha=.05, precision=4) {
+    sig_regions.lm(model, alpha, precision)
+}
+
+
 #' Test where simple effects become significant.
 #' 
 #' Helper function recursively searches through sequences of predictor values to
@@ -154,6 +165,7 @@ sig_regions.lm <- function(model, alpha=.05, precision=4) {
 .search_sequence <- function(model, int_vars, start=NULL, end=NULL,
                              alpha=.05, precision=4) {
     
+    mdata <- model$model
     factor_var <- int_vars == which(attr(terms(model), 'dataClasses') == 'factor')
     factor_var_name <- names(int_vars[which(factor_var)])
     cont_var_name <- names(int_vars[which(!factor_var)])
@@ -173,6 +185,7 @@ sig_regions.lm <- function(model, alpha=.05, precision=4) {
         end <- max(model$model[cont_var_name], na.rm=TRUE)
     }    
     
+    call <- model$call
     form <- format(formula(model))
     
     sequence <- seq(start, end, length.out=10)
@@ -185,7 +198,9 @@ sig_regions.lm <- function(model, alpha=.05, precision=4) {
         new_var_name <- paste0('I(', cont_var_name, ' - ', i, ')')
         new_form <- gsub(cont_var_name, new_var_name, form)
         
-        new_model <- lm(new_form, model$model)
+        call[['formula']] <- new_form
+        call[['data']] <- quote(mdata)
+        new_model <- eval(call)
         pvalues[counter] <- coef(summary(new_model))[dummy_name, 4]
             # pull out p-value for factor variable
         counter <- counter + 1

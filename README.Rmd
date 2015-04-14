@@ -78,7 +78,7 @@ been implemented:
 | ICC           | &ndash;  | &ndash;  | &ndash;  | &#10003; | &#10003; |
 | cell_means    | &#10003; | &#10003; | &#10003; |          |          |
 | graph_model   | &#10003; | &#10003; | &#10003; |          |          |
-| sig_regions   | &#10003; |          | &ndash;  |          |          |
+| sig_regions   | &#10003; | &#10003; | &ndash;  |          |          |
 | simple_slopes | &#10003; | &#10003; | &#10003; | &#10003; | &#10003; |
 
 ## Things to do

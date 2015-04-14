@@ -10,6 +10,8 @@ reghelper 0.3.0
 
 -   `cell_means` function extended to include `glm` models.
 
+-   `sig_regions` function extended to include `glm` models.
+
 reghelper 0.2.0
 ===============
 
