@@ -8,6 +8,8 @@ reghelper 0.3.0
 
 -   `build_model` function extended to include `aov` and `glm` models.
 
+-   `cell_means` function extended to include `glm` models.
+
 reghelper 0.2.0
 ===============
 
