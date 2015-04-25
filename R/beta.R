@@ -175,7 +175,12 @@ beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL) {
             # all other variables
             } else {
                 var_name <- paste0(vars[i], '.z')
-                formula <- gsub(vars[i], var_name, formula)
+                formula <- gsub(
+                    paste0('(?<![[:alnum:]._])', vars[i], '(?![[:alnum:]._])'),
+                    var_name, formula, perl=TRUE)
+                    # includes lookbehind and lookahead to ensure that variables
+                    # that are subsets of others (e.g., 'var' and 'thisisvar')
+                    # won't get matched twice
                 data[, var_name] <- scale(data[, vars[i]])
                     # add scaled variable to data frame
             }
