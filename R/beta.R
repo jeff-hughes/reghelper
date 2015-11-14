@@ -32,7 +32,7 @@ beta <- function(model, ...) UseMethod('beta')
 #' unstandardized (i.e., B) coefficients.
 #' 
 #' Unlike similar functions, this function properly calculates standardized
-#' estimates for interaciton terms (by first standardizing each of the
+#' estimates for interaction terms (by first standardizing each of the
 #' individual predictor variables).
 #' 
 #' @param model A fitted linear model of type 'lm'.
@@ -122,6 +122,61 @@ beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL) {
 }
 
 
+#' Standardized coeffients of a model.
+#' 
+#' \code{beta.lme} returns the summary of a linear model where all variables
+#' have been standardized.
+#' 
+#' This function takes a multi-level model and standardizes the variables,
+#' in order to produce standardized (i.e., beta) coefficients rather than
+#' unstandardized (i.e., B) coefficients.
+#' 
+#' Unlike similar functions, this function properly calculates standardized
+#' estimates for interaction terms (by first standardizing each of the
+#' individual predictor variables).
+#' 
+#' @param model A fitted linear model of type 'lme'.
+#' @param x Logical. Whether or not to standardize predictor variables.
+#' @param y Logical. Whether or not to standardize criterion variables.
+#' @param skip A string vector indicating any variables you do \emph{not} wish
+#'   to be standarized.
+#' @return Returns the summary of a multi-level linear model, with the output
+#'   showing the beta coefficients, standard error, t-values, and p-values for
+#'   each predictor.
+#' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}}
+#' @examples
+#' # iris data
+#' model <- lme(Sepal.Width ~ Sepal.Length + Petal.Length, random=~1|Species, data=iris)
+#' beta(model)  # all three variables standardized
+#' 
+#' beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
+#' @export
+beta.lme <- function(model, x=TRUE, y=TRUE, skip=NULL) {
+    call <- model$call
+    vars <- names(model$data)
+    formula <- format(formula(model))
+    lhs <- attr(terms(model), 'response')  # index of criterion variable(s)
+    if (x == FALSE) {
+        vars <- vars[lhs]  # get only variables on left-hand side
+    }
+    if (y == FALSE) {
+        vars <- vars[-lhs]  # get only variables on right-hand side
+    }
+    
+    # cover special case, where all variables are skipped
+    if (length(vars) == 0) {
+        return(summary(model))
+    }
+    
+    formula <- .create_formula(model, vars, skip)
+    data <- formula[['data']]
+    call[['fixed']] <- as.formula(formula[['formula']])
+    call[['data']] <- quote(data)  # need this so data doesn't get output
+                                   # directly in the summary
+    return(summary(eval(call)))
+}
+
+
 #' Create formula for standardized estimates.
 #' 
 #' Helper function creates a new formula and data with scales variables.
@@ -132,7 +187,13 @@ beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL) {
 #'   to be standarized.
 #' @return Returns a list with new formula and new data.
 .create_formula <- function(model, vars, skip) {
-    data <- model$model
+    modelClass <- class(model)
+    if(modelClass[1] %in% c('lm', 'aov', 'glm')) {
+        data <- model$model
+    } else if (modelClass == 'lme') {
+        data <- model$data
+    }
+    
     formula <- format(formula(model))
     for (i in 1:length(vars)) {
         if (!(vars[i] %in% skip)) {

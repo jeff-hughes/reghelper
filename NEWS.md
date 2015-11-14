@@ -1,6 +1,4 @@
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
-
-
 reghelper 0.3.0
 ===============
 
@@ -11,6 +9,8 @@ reghelper 0.3.0
 -   `cell_means` function extended to include `glm` models.
 
 -   `sig_regions` function extended to include `glm` models.
+
+-   `beta` function extended to include `lme` models.
 
 reghelper 0.2.0
 ===============

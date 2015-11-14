@@ -4,7 +4,7 @@
 \alias{coef.block_lm_summary}
 \title{Extract model coefficients.}
 \usage{
-coef.block_lm_summary(model, num = NULL, ...)
+\method{coef}{block_lm_summary}(model, num = NULL, ...)
 }
 \arguments{
 \item{model}{An object of class "\code{block_lm_summary}", usually, a result

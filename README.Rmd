@@ -60,8 +60,7 @@ implemented for `lm` models. These functions include:
 * `beta` Calculates standardized beta coefficients.
 * `build_model` Allows variables to be added to a series of regression models
 sequentially (similar to SPSS).
-* `ICC` Calculates the intra-class correlation for a multi-level model (lme only
-at this point).
+* `ICC` Calculates the intra-class correlation for a multi-level model.
 * `cell_means` Calculates the estimated means for a fitted model.
 * `graph_model` Easily graph interactions at +/- 1 SD (uses ggplot2 package).
 * `sig_regions` Calculate the Johnson-Neyman regions of significance for an
@@ -73,7 +72,7 @@ been implemented:
 
 | Function      | lm       | glm      | aov      | lme      | lmer     |
 | :------------ | :------: | :------: | :------: | :------: | :------: |
-| beta          | &#10003; | &#10003; | &#10003; |          |          |
+| beta          | &#10003; | &#10003; | &#10003; | &#10003; |          |
 | build_model   | &#10003; | &#10003; | &#10003; |          |          |
 | ICC           | &ndash;  | &ndash;  | &ndash;  | &#10003; | &#10003; |
 | cell_means    | &#10003; | &#10003; | &#10003; |          |          |

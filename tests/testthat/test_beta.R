@@ -269,6 +269,36 @@ test_that('binomial glm with continuous predictor works', {
 })
 
 
+test_that('lme with continuous and categorical predictors works', {
+    set.seed(123)
+    pre_dv <- rnorm(50)
+    
+    set.seed(234)
+    post_dv <- 2 + rnorm(50)
+    
+    dv <- c(pre_dv, post_dv)
+    
+    set.seed(345)
+    pred <- .3 * dv + rnorm(50)
+    
+    pre_post <- factor(c(rep(0, 50), rep(1, 50)))
+    id <- rep(1:50, 2)
+    
+    data <- data.frame(id, pre_post, pred, dv)
+    
+    model <- lme(dv ~ pre_post * pred, random=~1|id, data)
+    beta_model <- beta(model, skip='pre_post')
+    
+    expect_equal(attr(attr(beta_model$terms, 'dataClasses'), 'names'),
+        c('dv.z', 'pre_post', 'pred.z'))
+    
+    expect_equal(beta_model$tTable[2, 5], summary(model)$tTable[2, 5])
+    expect_equal(beta_model$tTable[3, 5], summary(model)$tTable[3, 5])
+    expect_equal(beta_model$tTable[4, 5], summary(model)$tTable[4, 5])
+        # p-values should still match
+})
+
+
 
 
 
