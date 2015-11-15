@@ -143,7 +143,7 @@ beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL) {
 #' @return Returns the summary of a multi-level linear model, with the output
 #'   showing the beta coefficients, standard error, t-values, and p-values for
 #'   each predictor.
-#' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}}
+#' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}}, \code{\link{beta.merMod}}
 #' @examples
 #' # iris data
 #' model <- lme(Sepal.Width ~ Sepal.Length + Petal.Length, random=~1|Species, data=iris)
@@ -177,6 +177,74 @@ beta.lme <- function(model, x=TRUE, y=TRUE, skip=NULL) {
 }
 
 
+#' Standardized coeffients of a model.
+#' 
+#' \code{beta.merMod} returns the summary of a linear model where all variables
+#' have been standardized.
+#' 
+#' This function takes a multi-level model and standardizes the variables,
+#' in order to produce standardized (i.e., beta) coefficients rather than
+#' unstandardized (i.e., B) coefficients.
+#' 
+#' Unlike similar functions, this function properly calculates standardized
+#' estimates for interaction terms (by first standardizing each of the
+#' individual predictor variables).
+#' 
+#' @param model A fitted linear model of type 'merMod' (from the 'lme4' package).
+#' @param x Logical. Whether or not to standardize predictor variables.
+#' @param y Logical. Whether or not to standardize criterion variables.
+#' @param skip A string vector indicating any variables you do \emph{not} wish
+#'   to be standarized.
+#' @return Returns the summary of a multi-level linear model, with the output
+#'   showing the beta coefficients, standard error, t-values, and p-values for
+#'   each predictor.
+#' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}}, \code{\link{beta.lme}}
+#' @examples
+#' # iris data
+#' model <- lmer(Sepal.Width ~ Sepal.Length + Petal.Length + (1|Species), data=iris)
+#' beta(model)  # all variables standardized
+#' 
+#' beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
+#' @export
+beta.merMod <- function(model, x=TRUE, y=TRUE, skip=NULL) {
+    call <- model@call
+    vars <- names(model@frame)
+    formula <- format(formula(model))
+    lhs <- attr(terms(model), 'response')  # index of criterion variable(s)
+    
+    # get all random variables, and unselect ones that are the DV
+    randvars <- unlist(as.list(attr(terms(model@frame), 'predvars.random')[-1]))
+    randvars <- randvars[-match(vars[lhs], randvars)]
+    randvars <- vars[match(randvars, vars)]
+        # turn variable symbols into character vector
+    
+    if (!is.null(skip)) {
+        skip <- union(skip, randvars)
+    } else {
+        skip <- randvars
+    }
+    
+    if (x == FALSE) {
+        vars <- vars[lhs]  # get only variables on left-hand side
+    }
+    if (y == FALSE) {
+        vars <- vars[-lhs]  # get only variables on right-hand side
+    }
+    
+    # cover special case, where all variables are skipped
+    if (length(vars) == 0) {
+        return(summary(model))
+    }
+    
+    formula <- .create_formula(model, vars, skip)
+    data <- formula[['data']]
+    call[['formula']] <- as.formula(formula[['formula']])
+    call[['data']] <- quote(data)  # need this so data doesn't get output
+                                   # directly in the summary
+    return(summary(eval(call)))
+}
+
+
 #' Create formula for standardized estimates.
 #' 
 #' Helper function creates a new formula and data with scales variables.
@@ -192,6 +260,8 @@ beta.lme <- function(model, x=TRUE, y=TRUE, skip=NULL) {
         data <- model$model
     } else if (modelClass == 'lme') {
         data <- model$data
+    } else if (modelClass == 'lmerMod') {
+        data <- model@frame
     }
     
     formula <- format(formula(model))

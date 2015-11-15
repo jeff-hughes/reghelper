@@ -48,7 +48,7 @@ The table below shows the current types of models for which each function has be
 
 | Function       |  lm | glm | aov | lme | lmer |
 |:---------------|:---:|:---:|:---:|:---:|:----:|
-| beta           |  ✓  |  ✓  |  ✓  |  ✓  |      |
+| beta           |  ✓  |  ✓  |  ✓  |  ✓  |   ✓  |
 | build\_model   |  ✓  |  ✓  |  ✓  |     |      |
 | ICC            |  –  |  –  |  –  |  ✓  |   ✓  |
 | cell\_means    |  ✓  |  ✓  |  ✓  |     |      |

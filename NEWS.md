@@ -10,7 +10,7 @@ reghelper 0.3.0
 
 -   `sig_regions` function extended to include `glm` models.
 
--   `beta` function extended to include `lme` models.
+-   `beta` function extended to include `lme` and `merMod` models.
 
 reghelper 0.2.0
 ===============
