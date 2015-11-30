@@ -499,57 +499,6 @@ print.simple_slopes <- function(
 }
 
 
-#' Find points to test variables.
-#' 
-#' Helper function calculates points at which to test slopes of a variable. For
-#' categorical variables, this includes all its levels. For continuous
-#' variables, this is -1 SD, the mean, and +1 SD.
-#' 
-#' @param model_data The data associated with the linear model being tested.
-#' @param int_vars The variables involved in the interaction being tested.
-#' @param user_levels Any user-specified levels to be used instead of the
-#'   defaults.
-#' @param sstest Logical. Whether or not to insert 'sstest' as a factor level.
-#' @return A list with all the factor points for each variable in the
-#'   interaction.
-.set_factors <- function(model_data, int_vars, user_levels=NULL, sstest=TRUE) {
-    factors <- list()
-    for (term in int_vars) {
-        term_data <- model_data[[term]]
-        if (!is.null(user_levels) && term %in% names(user_levels)) {
-            # if user specified levels, use those
-            factors[[term]] <- user_levels[[term]]
-        } else {
-            if (is.factor(term_data)) {
-                # factors are plotted at all levels
-                if (sstest == TRUE) {
-                    factors[[term]] <- c('sstest', levels(term_data))
-                } else {
-                    factors[[term]] <- levels(term_data)
-                }
-            } else {
-                # continuous vars are plotted at -1SD, mean, and +1 SD
-                if (sstest == TRUE) {
-                    factors[[term]] <- c(
-                        'sstest',
-                        .offset_point(term_data, -1),
-                        .offset_point(term_data, 0),
-                        .offset_point(term_data, 1)
-                    )
-                } else {
-                    factors[[term]] <- c(
-                        .offset_point(term_data, -1),
-                        .offset_point(term_data, 0),
-                        .offset_point(term_data, 1)
-                    )
-                }
-            }
-        }
-    }
-    return(factors)
-}
-
-
 #' Create grid of simple slope tests.
 #' 
 #' Helper function creates a data frame with a list of all simple slope tests to

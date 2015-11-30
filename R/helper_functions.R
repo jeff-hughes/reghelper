@@ -14,7 +14,7 @@
 .set_factors <- function(model, int_vars, user_levels=NULL, sstest=TRUE) {
     factors <- list()
     for (term in int_vars) {
-        term_data <- model$model[[term]]
+        term_data <- model[[term]]
         if (!is.null(user_levels) && term %in% names(user_levels)) {
             # if user specified levels, use those
             factors[[term]] <- user_levels[[term]]
