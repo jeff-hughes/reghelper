@@ -290,7 +290,14 @@ print.block_lm_summary <- function(
     
     num_models <- length(model$coefficients)
     for (m in 1:num_models) {
-        writeLines(paste0('lm(formula = ', format(model$formulas[[m]]), ')'))
+        frm <- format(model$formulas[[m]])
+        if (length(frm) > 1) {
+            frm[1] <- paste0('lm(formula = ', frm[1])
+            frm[length(frm)] <- paste0(frm[length(frm)], ')')
+        } else {
+            frm <- paste0('lm(formula = ', frm, ')')
+        }
+        writeLines(frm)
         coefs <- capture.output(printCoefmat(model$coefficients[[m]],
                 digits=digits,
                 signif.stars=signif.stars,
