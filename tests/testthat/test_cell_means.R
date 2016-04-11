@@ -323,4 +323,70 @@ test_that('aov with 2-level predictor works', {
 })
 
 
+test_that('binomial glm works', {
+    set.seed(123)
+    x1 <- rnorm(100)
+    
+    set.seed(234)
+    x2 <- rnorm(100)
+    
+    set.seed(345)
+    rand <- rnorm(100)
+    
+    y <- as.numeric(x1 * x2 > mean(x1 * x2) & rand > mean(rand))
+    
+    data <- data.frame(x1, x2, y)
+    
+    model <- glm(y ~ x1 * x2, data, family='binomial')
+    means <- cell_means(model, x1, x2, type='link')
+    
+    model_m1m1 <- summary(glm(
+        y ~ I((x1 - mean(x1)) + sd(x1)) * I((x2 - mean(x2)) + sd(x2)),
+        family='binomial'))
+    expect_equal(round(means[1, 'value'], 3), get_coef(model_m1m1, 1))
+    
+    model_0m1 <- summary(glm(
+        y ~ I(x1 - mean(x1)) * I((x2 - mean(x2)) + sd(x2)),
+        family='binomial'))
+    expect_equal(round(means[2, 'value'], 3), get_coef(model_0m1, 1))
+    
+    model_p1m1 <- summary(glm(
+        y ~ I((x1 - mean(x1)) - sd(x1)) * I((x2 - mean(x2)) + sd(x2)),
+        family='binomial'))
+    expect_equal(round(means[3, 'value'], 3), get_coef(model_p1m1, 1))
+    
+    
+    model_m10 <- summary(glm(
+        y ~ I((x1 - mean(x1)) + sd(x1)) * I(x2 - mean(x2)),
+        family='binomial'))
+    expect_equal(round(means[4, 'value'], 3), get_coef(model_m10, 1))
+    
+    model_00 <- summary(glm(
+        y ~ I(x1 - mean(x1)) * I(x2 - mean(x2)),
+        family='binomial'))
+    expect_equal(round(means[5, 'value'], 3), get_coef(model_00, 1))
+    
+    model_p10 <- summary(glm(
+        y ~ I((x1 - mean(x1)) - sd(x1)) * I(x2 - mean(x2)),
+        family='binomial'))
+    expect_equal(round(means[6, 'value'], 3), get_coef(model_p10, 1))
+    
+    
+    model_m1p1 <- summary(glm(
+        y ~ I((x1 - mean(x1)) + sd(x1)) * I((x2 - mean(x2)) - sd(x2)),
+        family='binomial'))
+    expect_equal(round(means[7, 'value'], 3), get_coef(model_m1p1, 1))
+    
+    model_0p1 <- summary(glm(
+        y ~ I(x1 - mean(x1)) * I((x2 - mean(x2)) - sd(x2)),
+        family='binomial'))
+    expect_equal(round(means[8, 'value'], 3), get_coef(model_0p1, 1))
+    
+    model_p1p1 <- summary(glm(
+        y ~ I((x1 - mean(x1)) - sd(x1)) * I((x2 - mean(x2)) - sd(x2)),
+        family='binomial'))
+    expect_equal(round(means[9, 'value'], 3), get_coef(model_p1p1, 1))
+})
+
+
 

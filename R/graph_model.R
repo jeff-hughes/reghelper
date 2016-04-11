@@ -4,11 +4,11 @@
 #' models. Selected variables will be graphed at +/- 1 SD (if continuous) or at
 #' each level of the factor (if categorical).
 #' 
-#' @param model A fitted linear model of type 'lm'.
+#' @param model A fitted linear model of type 'lm' or 'glm'.
 #' @param ... Additional arguments to be passed to the particular method for the
 #'   given model.
 #' @return A ggplot2 graph of the plotted variables in the model.
-#' @seealso \code{\link{graph_model.lm}}
+#' @seealso \code{\link{graph_model.lm}}, \code{\link{graph_model.glm}}
 #' @examples
 #' # iris data
 #' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
@@ -57,7 +57,10 @@ graph_model <- function(model, ...) UseMethod('graph_model')
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
 #' @return A ggplot2 graph of the plotted variables in the model.
-#' @examples TODO: Need to complete.
+#' @examples
+#' # iris data
+#' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
+#' graph_model(model, y=Sepal.Width, x=Sepal.Length, lines=Species)
 #' @export
 graph_model.lm <- function(model, y, x, lines=NULL, split=NULL, errorbars='CI',
     ymin=NULL, ymax=NULL, titles=NULL, bargraph=FALSE, draw.legend=TRUE,
@@ -124,6 +127,7 @@ graph_model.lm <- function(model, y, x, lines=NULL, split=NULL, errorbars='CI',
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
 #' @return A ggplot object of the plotted variables in the model.
+#' @seealso \code{\link{graph_model.lm}}
 #' @examples
 #' # iris data
 #' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
@@ -132,6 +136,186 @@ graph_model.lm <- function(model, y, x, lines=NULL, split=NULL, errorbars='CI',
 graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
     errorbars='CI', ymin=NULL, ymax=NULL, titles=NULL, bargraph=FALSE,
     draw.legend=TRUE, dodge=0, exp=FALSE) {
+    
+    call <- as.list(match.call())[-1]
+    call$type <- 'response'
+    
+    return(do.call(graph_model_q.glm, call))
+}
+
+
+#' Graph linear interactions.
+#' 
+#' \code{graph_model.aov}  is an alias of graph_model.lm.
+#' 
+#' @seealso \code{\link{graph_model.lm}}, \code{\link{graph_model.glm}}
+#' @export
+graph_model.aov <- function(model, y, x, lines=NULL, split=NULL, errorbars='CI',
+    ymin=NULL, ymax=NULL, titles=NULL, bargraph=FALSE, draw.legend=TRUE,
+    dodge=0, exp=FALSE) {
+    
+    call <- as.list(match.call())[-1]
+    
+    # convert variable names to strings
+    call$y <- deparse(substitute(y))
+    call$x <- deparse(substitute(x))
+    if (!is.null(call$lines)) {
+        call$lines <- deparse(substitute(lines))
+    }
+    if (!is.null(call$split)) {
+        call$split <- deparse(substitute(split))
+    }
+    
+    return(do.call(graph_model_q.aov, call))
+}
+
+
+#' Graph linear interactions.
+#' 
+#' \code{graph_model_q.aov}  is an alias of graph_model_q.lm.
+#' 
+#' @seealso \code{\link{graph_model_q.lm}}, \code{\link{graph_model_q.glm}}
+#' @export
+graph_model_q.aov <- function(model, y, x, lines=NULL, split=NULL,
+    errorbars='CI', ymin=NULL, ymax=NULL, titles=NULL, bargraph=FALSE,
+    draw.legend=TRUE, dodge=0, exp=FALSE) {
+    
+    call <- as.list(match.call())[-1]
+    
+    return(do.call(graph_model_q.lm, call))
+}
+
+
+#' Graph general linear interactions.
+#' 
+#' \code{graph_model.glm} provides an easy way to graph interactions in general
+#' linear models. Selected variables will be graphed at +/- 1 SD (if continuous)
+#' or at each level of the factor (if categorical).
+#' 
+#' If there are additional covariates in the model other than what is indicated
+#' to be graphed by the function, these variables will be plotted at their
+#' respective means. In the case of a categorical covariate, the results will be
+#' averaged across all its levels.
+#' 
+#' @param model A fitted linear model of type 'glm'.
+#' @param y The variable to be plotted on the y-axis. This variable is required
+#'   for the graph.
+#' @param x The variable to be plotted on the x-axis. This variable is required
+#'   for the graph.
+#' @param lines The variable to be plotted using separate lines (optional).
+#' @param split The variable to be split among separate graphs (optional).
+#' @param type The type of prediction required. The default 'link' is on the
+#'   scale of the linear predictors; the alternative 'response' is on the scale
+#'   of the response variable. For more information, see
+#'   \code{\link{predict.glm}}.
+#' @param errorbars A string indicating what kind of error bars to show.
+#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
+#'   error of the predicted means), or NULL.
+#' @param ymin Number indicating the minimum value for the y-axis scale. Default
+#'   NULL value will adjust position to the lowest y value.
+#' @param ymax Number indicating the maximum value for the y-axis scale. Default
+#'   NULL value will adjust position to the highest y value.
+#' @param titles: A character vector with strings for the various plot titles.
+#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
+#'   If any position is NULL, the names of the variables will be used.
+#' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
+#'   will draw a line graph of the results.
+#' @param draw.legend Logical. Whether or not to draw legend on the graph.
+#' @param dodge A numeric value indicating the amount each point on the graph
+#'   should be shifted left or right, which can help for readability when points
+#'   are close together. Default value is 0, with .1 or .2 probably sufficient
+#'   in most cases.
+#' @param exp Logical. If TRUE, the exponential function \code{exp()} will be
+#'   used to transform the y-axis (i.e., e to the power of y). Useful for
+#'   logistic regressions or for converting log-transformed y-values to their
+#'   original units.
+#' @return A ggplot2 graph of the plotted variables in the model.
+#' @seealso \code{\link{graph_model.lm}}
+#' @examples
+#' # iris data
+#' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
+#' graph_model(model, y=Sepal.Width, x=Sepal.Length, lines=Species)
+#' @export
+graph_model.glm <- function(model, y, x, lines=NULL, split=NULL,
+    type=c('link', 'response'), errorbars='CI', ymin=NULL, ymax=NULL,
+    titles=NULL, bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
+    
+    call <- as.list(match.call())[-1]
+    
+    # convert variable names to strings
+    call$y <- deparse(substitute(y))
+    call$x <- deparse(substitute(x))
+    if (!is.null(call$lines)) {
+        call$lines <- deparse(substitute(lines))
+    }
+    if (!is.null(call$split)) {
+        call$split <- deparse(substitute(split))
+    }
+    
+    return(do.call(graph_model_q.glm, call))
+}
+
+
+#' Graph general linear interactions.
+#' 
+#' \code{graph_model_q.glm} provides an easy way to graph interactions in
+#' general linear models. Selected variables will be graphed at +/- 1 SD (if
+#' continuous) or at each level of the factor (if categorical).
+#' 
+#' If there are additional covariates in the model other than what is indicated
+#' to be graphed by the function, these variables will be plotted at their
+#' respective means. In the case of a categorical covariate, the results will be
+#' averaged across all its levels.
+#' 
+#' Note that in most cases it is easier to use \code{\link{graph_model.glm}} and
+#' pass variable names in directly instead of strings of variable names.
+#' \code{graph_model_q.glm} uses standard evaluation in cases where such
+#' evaluation is easier.
+#' 
+#' @param model A fitted linear model of type 'glm'.
+#' @param y The variable to be plotted on the y-axis. This variable is required
+#'   for the graph.
+#' @param x The variable to be plotted on the x-axis. This variable is required
+#'   for the graph.
+#' @param lines The variable to be plotted using separate lines (optional).
+#' @param split The variable to be split among separate graphs (optional).
+#' @param type The type of prediction required. The default 'link' is on the
+#'   scale of the linear predictors; the alternative 'response' is on the scale
+#'   of the response variable. For more information, see
+#'   \code{\link{predict.glm}}.
+#' @param errorbars A string indicating what kind of error bars to show.
+#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
+#'   error of the predicted means), or NULL.
+#' @param ymin Number indicating the minimum value for the y-axis scale. Default
+#'   NULL value will adjust position to the lowest y value.
+#' @param ymax Number indicating the maximum value for the y-axis scale. Default
+#'   NULL value will adjust position to the highest y value.
+#' @param titles: A character vector with strings for the various plot titles.
+#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
+#'   If any position is NULL, the names of the variables will be used.
+#' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
+#'   will draw a line graph of the results.
+#' @param draw.legend Logical. Whether or not to draw legend on the graph.
+#' @param dodge A numeric value indicating the amount each point on the graph
+#'   should be shifted left or right, which can help for readability when points
+#'   are close together. Default value is 0, with .1 or .2 probably sufficient
+#'   in most cases.
+#' @param exp Logical. If TRUE, the exponential function \code{exp()} will be
+#'   used to transform the y-axis (i.e., e to the power of y). Useful for
+#'   logistic regressions or for converting log-transformed y-values to their
+#'   original units.
+#' @return A ggplot object of the plotted variables in the model.
+#' @seealso \code{\link{graph_model.glm}}, \code{\link{graph_model_q.lm}}
+#' @examples
+#' # iris data
+#' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
+#' graph_model_q.lm(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
+#' @export
+graph_model_q.glm <- function(model, y, x, lines=NULL, split=NULL,
+    type=c('link', 'response'), errorbars='CI', ymin=NULL, ymax=NULL,
+    titles=NULL, bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
+    
+    type <- match.arg(type)
     
     data <- model$model
     factors <- list()
@@ -197,7 +381,7 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
     }
     
     # predict cell means
-    predicted <- predict(model, newdata=grid, se=TRUE)
+    predicted <- predict(model, newdata=grid, type=type, se.fit=TRUE)
     if (exp == TRUE) {
         grid[[y]] <- exp(predicted$fit)
     } else {

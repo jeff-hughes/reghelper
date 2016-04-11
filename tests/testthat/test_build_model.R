@@ -208,3 +208,79 @@ test_that('opts parameter passes along arguments', {
 })
 
 
+test_that('2 block aov works', {
+    x1 <- c(rep(0, 50), rep(1, 50))
+    x2 <- rep(c(rep(0, 25), rep(1, 25)), 2)
+    
+    set.seed(345)
+    y <- x1 * x2 + rnorm(100)
+    
+    x1 <- factor(x1)
+    x2 <- factor(x2)
+    
+    data <- data.frame(x1, x2, y)
+    
+    model1 <- summary(aov(y ~ x1 + x2, data))[[1]]
+    model2 <- summary(aov(y ~ x1 * x2, data))[[1]]
+    
+    b_model <- build_model(y, c(x1, x2), x1 * x2, data=data, model='aov')
+    
+    expect_equal(length(b_model$formulas), 2)
+    expect_equal(length(b_model$models), 2)
+    
+    b_summ <- summary(b_model)
+    b_summaries <- b_summ$summaries
+    
+    expect_equal(nrow(b_summ$residuals), 2)
+    
+    # check F values
+    expect_equal(round(b_summaries[[1]][[1]]['x1', 4], 3),
+        round(model1['x1', 4], 3))
+    expect_equal(round(b_summaries[[1]][[1]]['x2', 4], 3),
+        round(model1['x2', 4], 3))
+    expect_equal(round(b_summaries[[2]][[1]]['x1', 4], 3),
+        round(model2['x1', 4], 3))
+    expect_equal(round(b_summaries[[2]][[1]]['x2', 4], 3),
+        round(model2['x2', 4], 3))
+    expect_equal(round(b_summaries[[2]][[1]]['x1:x2', 4], 3),
+        round(model2['x1:x2', 4], 3))
+})
+
+
+test_that('2 block glm works', {
+    set.seed(123)
+    x1 <- rnorm(100)
+    
+    set.seed(234)
+    x2 <- rnorm(100)
+    
+    set.seed(345)
+    rand <- rnorm(100)
+    
+    y <- as.numeric(x1 * x2 > mean(x1 * x2) & rand > mean(rand))
+    
+    data <- data.frame(x1, x2, y)
+    
+    model1 <- summary(glm(y ~ x1 + x2, data, family='binomial'))
+    model2 <- summary(glm(y ~ x1 * x2, data, family='binomial'))
+    
+    b_model <- build_model(y, c(x1, x2), x1 * x2, data=data, model='glm',
+        opts=list(family='binomial'))
+    
+    expect_equal(length(b_model$formulas), 2)
+    expect_equal(length(b_model$models), 2)
+    
+    b_summ <- summary(b_model)
+    
+    expect_equal(nrow(b_summ$residuals), 2)
+    
+    # check coefficients
+    expect_equal(round(coef(b_summ, 1)['x1', 1], 3), get_coef(model1, 'x1'))
+    expect_equal(round(coef(b_summ, 1)['x2', 1], 3), get_coef(model1, 'x2'))
+    expect_equal(round(coef(b_summ, 2)['x1', 1], 3), get_coef(model2, 'x1'))
+    expect_equal(round(coef(b_summ, 2)['x2', 1], 3), get_coef(model2, 'x2'))
+    expect_equal(round(coef(b_summ, 2)['x1:x2', 1], 3),
+        get_coef(model2, 'x1:x2'))
+})
+
+

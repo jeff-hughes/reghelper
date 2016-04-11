@@ -11,7 +11,7 @@
 #' @return The form of the value returned by \code{sig_regions} depends on the
 #'   class of its argument. See the documentation of the particular methods for
 #'   details of what is produced by that method.
-#' @seealso \code{\link{sig_regions.lm}}
+#' @seealso \code{\link{sig_regions.lm}}, \code{\link{simple_slopes}}
 #' @examples
 #' # mtcars data
 #' mtcars$am <- factor(mtcars$am)  # make 'am' categorical
@@ -28,19 +28,17 @@ sig_regions <- function(model, ...) UseMethod('sig_regions')
 #' significance for an interaction, the points at which the simple effect of the
 #' categorical predictor changes from non-significant to significant.
 #' 
-#' This function takes a regression model with one two-way interaction, where at
-#' least one of the predictors in the interaction is categorical. If both
-#' variables are categorical, the function will just pick one as the x variable
-#' and one as the categorical moderator. To see the J-N points for the other
-#' categorical predictor, just flip the order of the two variables in your
-#' model.
+#' This function takes a regression model with one two-way interaction, where
+#' one of the predictors in the interaction is categorical (factor) and the
+#' other is continuous. For other types of interaction terms, use the
+#' \code{\link{simple_slopes}} function instead.
 #' 
 #' For more information about regions of significance, see
 #' \href{http://ssrn.com/abstract=2208103}{Spiller, Fitzsimons, Lynch, &
 #' McClelland (2012)}.
 #' 
 #' @param model A fitted linear model of type 'lm' with one two-way interaction
-#'   including at least one categorical predictor.
+#'   including one categorical predictor and one continuous variable.
 #' @param alpha The level at which to test for significance. Default value is
 #'   .05.
 #' @param precision The number of decimal places to which to round the alpha
@@ -49,6 +47,7 @@ sig_regions <- function(model, ...) UseMethod('sig_regions')
 #'   more of the J-N points fall outside the range of your predictor, the
 #'   function will return NA for that point. If your interaction is not
 #'   significant, both J-N points will be NA.
+#' @seealso \code{\link{simple_slopes.lm}}
 #' @examples
 #' # mtcars data
 #' mtcars$am <- factor(mtcars$am)  # make 'am' categorical
@@ -59,10 +58,25 @@ sig_regions <- function(model, ...) UseMethod('sig_regions')
 sig_regions.lm <- function(model, alpha=.05, precision=4) {
     int_term <- which(attr(terms(model), 'order') == 2)
         # get location of interaction term
+    
+    # if more than one 2-way interaction, pick first one
+    if (length(int_term) > 1) {
+        int_term <- int_term[1]
+    }
+    
     int_vars <- which(attr(terms(model), 'factors')[, int_term] == 1)
         # get location of variables in the interaction
     factor_var <- int_vars == which(attr(terms(model), 'dataClasses') == 'factor')
         # indicates TRUE for the variable in int_vars that is a factor
+    
+    # check that interaction contains one categorical variable and one
+    # continuous variable
+    if (sum(factor_var) > 1) {
+        stop('Interaction contains more than one factor variable.')
+    }
+    if (sum(factor_var) == 0) {
+        stop('Interaction has no factor variables.')
+    }
     
     cont_var_name <- names(int_vars[which(!factor_var)])
     
@@ -117,6 +131,17 @@ sig_regions.lm <- function(model, alpha=.05, precision=4) {
 }
 
 
+#' Regions of significance for an interaction.
+#' 
+#' \code{sig_regions.glm} is an alias of sig_regions.lm.
+#' 
+#' @seealso \code{\link{sig_regions.lm}}
+#' @export
+sig_regions.glm <- function(model, alpha=.05, precision=4) {
+    sig_regions.lm(model, alpha, precision)
+}
+
+
 #' Test where simple effects become significant.
 #' 
 #' Helper function recursively searches through sequences of predictor values to
@@ -140,6 +165,7 @@ sig_regions.lm <- function(model, alpha=.05, precision=4) {
 .search_sequence <- function(model, int_vars, start=NULL, end=NULL,
                              alpha=.05, precision=4) {
     
+    mdata <- model$model
     factor_var <- int_vars == which(attr(terms(model), 'dataClasses') == 'factor')
     factor_var_name <- names(int_vars[which(factor_var)])
     cont_var_name <- names(int_vars[which(!factor_var)])
@@ -159,6 +185,7 @@ sig_regions.lm <- function(model, alpha=.05, precision=4) {
         end <- max(model$model[cont_var_name], na.rm=TRUE)
     }    
     
+    call <- model$call
     form <- format(formula(model))
     
     sequence <- seq(start, end, length.out=10)
@@ -171,7 +198,9 @@ sig_regions.lm <- function(model, alpha=.05, precision=4) {
         new_var_name <- paste0('I(', cont_var_name, ' - ', i, ')')
         new_form <- gsub(cont_var_name, new_var_name, form)
         
-        new_model <- lm(new_form, model$model)
+        call[['formula']] <- new_form
+        call[['data']] <- quote(mdata)
+        new_model <- eval(call)
         pvalues[counter] <- coef(summary(new_model))[dummy_name, 4]
             # pull out p-value for factor variable
         counter <- counter + 1

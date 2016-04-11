@@ -1,5 +1,18 @@
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
+reghelper 0.3.0
+===============
 
+NEW FEATURES
+
+-   `beta` function extended to include `lme` and `merMod` models.
+
+-   `build_model` function extended to include `aov` and `glm` models.
+
+-   `cell_means` function extended to include `glm` models.
+
+-   `graph_model` function extended to include `aov` and `glm` models.
+
+-   `sig_regions` function extended to include `glm` models.
 
 reghelper 0.2.0
 ===============

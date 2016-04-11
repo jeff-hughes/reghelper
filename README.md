@@ -1,23 +1,21 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
-
 reghelper
 =========
 
 The `reghelper` R package includes a set of functions used to automate commonly used methods in regression analysis. This includes plotting interactions, calculating simple slopes, calculating standardized coefficients, etc.
 
-Version 0.2.0 has been released, but be aware that this package is still early in the development stages, and as such, functions and function parameters may still be subject to change.
+Version 0.3.0 has been released. However, be aware that this package is still in development, and as such, bugs may still exist, and functions and function parameters may still be subject to change.
 
 To install the most recent stable release, use the following code:
 
-``` {.R}
+``` r
 install.packages("devtools")
 devtools::install_github("jeff-hughes/reghelper")
 ```
 
 If you are interested in helping out with the development process, you can install the development branch with the following code:
 
-``` {.R}
+``` r
 install.packages("devtools")
 devtools::install_github("jeff-hughes/reghelper@develop")
 ```
@@ -26,7 +24,7 @@ devtools::install_github("jeff-hughes/reghelper@develop")
 
 Networked computers can sometimes result in installation issues, as the `install_github` function sometimes has difficulty with networked directories. If this happens to you, use the `.libPaths()` function to find the path to your R libraries. That will likely give you a path starting with two backslashes, but you will need to convert that to a path starting with a drive letter (e.g., 'C:', 'D:'). From there, use the following code:
 
-``` {.R}
+``` r
 install.packages("devtools")
 devtools::install_github("jeff-hughes/reghelper", args=c('--library="N:/path/to/libraries/"'))
 ```
@@ -40,7 +38,7 @@ So far, most functions that I had originally planned to include have been implem
 
 -   `beta` Calculates standardized beta coefficients.
 -   `build_model` Allows variables to be added to a series of regression models sequentially (similar to SPSS).
--   `ICC` Calculates the intra-class correlation for a multi-level model (lme only at this point).
+-   `ICC` Calculates the intra-class correlation for a multi-level model.
 -   `cell_means` Calculates the estimated means for a fitted model.
 -   `graph_model` Easily graph interactions at +/- 1 SD (uses ggplot2 package).
 -   `sig_regions` Calculate the Johnson-Neyman regions of significance for an interaction.
@@ -48,15 +46,15 @@ So far, most functions that I had originally planned to include have been implem
 
 The table below shows the current types of models for which each function has been implemented:
 
-|Function|lm|glm|aov|lme|lmer|
-|:-------|:-:|:-:|:-:|:-:|:--:|
-|beta|✓|✓|✓|||
-|build\_model|✓|||||
-|ICC||||✓|✓|
-|cell\_means|✓||✓|||
-|graph\_model|✓|||||
-|sig\_regions|✓|||||
-|simple\_slopes|✓|✓|✓|✓|✓|
+| Function       |  lm | glm | aov | lme | lmer |
+|:---------------|:---:|:---:|:---:|:---:|:----:|
+| beta           |  ✓  |  ✓  |  ✓  |  ✓  |   ✓  |
+| build\_model   |  ✓  |  ✓  |  ✓  |     |      |
+| ICC            |  –  |  –  |  –  |  ✓  |   ✓  |
+| cell\_means    |  ✓  |  ✓  |  ✓  |     |      |
+| graph\_model   |  ✓  |  ✓  |  ✓  |     |      |
+| sig\_regions   |  ✓  |  ✓  |  –  |     |      |
+| simple\_slopes |  ✓  |  ✓  |  ✓  |  ✓  |   ✓  |
 
 Things to do
 ------------

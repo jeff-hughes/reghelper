@@ -290,7 +290,14 @@ print.block_lm_summary <- function(
     
     num_models <- length(model$coefficients)
     for (m in 1:num_models) {
-        writeLines(paste0('lm(formula = ', format(model$formulas[[m]]), ')'))
+        frm <- format(model$formulas[[m]])
+        if (length(frm) > 1) {
+            frm[1] <- paste0('lm(formula = ', frm[1])
+            frm[length(frm)] <- paste0(frm[length(frm)], ')')
+        } else {
+            frm <- paste0('lm(formula = ', frm, ')')
+        }
+        writeLines(frm)
         coefs <- capture.output(printCoefmat(model$coefficients[[m]],
                 digits=digits,
                 signif.stars=signif.stars,
@@ -366,7 +373,7 @@ coef.block_lm <- function(model, num=NULL, ...) {
 #' \code{coef} method for class "\code{block_lm_summary}".
 #' 
 #' @param model An object of class "\code{block_lm_summary}", usually, a result
-#'   of a call to \code{\link{block_lm_summary}}.
+#'   of a call to \code{\link{summary.block_lm}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   coefficients.
 #' @param ... Further arguments passed to or from other methods.
@@ -438,7 +445,7 @@ residuals.block_lm <- function(model, num=NULL, ...) {
 #' \code{residuals} method for class "\code{block_lm_summary}".
 #' 
 #' @param model An object of class "\code{block_lm_summary}", usually, a result
-#'   of a call to \code{\link{block_lm_summary}}.
+#'   of a call to \code{\link{summary.block_lm}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   residuals.
 #' @param ... Further arguments passed to or from other methods.
@@ -489,6 +496,532 @@ residuals.block_lm_summary <- function(model, num=NULL, ...) {
 #' fitted(model2, num=2)  # returns second block
 #' @export
 fitted.block_lm <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(lapply(model$models[num], fitted, ...))
+        } else {
+            return(fitted(model$models[[num]], ...))
+        }
+    } else {
+        return(lapply(model$models, fitted, ...))
+    }
+}
+
+
+#' Summarizing block ANOVA.
+#' 
+#' \code{summary} method for class "\code{block_aov}".
+#' 
+#' @param model An object of class "\code{block_aov}", usually, a result of a
+#'   call to \code{\link{build_model}}.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The function computes and returns a named list of summary statistics
+#'   of the fitted aov models given in \code{model}. The list has the following
+#'   elements:
+#' \tabular{ll}{
+#'   \code{formulas} \tab A list of the aov formulas used for each block.
+#'   \cr
+#'   \code{residuals} \tab A matrix with quantiles of the residuals for each
+#'   model.\cr
+#'   \code{summaries} \tab A list with an ANOVA table for each model, including
+#'   the sums of squares, mean squares, F values, and p-values.\cr
+#' }
+#' @seealso \code{\link{build_model}}, \code{\link{print.block_aov_summary}}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2)
+#' @export
+summary.block_aov <- function(model, ...) {
+    obj <- list()
+    obj$formulas <- model$formulas
+    
+    model_names <- paste('Model', 1:length(model$models))
+    delta_anova <- do.call(anova, model$models) 
+    
+    resids <- list()
+    summ <- list()
+    
+    # pull out residuals, coefficients, and R-squared and F
+    for (m in 1:length(model$models)) {
+        # calculate residuals for model
+        resids[[m]] <- quantile(residuals(model$models[[m]]))
+        
+        summ[[m]] <- summary(model$models[[m]])
+    }
+    
+    # reorganize residual information
+    resids <- matrix(unlist(resids), ncol=5, byrow=TRUE)
+    colnames(resids) <- c('Min', '1Q', 'Median', '3Q', 'Max')
+    rownames(resids) <- model_names
+    obj$residuals <- resids  
+    
+    obj$summaries <- summ
+    class(obj) <- 'block_aov_summary'
+    
+    return(obj)
+}
+
+
+#' Summarizing block ANOVA.
+#' 
+#' \code{print} method for class "\code{block_aov_summary}".
+#' 
+#' @param model An object of class "\code{block_aov_summary}", usually, a result
+#'   of a call to \code{\link{summary.block_aov}}.
+#' @param digits The number of significant digits to use when printing.
+#' @param signif.stars Logical. If \code{TRUE}, 'significance stars' are printed
+#'   for each coefficient.
+#' @param ... Further arguments passed to or from other methods.
+#' @seealso \code{\link{build_model}}, \code{\link{summary.block_aov}}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2)
+#' @export
+print.block_aov_summary <- function(
+    model,
+    digits=max(3L, getOption('digits') - 3L),
+    signif.stars=getOption('show.signif.stars'),
+    ...) {
+    
+    writeLines('Residuals:')
+    print(model$residuals, digits=digits, ...)
+    
+    writeLines('\nTables:')
+    
+    num_models <- length(model$summaries)
+    for (m in 1:num_models) {
+        writeLines(paste0('aov(formula = ', format(model$formulas[[m]]), ')'))
+        summ <- capture.output(print(model$summaries[[m]],
+            digits=digits,
+            signif.stars=signif.stars,
+            na.print='NA', ...))
+        
+        # cut off significance codes for all but last model
+        if (m == num_models || !grepl('Signif. codes', summ[length(summ)])) {
+            writeLines(summ)
+        } else {
+            writeLines(summ[1:(length(summ)-2)])
+        }
+        writeLines('')
+    }
+    
+    invisible(model)
+}
+
+
+#' Extract model coefficients.
+#' 
+#' \code{coef} method for class "\code{block_aov}".
+#' 
+#' @param model An object of class "\code{block_aov}", usually, a result of a
+#'   call to \code{\link{build_model}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   coefficients.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The coefficients of block(s) `num`, or if `num` is NULL, a list of
+#'   coefficients from all blocks.
+#' @seealso \code{\link{build_model}}, \code{\link{fitted.block_aov}},
+#'   \code{residuals.block_aov}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2, num=2)  # returns second block
+#' @export
+coef.block_aov <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(lapply(model$models[num], coef, ...))
+        } else {
+            return(coef(model$models[[num]], ...))
+        }
+    } else {
+        return(lapply(model$models, coef, ...))
+    }
+}
+
+
+#' Extract model residuals.
+#' 
+#' \code{residuals} method for class "\code{block_aov}".
+#' 
+#' @param model An object of class "\code{block_aov}", usually, a result of a
+#'   call to \code{\link{build_model}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   residuals.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The residuals of block(s) `num`, or if `num` is NULL, a list of
+#'   residuals from all blocks.
+#' @seealso \code{\link{build_model}}, \code{\link{fitted.block_aov}},
+#'   \code{coef.block_aov}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' residuals(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' residuals(model2, num=2)  # returns second block
+#' @export
+residuals.block_aov <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(lapply(model$models[num], residuals, ...))
+        } else {
+            return(residuals(model$models[[num]], ...))
+        }
+    } else {
+        return(lapply(model$models, residuals, ...))
+    }
+}
+
+
+#' Extract model fitted values.
+#' 
+#' \code{fitted} method for class "\code{block_aov}".
+#' 
+#' @param model An object of class "\code{block_aov}", usually, a result of a
+#'   call to \code{\link{build_model}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   fitted values.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The fitted values of block(s) `num`, or if `num` is NULL, a list of
+#'   fitted values from all blocks.
+#' @seealso \code{\link{build_model}}, \code{coef.block_aov},
+#'   \code{residuals.block_aov}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' fitted(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' fitted(model2, num=2)  # returns second block
+#' @export
+fitted.block_aov <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(lapply(model$models[num], fitted, ...))
+        } else {
+            return(fitted(model$models[[num]], ...))
+        }
+    } else {
+        return(lapply(model$models, fitted, ...))
+    }
+}
+
+
+#' Summarizing block general linear models.
+#' 
+#' \code{summary} method for class "\code{block_glm}".
+#' 
+#' @param model An object of class "\code{block_glm}", usually, a result of a
+#'   call to \code{\link{build_model}}.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The function computes and returns a named list of summary statistics
+#'   of the fitted general linear models given in \code{model}. The list has the
+#'   following elements:
+#' \tabular{ll}{
+#'   \code{formulas} \tab A list of the regression formulas used for each block.
+#'   \cr
+#'   \code{family} \tab The link function used in the model fit.\cr
+#'   \code{residuals} \tab A matrix with quantiles of the residuals for each
+#'   model.\cr
+#'   \code{coefficients} \tab A list with a matrix of coefficients for each
+#'   model, as well as the standard error, t-statistic, and p-value.\cr
+#'   \code{overall} \tab A data frame with information about the overall models,
+#'   including the multiple R-squared value; adjusted R-squared; F-statistic,
+#'   degrees of freedom, and p-value for each overall model; and the delta
+#'   R-squared (change in R-squared) and its associated F-statistic and p-value.
+#'   \cr
+#' }
+#' @seealso \code{\link{build_model}}, \code{\link{print.block_glm_summary}}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2)
+#' @export
+summary.block_glm <- function(model, ...) {
+    obj <- list()
+    obj$formulas <- model$formulas
+    obj$family <- model$models[[1]]$family$family
+    
+    model_names <- paste('Model', 1:length(model$models))
+    
+    resids <- list()
+    coefs <- list()
+    
+    # pull out residuals, coefficients, and R-squared and F
+    for (m in 1:length(model$models)) {
+        # calculate residuals for model
+        resids[[m]] <- quantile(residuals(model$models[[m]]))
+        
+        summ <- summary(model$models[[m]])
+        coefs[[m]] <- coef(summ)
+    }
+    
+    # reorganize residual information
+    resids <- matrix(unlist(resids), ncol=5, byrow=TRUE)
+    colnames(resids) <- c('Min', '1Q', 'Median', '3Q', 'Max')
+    rownames(resids) <- model_names
+    obj$residuals <- resids  
+    
+    obj$coefficients <- coefs
+    class(obj) <- 'block_glm_summary'
+    
+    return(obj)
+}
+
+
+#' Summarizing block general linear models.
+#' 
+#' \code{print} method for class "\code{block_glm_summary}".
+#' 
+#' @param model An object of class "\code{block_glm_summary}", usually, a result
+#'   of a call to \code{\link{summary.block_glm}}.
+#' @param digits The number of significant digits to use when printing.
+#' @param signif.stars Logical. If \code{TRUE}, 'significance stars' are printed
+#'   for each coefficient.
+#' @param ... Further arguments passed to or from other methods.
+#' @seealso \code{\link{build_model}}, \code{\link{summary.block_glm}}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2)
+#' @export
+print.block_glm_summary <- function(
+    model,
+    digits=max(3L, getOption('digits') - 3L),
+    signif.stars=getOption('show.signif.stars'),
+    ...) {
+    
+    writeLines('Deviance Residuals:')
+    print(model$residuals, digits=digits, ...)
+    
+    writeLines('\nCoefficients:')
+    
+    num_models <- length(model$coefficients)
+    for (m in 1:num_models) {
+        writeLines(paste0('glm(formula = ', format(model$formulas[[m]]),
+            ', family = "', model$family, '")'))
+        coefs <- capture.output(printCoefmat(model$coefficients[[m]],
+            digits=digits,
+            signif.stars=signif.stars,
+            na.print='NA', ...))
+        
+        # cut off significance codes for all but last model
+        if (m == num_models || !grepl('Signif. codes', coefs[length(coefs)])) {
+            writeLines(coefs)
+        } else {
+            writeLines(coefs[1:(length(coefs)-2)])
+        }
+        writeLines('')
+    }
+    
+    invisible(model)
+}
+
+
+#' Extract model coefficients.
+#' 
+#' \code{coef} method for class "\code{block_glm}".
+#' 
+#' @param model An object of class "\code{block_glm}", usually, a result of a
+#'   call to \code{\link{build_model}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   coefficients.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The coefficients of block(s) `num`, or if `num` is NULL, a list of
+#'   coefficients from all blocks.
+#' @seealso \code{\link{build_model}}, \code{coef.block_glm_summary},
+#'   \code{\link{fitted.block_glm}}, \code{residuals.block_glm}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' coef(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' coef(model2, num=2)  # returns second block
+#' @export
+coef.block_glm <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(lapply(model$models[num], coef, ...))
+        } else {
+            return(coef(model$models[[num]], ...))
+        }
+    } else {
+        return(lapply(model$models, coef, ...))
+    }
+}
+
+
+#' Extract model coefficients.
+#' 
+#' \code{coef} method for class "\code{block_glm_summary}".
+#' 
+#' @param model An object of class "\code{block_glm_summary}", usually, a result
+#'   of a call to \code{\link{summary.block_glm}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   coefficients.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The coefficients of block(s) `num`, or if `num` is NULL, a list of
+#'   coefficients from all blocks.
+#' @seealso \code{\link{summary.block_glm}}, \code{coef.block_glm},
+#'   \code{residuals.block_glm_summary}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' coef(summary(model1))  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' coef(summary(model2), num=2)  # returns second block
+#' @export
+coef.block_glm_summary <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(model$coefficients[num])
+        } else {
+            return(model$coefficients[[num]])
+        }
+    } else {
+        return(model$coefficients)
+    }
+}
+
+
+#' Extract model residuals.
+#' 
+#' \code{residuals} method for class "\code{block_glm}".
+#' 
+#' @param model An object of class "\code{block_glm}", usually, a result of a
+#'   call to \code{\link{build_model}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   residuals.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The residuals of block(s) `num`, or if `num` is NULL, a list of
+#'   residuals from all blocks.
+#' @seealso \code{\link{build_model}}, \code{residuals.block_glm_summary},
+#'   \code{\link{fitted.block_glm}}, \code{coef.block_glm}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' residuals(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' residuals(model2, num=2)  # returns second block
+#' @export
+residuals.block_glm <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        if (length(num) > 1) {
+            return(lapply(model$models[num], residuals, ...))
+        } else {
+            return(residuals(model$models[[num]], ...))
+        }
+    } else {
+        return(lapply(model$models, residuals, ...))
+    }
+}
+
+
+#' Extract model residuals.
+#' 
+#' \code{residuals} method for class "\code{block_glm_summary}".
+#' 
+#' @param model An object of class "\code{block_glm_summary}", usually, a result
+#'   of a call to \code{\link{summary.block_glm}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   residuals.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The residuals of block(s) `num`, or if `num` is NULL, a list of
+#'   residuals from all blocks.
+#' @seealso \code{\link{summary.block_lm}}, \code{residuals.block_lm},
+#'   \code{coef.block_lm_summary}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' residuals(summary(model1))  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' residuals(summary(model2), num=2)  # returns second block
+#' @export
+residuals.block_glm_summary <- function(model, num=NULL, ...) {
+    if (!is.null(num)) {
+        return(model$residuals[num, ])
+    } else {
+        return(model$residuals)
+    }
+}
+
+
+#' Extract model fitted values.
+#' 
+#' \code{fitted} method for class "\code{block_glm}".
+#' 
+#' @param model An object of class "\code{block_glm}", usually, a result of a
+#'   call to \code{\link{build_model}}.
+#' @param num Numeric vector with the index of model(s) from which to return the
+#'   fitted values.
+#' @param ... Further arguments passed to or from other methods.
+#' @return The fitted values of block(s) `num`, or if `num` is NULL, a list of
+#'   fitted values from all blocks.
+#' @seealso \code{\link{build_model}}, \code{coef.block_glm},
+#'   \code{residuals.block_glm}
+#' @examples
+#' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
+#' model1 <- build_model(Sepal.Length, Petal.Length, Petal.Width, data=iris, model='lm')
+#' summary(model1)
+#' fitted(model1)  # returns both blocks 1 and 2
+#' 
+#' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
+#' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
+#' summary(model2)
+#' fitted(model2, num=2)  # returns second block
+#' @export
+fitted.block_glm <- function(model, num=NULL, ...) {
     if (!is.null(num)) {
         if (length(num) > 1) {
             return(lapply(model$models[num], fitted, ...))
