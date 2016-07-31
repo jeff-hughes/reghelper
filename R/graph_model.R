@@ -724,6 +724,279 @@ graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
 }
 
 
+#' Graph multi-level model interactions.
+#' 
+#' \code{graph_model.merMod} provides an easy way to graph interactions in
+#' multi-level models. Selected variables will be graphed at +/- 1 SD (if
+#' continuous) or at each level of the factor (if categorical).
+#' 
+#' This function only deals with fixed effects of the model, after the random
+#' effects have been accounted for. To look at the lower-level effects, consider
+#' using \code{\link{predict.merMod}} to generate predicted values at the
+#' desired level.
+#' 
+#' If there are additional covariates in the model other than what is indicated
+#' to be graphed by the function, these variables will be plotted at their
+#' respective means. In the case of a categorical covariate, the results will be
+#' averaged across all its levels.
+#' 
+#' @param model A fitted linear model of type 'merMod' (from the 'lme4' package).
+#' @param y The variable to be plotted on the y-axis. This variable is required
+#'   for the graph.
+#' @param x The variable to be plotted on the x-axis. This variable is required
+#'   for the graph.
+#' @param lines The variable to be plotted using separate lines (optional).
+#' @param split The variable to be split among separate graphs (optional).
+#' @param errorbars A string indicating what kind of error bars to show.
+#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
+#'   error of the predicted means), or "none".
+#' @param ymin Number indicating the minimum value for the y-axis scale. Default
+#'   NULL value will adjust position to the lowest y value.
+#' @param ymax Number indicating the maximum value for the y-axis scale. Default
+#'   NULL value will adjust position to the highest y value.
+#' @param titles A character vector with strings for the various plot titles.
+#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
+#'   If any position is NULL, the names of the variables will be used.
+#' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
+#'   will draw a line graph of the results.
+#' @param draw.legend Logical. Whether or not to draw legend on the graph.
+#' @param dodge A numeric value indicating the amount each point on the graph
+#'   should be shifted left or right, which can help for readability when points
+#'   are close together. Default value is 0, with .1 or .2 probably sufficient
+#'   in most cases.
+#' @param exp Logical. If TRUE, the exponential function \code{exp()} will be
+#'   used to transform the y-axis (i.e., e to the power of y). Useful for
+#'   logistic regressions or for converting log-transformed y-values to their
+#'   original units.
+#' @return A ggplot2 graph of the plotted variables in the model.
+#' @seealso \code{\link{graph_model.lme}}, \code{\link{graph_model.lm}}
+#' @examples
+#' # iris data
+#' model <- lmer(distance ~ age * Sex + (1|Subject), data=Orthodont)
+#' graph_model(model, y=distance, x=age, lines=Sex)
+#' @export
+graph_model.merMod <- function(model, y, x, lines=NULL, split=NULL,
+    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, titles=NULL,
+    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
+    
+    call <- as.list(match.call())[-1]
+    
+    # convert variable names to strings
+    call$y <- deparse(substitute(y))
+    call$x <- deparse(substitute(x))
+    if (!is.null(call$lines)) {
+        call$lines <- deparse(substitute(lines))
+    }
+    if (!is.null(call$split)) {
+        call$split <- deparse(substitute(split))
+    }
+    
+    return(do.call(graph_model_q.merMod, call))
+}
+
+
+#' Graph multi-level model interactions.
+#' 
+#' \code{graph_model_q.merMod} provides an easy way to graph interactions in
+#' multi-level models. Selected variables will be graphed at +/- 1 SD (if
+#' continuous) or at each level of the factor (if categorical).
+#' 
+#' This function only deals with fixed effects of the model, after the random
+#' effects have been accounted for. To look at the lower-level effects, consider
+#' using \code{\link{predict.merMod}} to generate predicted values at the
+#' desired level.
+#' 
+#' If there are additional covariates in the model other than what is indicated
+#' to be graphed by the function, these variables will be plotted at their
+#' respective means. In the case of a categorical covariate, the results will be
+#' averaged across all its levels.
+#' 
+#' Note that in most cases it is easier to use \code{\link{graph_model.merMod}}
+#' and pass variable names in directly instead of strings of variable names.
+#' \code{graph_model_q.merMod} uses standard evaluation in cases where such
+#' evaluation is easier.
+#' 
+#' @param model A fitted linear model of type 'merMod' (from the 'lme4' package).
+#' @param y The variable to be plotted on the y-axis. This variable is required
+#'   for the graph.
+#' @param x The variable to be plotted on the x-axis. This variable is required
+#'   for the graph.
+#' @param lines The variable to be plotted using separate lines (optional).
+#' @param split The variable to be split among separate graphs (optional).
+#' @param errorbars A string indicating what kind of error bars to show.
+#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
+#'   error of the predicted means), or "none".
+#' @param ymin Number indicating the minimum value for the y-axis scale. Default
+#'   NULL value will adjust position to the lowest y value.
+#' @param ymax Number indicating the maximum value for the y-axis scale. Default
+#'   NULL value will adjust position to the highest y value.
+#' @param titles A character vector with strings for the various plot titles.
+#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
+#'   If any position is NULL, the names of the variables will be used.
+#' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
+#'   will draw a line graph of the results.
+#' @param draw.legend Logical. Whether or not to draw legend on the graph.
+#' @param dodge A numeric value indicating the amount each point on the graph
+#'   should be shifted left or right, which can help for readability when points
+#'   are close together. Default value is 0, with .1 or .2 probably sufficient
+#'   in most cases.
+#' @param exp Logical. If TRUE, the exponential function \code{exp()} will be
+#'   used to transform the y-axis (i.e., e to the power of y). Useful for
+#'   logistic regressions or for converting log-transformed y-values to their
+#'   original units.
+#' @return A ggplot2 graph of the plotted variables in the model.
+#' @seealso \code{\link{graph_model.merMod}}, \code{\link{graph_model_q.lme}},
+#'   \code{\link{graph_model_q.lm}}
+#' @examples
+#' # iris data
+#' model <- lmer(distance ~ age * Sex + (1|Subject), data=Orthodont)
+#' graph_model_q(model, y='distance', x='age', lines='Sex')
+#' @export
+graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
+    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, titles=NULL,
+    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
+    
+    errorbars <- match.arg(errorbars)
+    
+    data <- model@frame
+    factors <- list()
+    
+    # determine whether each variable is categorical (factor) or continuous, and
+    # set up the points at which to graph each variable, to be used later
+    i <- 1
+    for (term in c(x, lines, split)) {
+        if (!is.null(term)) {
+            if (is.factor(data[[term]])) {
+                factors[[i]] <- levels(data[[term]])
+            } else {
+                factors[[i]] <- c(
+                    mean(data[[term]], na.rm=TRUE)+sd(data[[term]], na.rm=TRUE),
+                    mean(data[[term]], na.rm=TRUE)-sd(data[[term]], na.rm=TRUE)
+                )
+            }
+            i <- i + 1
+        }
+    }
+    
+    # set up grid of points to graph the model at, to predict cell means
+    if (is.null(lines) && is.null(split)) {
+        grid <- with(data, expand.grid(
+            x=factors[[1]],
+            g=1  # dummy 'group' so ggplot still draws lines
+        ))
+        names(grid)[names(grid) == 'x'] <- x
+    } else if (is.null(split)) {
+        grid <- with(data, expand.grid(
+            x=factors[[1]],
+            lines=factors[[2]]
+        ))
+        names(grid) <- c(x, lines)
+    } else {
+        grid <- with(data, expand.grid(
+            x=factors[[1]],
+            lines=factors[[2]],
+            split=factors[[3]]
+        ))
+        names(grid) <- c(x, lines, split)
+    }
+    
+    # add in other variables that are in the model, but are not selected to be
+    # graphed; these variables get plotted at their means
+    variables <- all.vars(formula(model, fixed.only=TRUE))[-1]
+    factor_name <- NULL
+    for (i in 1:length(variables)) {
+        if (!(variables[[i]] %in% colnames(grid))) {
+            if (is.factor(data[[variables[[i]]]])) {
+                # if factor, must include all levels in model for
+                # predict() to work properly
+                temp_list <- lapply(as.list(grid), unique)
+                    # get unique values and put into list format
+                temp_list[[variables[[i]]]] <- levels(data[[variables[[i]]]])
+                grid <- expand.grid(temp_list)
+                factor_name <- variables[[i]]
+            } else {
+                grid[[variables[[i]]]] <- mean(data[[variables[[i]]]],
+                    na.rm=TRUE)  # if continuous, include in model at mean
+            }
+        }
+    }
+    
+    # predict cell means
+    predicted <- predict(model, newdata=grid, re.form=NA)
+    if (exp == TRUE) {
+        grid[[y]] <- exp(predicted)
+    } else {
+        grid[[y]] <- predicted
+    }
+    
+    # add error bars, if desired
+    errors <- FALSE
+    if (errorbars == 'CI' || errorbars == 'SE') {
+        # code from: http://glmm.wikidot.com/faq
+        designmat <- model.matrix(delete.response(terms(model)), grid)
+        predicted <- predict(model, grid, re.form=NA)
+        predvar <- diag(designmat %*% as.matrix(vcov(model)) %*% t(designmat))
+        se <- sqrt(predvar)
+        
+        if (errorbars == 'CI') {
+            grid$error_upper <- predicted + 1.96 * se
+            grid$error_lower <- predicted - 1.96 * se
+        } else if (errorbars == 'SE') {
+            grid$error_upper <- predicted + se
+            grid$error_lower <- predicted - se
+        }
+        errors <- TRUE
+    }
+    if (exp == TRUE && errors == TRUE) {
+        grid$error_upper <- exp(grid$error_upper)
+        grid$error_lower <- exp(grid$error_lower)
+    }
+    
+    # workaround to include factor covariates -- average across levels;
+    # only works for one factor covariate
+    if (!is.null(factor_name)) {
+        grid2 <- subset(grid, FALSE)
+        lev <- levels(data[[factor_name]])
+        location <- which(names(grid) == factor_name)
+        for (i in 1:(nrow(grid)/length(lev))) {
+            grid2[i, -location] <- apply(grid[seq(i, nrow(grid),
+                by=(nrow(grid)/length(lev))), -location], 2, mean, na.rm=TRUE)
+        }
+        grid2[[location]] <- NULL
+        grid <- grid2
+    }
+    
+    # factor all the variables, to make for a cleaner graph
+    for (term in c(x, lines, split)) {
+        if (!is.null(term) && !is.factor(data[[term]])) {
+            grid[[term]] <- factor(grid[[term]], labels=c('-1 SD', '+1 SD'))
+        }
+    }
+    
+    # add in title for the 'split' variable, if one exists
+    if (!is.null(titles) && !is.null(split)) {
+        if (!is.factor(data[[split]])) {
+            levels(grid[[split]]) <- c(paste0(titles[5], ': -1 SD'),
+                paste0(titles[5], ': +1 SD'))
+        } else {
+            num_levels <- length(levels(grid[[split]]))
+            levels(grid[[split]]) <- paste0(rep(titles[5], num_levels), ': ',
+                levels(grid[[split]]))
+        }
+    }
+    
+    if (is.null(lines)) {
+        lines <- 'g'  # dummy group so ggplot still draws lines
+        draw.legend <- FALSE
+    }
+    
+    # build and return graph
+    graph <- .build_plot(grid, y, x, lines, split, errors, ymin, ymax,
+        titles, bargraph, draw.legend, dodge, exp)
+    return(graph)
+}
+
+
 #' Build ggplot object.
 #' 
 #' Helper function takes care of building a ggplot object, given points and

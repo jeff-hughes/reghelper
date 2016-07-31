@@ -46,15 +46,84 @@ So far, most functions that I had originally planned to include have been implem
 
 The table below shows the current types of models for which each function has been implemented:
 
-| Function       |  lm | glm | aov | lme | lmer |
-|:---------------|:---:|:---:|:---:|:---:|:----:|
-| beta           |  ✓  |  ✓  |  ✓  |  ✓  |   ✓  |
-| build\_model   |  ✓  |  ✓  |  ✓  |     |      |
-| ICC            |  –  |  –  |  –  |  ✓  |   ✓  |
-| cell\_means    |  ✓  |  ✓  |  ✓  |     |      |
-| graph\_model   |  ✓  |  ✓  |  ✓  |     |      |
-| sig\_regions   |  ✓  |  ✓  |  –  |     |      |
-| simple\_slopes |  ✓  |  ✓  |  ✓  |  ✓  |   ✓  |
+<table style="width:82%;">
+<colgroup>
+<col width="19%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Function</th>
+<th align="center">lm</th>
+<th align="center">glm</th>
+<th align="center">aov</th>
+<th align="center">lme</th>
+<th align="center">lmer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">beta</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+</tr>
+<tr class="even">
+<td align="left">build_model</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">ICC</td>
+<td align="center">–</td>
+<td align="center">–</td>
+<td align="center">–</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+</tr>
+<tr class="even">
+<td align="left">cell_means</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">graph_model</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+</tr>
+<tr class="even">
+<td align="left">sig_regions</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">–</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">simple_slopes</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+<td align="center">✓</td>
+</tr>
+</tbody>
+</table>
 
 Things to do
 ------------
