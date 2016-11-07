@@ -5,8 +5,9 @@
 \title{Graph linear interactions.}
 \usage{
 graph_model_q.lm(model, y, x, lines = NULL, split = NULL,
-  errorbars = "CI", ymin = NULL, ymax = NULL, titles = NULL,
-  bargraph = FALSE, draw.legend = TRUE, dodge = 0, exp = FALSE)
+  errorbars = c("CI", "SE", "none"), ymin = NULL, ymax = NULL,
+  titles = NULL, bargraph = FALSE, draw.legend = TRUE, dodge = 0,
+  exp = FALSE)
 }
 \arguments{
 \item{model}{A fitted linear model of type 'lm'.}
@@ -23,13 +24,17 @@ for the graph.}
 
 \item{errorbars}{A string indicating what kind of error bars to show.
 Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
-error of the predicted means), or NULL.}
+error of the predicted means), or "none".}
 
 \item{ymin}{Number indicating the minimum value for the y-axis scale. Default
 NULL value will adjust position to the lowest y value.}
 
 \item{ymax}{Number indicating the maximum value for the y-axis scale. Default
 NULL value will adjust position to the highest y value.}
+
+\item{titles}{A character vector with strings for the various plot titles.
+In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
+If any position is NULL, the names of the variables will be used.}
 
 \item{bargraph}{Logical. TRUE will draw a bar graph of the results; FALSE
 will draw a line graph of the results.}
@@ -45,10 +50,6 @@ in most cases.}
 used to transform the y-axis (i.e., e to the power of y). Useful for
 logistic regressions or for converting log-transformed y-values to their
 original units.}
-
-\item{titles:}{A character vector with strings for the various plot titles.
-In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
-If any position is NULL, the names of the variables will be used.}
 }
 \value{
 A ggplot object of the plotted variables in the model.

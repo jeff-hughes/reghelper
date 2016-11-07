@@ -490,11 +490,29 @@ print.simple_slopes <- function(
     signif.stars=getOption('show.signif.stars'),
     ...) {
 
-    suppressWarnings(printCoefmat(
-        model,
-        digits=digits,
-        signif.stars=signif.stars,
-        na.print='sstest'))
+    if (!is.logical(signif.stars) || is.na(signif.stars)) {
+        warning("option \"show.signif.stars\" is invalid: assuming TRUE")
+        signif.stars <- TRUE
+    }
+    
+    index <- c('Test Estimate', 'Std. Error', 't value', 'df')
+    for (i in index) {
+        model[, i] <- round(model[, i], digits=digits)
+    }
+    
+    if (signif.stars) {
+        stars <- symnum(as.numeric(model[, 'Pr(>|t|)']), corr=FALSE, na=FALSE,
+            numeric.x=TRUE, cutpoints=c(0, 0.001, 0.01, 0.05, 0.1, 1), 
+            symbols=c("***", "**", "*", ".", " "))
+    }
+    
+    model[, 'Pr(>|t|)'] <- format.pval(as.numeric(model[, 'Pr(>|t|)']), digits=digits)
+    
+    if (signif.stars) {
+        model[, 'Sig.'] <- as.character(stars)
+    }
+    
+    print.data.frame(model, quote=FALSE, right=TRUE, na.print='NA')
     invisible(model)
 }
 

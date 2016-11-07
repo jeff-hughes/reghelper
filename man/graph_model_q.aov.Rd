@@ -5,8 +5,9 @@
 \title{Graph linear interactions.}
 \usage{
 graph_model_q.aov(model, y, x, lines = NULL, split = NULL,
-  errorbars = "CI", ymin = NULL, ymax = NULL, titles = NULL,
-  bargraph = FALSE, draw.legend = TRUE, dodge = 0, exp = FALSE)
+  errorbars = c("CI", "SE", "none"), ymin = NULL, ymax = NULL,
+  titles = NULL, bargraph = FALSE, draw.legend = TRUE, dodge = 0,
+  exp = FALSE)
 }
 \description{
 \code{graph_model_q.aov}  is an alias of graph_model_q.lm.
