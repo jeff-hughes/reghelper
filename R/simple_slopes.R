@@ -42,14 +42,14 @@ simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 #' overridden with the \code{levels} parameter.
 #' 
 #' If a categorical variable with more than two levels is being tested, you may
-#' see multiple row for that test. One row will be shown for each contrast for
+#' see multiple rows for that test. One row will be shown for each contrast for
 #' that variable; the order is in the same order shown in \code{contrasts()}.
 #' 
 #' @param model A fitted linear model of type 'lm' with at least one interaction
 #'   term.
 #' @param levels A list with element names corresponding to some or all of the
 #'   variables in the model. Each list element should be a vector with the names
-#'   of factor levels (for categorical variables) or numeric points (for
+#'   of factor levels (for categorical variables) or numeric values (for
 #'   continuous variables) at which to test that variable. \strong{Note:} If you
 #'   do not include 'sstest' as one of these levels, the function will not test
 #'   the simple effects for that variable.
@@ -186,14 +186,14 @@ simple_slopes.aov <- function(model, levels=NULL) {
 #' overridden with the \code{levels} parameter.
 #' 
 #' If a categorical variable with more than two levels is being tested, you may
-#' see multiple row for that test. One row will be shown for each contrast for
+#' see multiple rows for that test. One row will be shown for each contrast for
 #' that variable; the order is in the same order shown in \code{contrasts()}.
 #' 
 #' @param model A fitted linear model of type 'glm' with at least one
 #'   interaction term.
 #' @param levels A list with element names corresponding to some or all of the
 #'   variables in the model. Each list element should be a vector with the names
-#'   of factor levels (for categorical variables) or numeric points (for
+#'   of factor levels (for categorical variables) or numeric values (for
 #'   continuous variables) at which to test that variable. \strong{Note:} If you
 #'   do not include 'sstest' as one of these levels, the function will not test
 #'   the simple effects for that variable.
@@ -235,14 +235,14 @@ simple_slopes.glm <- function(model, levels=NULL) {
 #' overridden with the \code{levels} parameter.
 #' 
 #' If a categorical variable with more than two levels is being tested, you may
-#' see multiple row for that test. One row will be shown for each contrast for
+#' see multiple rows for that test. One row will be shown for each contrast for
 #' that variable; the order is in the same order shown in \code{contrasts()}.
 #' 
 #' @param model A fitted linear model of type 'lme' with at least one
 #'   interaction term.
 #' @param levels A list with element names corresponding to some or all of the
 #'   variables in the model. Each list element should be a vector with the names
-#'   of factor levels (for categorical variables) or numeric points (for
+#'   of factor levels (for categorical variables) or numeric values (for
 #'   continuous variables) at which to test that variable. \strong{Note:} If you
 #'   do not include 'sstest' as one of these levels, the function will not test
 #'   the simple effects for that variable.
@@ -365,14 +365,14 @@ simple_slopes.lme <- function(model, levels=NULL) {
 #' overridden with the \code{levels} parameter.
 #' 
 #' If a categorical variable with more than two levels is being tested, you may
-#' see multiple row for that test. One row will be shown for each contrast for
+#' see multiple rows for that test. One row will be shown for each contrast for
 #' that variable; the order is in the same order shown in \code{contrasts()}.
 #' 
 #' @param model A fitted linear model of type 'merMod' with at least one
 #'   interaction term.
 #' @param levels A list with element names corresponding to some or all of the
 #'   variables in the model. Each list element should be a vector with the names
-#'   of factor levels (for categorical variables) or numeric points (for
+#'   of factor levels (for categorical variables) or numeric values (for
 #'   continuous variables) at which to test that variable. \strong{Note:} If you
 #'   do not include 'sstest' as one of these levels, the function will not test
 #'   the simple effects for that variable.

@@ -42,9 +42,11 @@ graph_model <- function(model, ...) UseMethod('graph_model')
 #'   NULL value will adjust position to the lowest y value.
 #' @param ymax Number indicating the maximum value for the y-axis scale. Default
 #'   NULL value will adjust position to the highest y value.
-#' @param titles A character vector with strings for the various plot titles.
-#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
-#'   If any position is NULL, the names of the variables will be used.
+#' @param labels A named list with strings for the various plot labels: 'title'
+#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
+#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
+#'   facet. If any label is not set, the names of the variables will be used.
+#'   Setting a label explicitly to NA will set an empty label.
 #' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
 #'   will draw a line graph of the results.
 #' @param draw.legend Logical. Whether or not to draw legend on the graph.
@@ -63,7 +65,7 @@ graph_model <- function(model, ...) UseMethod('graph_model')
 #' graph_model(model, y=Sepal.Width, x=Sepal.Length, lines=Species)
 #' @export
 graph_model.lm <- function(model, y, x, lines=NULL, split=NULL,
-    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, titles=NULL,
+    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
     bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
     
     call <- as.list(match.call())[-1]
@@ -112,9 +114,11 @@ graph_model.lm <- function(model, y, x, lines=NULL, split=NULL,
 #'   NULL value will adjust position to the lowest y value.
 #' @param ymax Number indicating the maximum value for the y-axis scale. Default
 #'   NULL value will adjust position to the highest y value.
-#' @param titles A character vector with strings for the various plot titles.
-#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
-#'   If any position is NULL, the names of the variables will be used.
+#' @param labels A named list with strings for the various plot labels: 'title'
+#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
+#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
+#'   facet. If any label is not set, the names of the variables will be used.
+#'   Setting a label explicitly to NA will set an empty label.
 #' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
 #'   will draw a line graph of the results.
 #' @param draw.legend Logical. Whether or not to draw legend on the graph.
@@ -134,7 +138,7 @@ graph_model.lm <- function(model, y, x, lines=NULL, split=NULL,
 #' graph_model_q.lm(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
 #' @export
 graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
-    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, titles=NULL,
+    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
     bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
     
     call <- as.list(match.call())[-1]
@@ -151,7 +155,7 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
 #' @seealso \code{\link{graph_model.lm}}, \code{\link{graph_model.glm}}
 #' @export
 graph_model.aov <- function(model, y, x, lines=NULL, split=NULL,
-    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, titles=NULL,
+    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
     bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
     
     call <- as.list(match.call())[-1]
@@ -177,7 +181,7 @@ graph_model.aov <- function(model, y, x, lines=NULL, split=NULL,
 #' @seealso \code{\link{graph_model_q.lm}}, \code{\link{graph_model_q.glm}}
 #' @export
 graph_model_q.aov <- function(model, y, x, lines=NULL, split=NULL,
-    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, titles=NULL,
+    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
     bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
     
     call <- as.list(match.call())[-1]
@@ -215,9 +219,11 @@ graph_model_q.aov <- function(model, y, x, lines=NULL, split=NULL,
 #'   NULL value will adjust position to the lowest y value.
 #' @param ymax Number indicating the maximum value for the y-axis scale. Default
 #'   NULL value will adjust position to the highest y value.
-#' @param titles A character vector with strings for the various plot titles.
-#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
-#'   If any position is NULL, the names of the variables will be used.
+#' @param labels A named list with strings for the various plot labels: 'title'
+#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
+#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
+#'   facet. If any label is not set, the names of the variables will be used.
+#'   Setting a label explicitly to NA will set an empty label.
 #' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
 #'   will draw a line graph of the results.
 #' @param draw.legend Logical. Whether or not to draw legend on the graph.
@@ -238,7 +244,7 @@ graph_model_q.aov <- function(model, y, x, lines=NULL, split=NULL,
 #' @export
 graph_model.glm <- function(model, y, x, lines=NULL, split=NULL,
     type=c('link', 'response'), errorbars=c('CI', 'SE', 'none'), ymin=NULL,
-    ymax=NULL, titles=NULL, bargraph=FALSE, draw.legend=TRUE, dodge=0,
+    ymax=NULL, labels=NULL, bargraph=FALSE, draw.legend=TRUE, dodge=0,
     exp=FALSE) {
     
     call <- as.list(match.call())[-1]
@@ -291,9 +297,11 @@ graph_model.glm <- function(model, y, x, lines=NULL, split=NULL,
 #'   NULL value will adjust position to the lowest y value.
 #' @param ymax Number indicating the maximum value for the y-axis scale. Default
 #'   NULL value will adjust position to the highest y value.
-#' @param titles A character vector with strings for the various plot titles.
-#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
-#'   If any position is NULL, the names of the variables will be used.
+#' @param labels A named list with strings for the various plot labels: 'title'
+#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
+#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
+#'   facet. If any label is not set, the names of the variables will be used.
+#'   Setting a label explicitly to NA will set an empty label.
 #' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
 #'   will draw a line graph of the results.
 #' @param draw.legend Logical. Whether or not to draw legend on the graph.
@@ -314,7 +322,7 @@ graph_model.glm <- function(model, y, x, lines=NULL, split=NULL,
 #' @export
 graph_model_q.glm <- function(model, y, x, lines=NULL, split=NULL,
     type=c('link', 'response'), errorbars=c('CI', 'SE', 'none'), ymin=NULL,
-    ymax=NULL, titles=NULL, bargraph=FALSE, draw.legend=TRUE, dodge=0,
+    ymax=NULL, labels=NULL, bargraph=FALSE, draw.legend=TRUE, dodge=0,
     exp=FALSE) {
     
     type <- match.arg(type)
@@ -428,14 +436,22 @@ graph_model_q.glm <- function(model, y, x, lines=NULL, split=NULL,
         }
     }
     
-    # add in title for the 'split' variable, if one exists
-    if (!is.null(titles) && !is.null(split)) {
+    # add in label for the 'split' variable, if one exists
+    if (!is.null(split)) {
+        if (is.null(labels$split)) {
+            labels$split <- paste0(split, ': ')
+        } else if (is.na(labels$split)) {
+            labels$split <- ''
+        } else {
+            labels$split <- paste0(labels$split, ': ')
+        }
+        
         if (!is.factor(data[[split]])) {
-            levels(grid[[split]]) <- c(paste0(titles[5], ': -1 SD'),
-                paste0(titles[5], ': +1 SD'))
+            levels(grid[[split]]) <- c(paste0(labels$split, '-1 SD'),
+                paste0(labels$split, '+1 SD'))
         } else {
             num_levels <- length(levels(grid[[split]]))
-            levels(grid[[split]]) <- paste0(rep(titles[5], num_levels), ': ',
+            levels(grid[[split]]) <- paste0(rep(labels$split, num_levels),
                 levels(grid[[split]]))
         }
     }
@@ -447,7 +463,7 @@ graph_model_q.glm <- function(model, y, x, lines=NULL, split=NULL,
     
     # build and return graph
     graph <- .build_plot(grid, y, x, lines, split, errors, ymin, ymax,
-        titles, bargraph, draw.legend, dodge, exp)
+        labels, bargraph, draw.legend, dodge, exp)
     return(graph)
 }
 
@@ -482,9 +498,11 @@ graph_model_q.glm <- function(model, y, x, lines=NULL, split=NULL,
 #'   NULL value will adjust position to the lowest y value.
 #' @param ymax Number indicating the maximum value for the y-axis scale. Default
 #'   NULL value will adjust position to the highest y value.
-#' @param titles A character vector with strings for the various plot titles.
-#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
-#'   If any position is NULL, the names of the variables will be used.
+#' @param labels A named list with strings for the various plot labels: 'title'
+#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
+#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
+#'   facet. If any label is not set, the names of the variables will be used.
+#'   Setting a label explicitly to NA will set an empty label.
 #' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
 #'   will draw a line graph of the results.
 #' @param draw.legend Logical. Whether or not to draw legend on the graph.
@@ -504,7 +522,7 @@ graph_model_q.glm <- function(model, y, x, lines=NULL, split=NULL,
 #' graph_model(model, y=distance, x=age, lines=Sex)
 #' @export
 graph_model.lme <- function(model, y, x, lines=NULL, split=NULL,
-    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, titles=NULL,
+    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
     bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
     
     call <- as.list(match.call())[-1]
@@ -558,9 +576,11 @@ graph_model.lme <- function(model, y, x, lines=NULL, split=NULL,
 #'   NULL value will adjust position to the lowest y value.
 #' @param ymax Number indicating the maximum value for the y-axis scale. Default
 #'   NULL value will adjust position to the highest y value.
-#' @param titles A character vector with strings for the various plot titles.
-#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
-#'   If any position is NULL, the names of the variables will be used.
+#' @param labels A named list with strings for the various plot labels: 'title'
+#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
+#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
+#'   facet. If any label is not set, the names of the variables will be used.
+#'   Setting a label explicitly to NA will set an empty label.
 #' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
 #'   will draw a line graph of the results.
 #' @param draw.legend Logical. Whether or not to draw legend on the graph.
@@ -581,7 +601,7 @@ graph_model.lme <- function(model, y, x, lines=NULL, split=NULL,
 #' graph_model_q(model, y='distance', x='age', lines='Sex')
 #' @export
 graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
-    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, titles=NULL,
+    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
     bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
     
     errorbars <- match.arg(errorbars)
@@ -700,14 +720,22 @@ graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
         }
     }
     
-    # add in title for the 'split' variable, if one exists
-    if (!is.null(titles) && !is.null(split)) {
+    # add in label for the 'split' variable, if one exists
+    if (!is.null(split)) {
+        if (is.null(labels$split)) {
+            labels$split <- paste0(split, ': ')
+        } else if (is.na(labels$split)) {
+            labels$split <- ''
+        } else {
+            labels$split <- paste0(labels$split, ': ')
+        }
+        
         if (!is.factor(data[[split]])) {
-            levels(grid[[split]]) <- c(paste0(titles[5], ': -1 SD'),
-                paste0(titles[5], ': +1 SD'))
+            levels(grid[[split]]) <- c(paste0(labels$split, '-1 SD'),
+                paste0(labels$split, '+1 SD'))
         } else {
             num_levels <- length(levels(grid[[split]]))
-            levels(grid[[split]]) <- paste0(rep(titles[5], num_levels), ': ',
+            levels(grid[[split]]) <- paste0(rep(labels$split, num_levels),
                 levels(grid[[split]]))
         }
     }
@@ -719,7 +747,7 @@ graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
     
     # build and return graph
     graph <- .build_plot(grid, y, x, lines, split, errors, ymin, ymax,
-        titles, bargraph, draw.legend, dodge, exp)
+        labels, bargraph, draw.legend, dodge, exp)
     return(graph)
 }
 
@@ -754,9 +782,11 @@ graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
 #'   NULL value will adjust position to the lowest y value.
 #' @param ymax Number indicating the maximum value for the y-axis scale. Default
 #'   NULL value will adjust position to the highest y value.
-#' @param titles A character vector with strings for the various plot titles.
-#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
-#'   If any position is NULL, the names of the variables will be used.
+#' @param labels A named list with strings for the various plot labels: 'title'
+#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
+#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
+#'   facet. If any label is not set, the names of the variables will be used.
+#'   Setting a label explicitly to NA will set an empty label.
 #' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
 #'   will draw a line graph of the results.
 #' @param draw.legend Logical. Whether or not to draw legend on the graph.
@@ -776,7 +806,7 @@ graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
 #' graph_model(model, y=distance, x=age, lines=Sex)
 #' @export
 graph_model.merMod <- function(model, y, x, lines=NULL, split=NULL,
-    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, titles=NULL,
+    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
     bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
     
     call <- as.list(match.call())[-1]
@@ -830,9 +860,11 @@ graph_model.merMod <- function(model, y, x, lines=NULL, split=NULL,
 #'   NULL value will adjust position to the lowest y value.
 #' @param ymax Number indicating the maximum value for the y-axis scale. Default
 #'   NULL value will adjust position to the highest y value.
-#' @param titles A character vector with strings for the various plot titles.
-#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
-#'   If any position is NULL, the names of the variables will be used.
+#' @param labels A named list with strings for the various plot labels: 'title'
+#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
+#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
+#'   facet. If any label is not set, the names of the variables will be used.
+#'   Setting a label explicitly to NA will set an empty label.
 #' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
 #'   will draw a line graph of the results.
 #' @param draw.legend Logical. Whether or not to draw legend on the graph.
@@ -853,7 +885,7 @@ graph_model.merMod <- function(model, y, x, lines=NULL, split=NULL,
 #' graph_model_q(model, y='distance', x='age', lines='Sex')
 #' @export
 graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
-    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, titles=NULL,
+    errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
     bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
     
     errorbars <- match.arg(errorbars)
@@ -973,14 +1005,22 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
         }
     }
     
-    # add in title for the 'split' variable, if one exists
-    if (!is.null(titles) && !is.null(split)) {
+    # add in label for the 'split' variable, if one exists
+    if (!is.null(split)) {
+        if (is.null(labels$split)) {
+            labels$split <- paste0(split, ': ')
+        } else if (is.na(labels$split)) {
+            labels$split <- ''
+        } else {
+            labels$split <- paste0(labels$split, ': ')
+        }
+        
         if (!is.factor(data[[split]])) {
-            levels(grid[[split]]) <- c(paste0(titles[5], ': -1 SD'),
-                paste0(titles[5], ': +1 SD'))
+            levels(grid[[split]]) <- c(paste0(labels$split, '-1 SD'),
+                paste0(labels$split, '+1 SD'))
         } else {
             num_levels <- length(levels(grid[[split]]))
-            levels(grid[[split]]) <- paste0(rep(titles[5], num_levels), ': ',
+            levels(grid[[split]]) <- paste0(rep(labels$split, num_levels),
                 levels(grid[[split]]))
         }
     }
@@ -992,7 +1032,7 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
     
     # build and return graph
     graph <- .build_plot(grid, y, x, lines, split, errors, ymin, ymax,
-        titles, bargraph, draw.legend, dodge, exp)
+        labels, bargraph, draw.legend, dodge, exp)
     return(graph)
 }
 
@@ -1014,9 +1054,11 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
 #'   NULL value will adjust position to the lowest y value.
 #' @param ymax Number indicating the maximum value for the y-axis scale. Default
 #'   NULL value will adjust position to the highest y value.
-#' @param titles A character vector with strings for the various plot titles.
-#'   In order: Graph title, 'y' title, 'x' title, 'lines' title', 'split' title.
-#'   If any position is NULL, the names of the variables will be used.
+#' @param labels A named list with strings for the various plot labels: 'title'
+#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
+#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
+#'   facet. If any label is not set, the names of the variables will be used.
+#'   Setting a label explicitly to NA will set an empty label.
 #' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
 #'   will draw a line graph of the results.
 #' @param draw.legend Logical. Whether or not to draw legend on the graph.
@@ -1030,7 +1072,7 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
 #'   original units.
 #' @return A ggplot object of the plotted variables in the model.
 .build_plot <- function(grid, y, x, lines=NULL, split=NULL, errors=TRUE,
-    ymin=NULL, ymax=NULL, titles=NULL, bargraph=FALSE, draw.legend=TRUE,
+    ymin=NULL, ymax=NULL, labels=NULL, bargraph=FALSE, draw.legend=TRUE,
     dodge=0, exp=FALSE) {
     
     # draw line graph
@@ -1073,21 +1115,32 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
         graph <- graph + ggplot2::facet_grid(paste0('. ~ ', split))
     }
     
-    # add titles to graph
-    if (!is.null(titles)) {
-        if (!is.null(titles[1]) && !is.na(titles[1])) {
-            graph <- graph + ggplot2::ggtitle(titles[1])
+    # add labels to graph
+    if (!is.null(labels)) {
+        if (!is.null(labels$y) && is.na(labels$y)) {
+            labels$y <- ''
         }
-        if (!is.null(titles[2]) && !is.na(titles[2])) {
-            graph <- graph + ggplot2::ylab(titles[2])
+        if (!is.null(labels$x) && is.na(labels$x)) {
+            labels$x <- ''
         }
-        if (!is.null(titles[3]) && !is.na(titles[3])) {
-            graph <- graph + ggplot2::xlab(titles[3])
+        if (!is.null(labels$lines) && is.na(labels$lines)) {
+            labels$lines <- ''
         }
-        if (!is.null(titles[4]) && !is.na(titles[4])) {
-            graph <- graph + ggplot2::labs(colour=titles[4])
+        
+        if (!is.null(labels$title) && !is.na(labels$title)) {
+            graph <- graph + ggplot2::ggtitle(labels$title)
+        }
+        if (!is.null(labels$y)) {
+            graph <- graph + ggplot2::ylab(labels$y)
+        }
+        if (!is.null(labels$x)) {
+            graph <- graph + ggplot2::xlab(labels$x)
+        }
+        if (!is.null(labels$lines)) {
+            graph <- graph + ggplot2::labs(colour=labels$lines)
         }
     }
+    
     return(graph)
 }
 

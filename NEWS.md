@@ -1,6 +1,10 @@
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
-reghelper 0.4.0
+reghelper 0.3.1
 ===============
+
+-   `build_model` now drops missing data based on the variables included in the final model, so that all models are tested on the same data.
+
+-   The `titles` parameter of `graph_model` has been changed to `labels`, and now takes a named list rather than relying on the index of a character vector.
 
 -   `graph_model` function extended to include `lme` and `merMod` models.
 
