@@ -104,7 +104,7 @@ test_that('lm with 3 continuous int. works', {
     
     expect_equal(levels(graph$data$x1), c('-1 SD', '+1 SD'))
     expect_equal(levels(graph$data$x2), c('-1 SD', '+1 SD'))
-    expect_equal(levels(graph$data$x3), c('-1 SD', '+1 SD'))
+    expect_equal(levels(graph$data$x3), c('x3: -1 SD', 'x3: +1 SD'))
 })
 
 
