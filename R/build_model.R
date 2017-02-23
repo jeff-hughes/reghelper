@@ -6,12 +6,16 @@
 #' Given a list of names of variables at each step, this function will run a
 #' series of models, adding the terms for each block incrementally.
 #' 
+#' Note: Cases with missing data are dropped based on the final model that
+#' includes all the relevant terms. This ensures that all the models are tested
+#' on the same number of cases.
+#' 
 #' @param dv The variable name to be used as the dependent variable.
 #' @param ... Pass through variable names (or interaction terms) to add for each
 #'   block. To add one term to a block, just pass it through directly; to
 #'   add multiple terms, pass it through in a vector or list. Blocks will be
 #'   added in the order they are passed to the function, and variables from
-#'   previous blocks will be added to each subsequent block.
+#'   previous blocks will be included with each subsequent block.
 #' @param data An optional data frame containing the variables in the model. If
 #'   not found in \code{data}, the variables are taken from the environment from
 #'   which the function is called.
@@ -94,10 +98,14 @@ build_model <- function(dv, ..., data=NULL, opts=NULL, model='lm') {
 #' in directly instead of strings of variable names. \code{build_model_q} uses
 #' standard evaluation in cases where such evaluation is easier.
 #' 
+#' Note: Cases with missing data are dropped based on the final model that
+#' includes all the relevant terms. This ensures that all the models are tested
+#' on the same number of cases.
+#' 
 #' @param dv String of the variable name to be used as the dependent variable.
 #' @param blocks List of variable names (or interaction terms) to add for each
 #'   block. Each list element should be a vector or list of strings with terms
-#'   for that block. Variables from previous blocks will be added to each
+#'   for that block. Variables from previous blocks will be included with each
 #'   subsequent block.
 #' @param data An optional data frame containing the variables in the model. If
 #'   not found in \code{data}, the variables are taken from the environment from
@@ -128,7 +136,19 @@ build_model_q <- function(dv, blocks=NULL, data=NULL, opts=NULL, model='lm') {
     
     for (i in 1:length(blocks)) {
         formulas[[i]] <- as.formula(paste(dv, '~', blocks[[i]]))
-        
+    }
+    
+    allterms <- as.character(attr(terms(formulas[[length(formulas)]]), 'variables'))[-1]
+    
+    # omit missing data so that all models are built on same number of rows
+    if (!is.null(data)) {
+        data <- na.omit(data[, allterms, drop=FALSE])
+    } else {
+        tempdata <- as.data.frame(mget(allterms))
+        data <- na.omit(tempdata)
+    }
+    
+    for (i in 1:length(blocks)) {
         if (is.null(opts)) {
             args <- list(formula=formulas[[i]], data=data)
         } else {
