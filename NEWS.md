@@ -1,5 +1,5 @@
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
-reghelper 0.4.0
+reghelper 0.3.1
 ===============
 
 -   `build_model` now drops missing data based on the variables included in the final model, so that all models are tested on the same data.
