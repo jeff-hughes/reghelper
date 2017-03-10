@@ -1,4 +1,11 @@
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
+reghelper 0.3.2
+===============
+
+BUG FIXES
+
+-   Fixed bug with `simple_slopes` using incorrect contrasts for factor variables. Resolves Issue \#2.
+
 reghelper 0.3.1
 ===============
 

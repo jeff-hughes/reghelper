@@ -79,6 +79,20 @@ simple_slopes.lm <- function(model, levels=NULL) {
     int_vars <- names(which(attr(terms(model), 'factors')[, int_term] == 1))
         # get location of variables in the interaction
     
+    # figure out which variables are categorical
+    factor_vars_log <- vapply(int_vars, function(v) {
+        is.factor(mdata[, v])
+    }, logical(1))
+    factor_vars <- names(factor_vars_log)[which(factor_vars_log == 1)]
+    
+    original_contrasts <- list()
+    if (length(factor_vars) > 0) {
+        for (i in 1:length(factor_vars)) {
+            original_contrasts[[factor_vars[i]]] <- contrasts(mdata[, factor_vars[i]])
+        }
+    }
+    
+    
     # get points at which to test each variable
     factors <- .set_factors(mdata, int_vars, levels)
     
@@ -114,6 +128,12 @@ simple_slopes.lm <- function(model, levels=NULL) {
                     new_var <- paste0('I(', vname, ' - ', template[i, j], ')')
                     new_form <- gsub(vname, new_var, new_form)
                 }
+            } else {
+                # when testing a factor effect, revert to original contrasts
+                # that the user had set
+                if (is.factor(mdata[[vname]])) {
+                    contrasts(mdata[[vname]]) <- original_contrasts[[vname]]
+                }
             }
         }
         call[['formula']] <- new_form
@@ -121,19 +141,12 @@ simple_slopes.lm <- function(model, levels=NULL) {
         new_model <- eval(call)
         
         if (is.factor(test_var)) {
-            contr <- contrasts(test_var)
+            contr <- original_contrasts[[test_var_name]]
             dummy_names <- paste0(test_var_name, colnames(contr))
             
             estimates <- as.data.frame(
-                summary(new_model)$coefficients[dummy_names, ])
-            
-            # when only one contrast, the coefficients will be a vector, not a
-            # matrix, so estimates ends up transposed
-            if (ncol(contr) < 2) {
-                estimates <- as.data.frame(t(estimates))
-                rownames(estimates) <- 1
-            }
-            
+                summary(new_model)$coefficients[dummy_names, , drop=FALSE])
+
             estimates$df <- new_model$df.residual
             
             for (est in 1:nrow(estimates)) {
