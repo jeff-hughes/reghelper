@@ -13,6 +13,13 @@ knitr::opts_chunk$set(
   fig.path = "NEWS-"
 )
 ```
+# reghelper 0.3.2
+
+BUG FIXES
+
+* Fixed bug with `simple_slopes` using incorrect contrasts for factor variables.
+  Resolves Issue #2.
+
 # reghelper 0.3.1
 
 * `build_model` now drops missing data based on the variables included in the
