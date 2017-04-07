@@ -4,7 +4,7 @@
 #' models. Selected variables will be graphed at +/- 1 SD (if continuous) or at
 #' each level of the factor (if categorical).
 #' 
-#' @param model A fitted linear model of type 'lm' or 'glm'.
+#' @param model A fitted linear model of type 'lm', 'glm', 'lme', or 'merMod'.
 #' @param ... Additional arguments to be passed to the particular method for the
 #'   given model.
 #' @return A ggplot2 graph of the plotted variables in the model.
@@ -15,6 +15,30 @@
 #' graph_model(model, y=Sepal.Width, x=Sepal.Length, lines=Species)
 #' @export
 graph_model <- function(model, ...) UseMethod('graph_model')
+
+
+#' Graph fitted model interactions.
+#' 
+#' \code{graph_model_q} provides an easy way to graph interactions in fitted
+#' models. Selected variables will be graphed at +/- 1 SD (if continuous) or at
+#' each level of the factor (if categorical).
+#' 
+#' Note that in most cases it is easier to use \code{\link{graph_model}} and
+#' pass variable names in directly instead of strings of variable names.
+#' \code{graph_model_q} uses standard evaluation in cases where such
+#' evaluation is easier.
+#' 
+#' @param model A fitted linear model of type 'lm', 'glm', 'lme', or 'merMod'.
+#' @param ... Additional arguments to be passed to the particular method for the
+#'   given model.
+#' @return A ggplot2 graph of the plotted variables in the model.
+#' @seealso \code{\link{graph_model.lm}}, \code{\link{graph_model.glm}}
+#' @examples
+#' # iris data
+#' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
+#' graph_model_q(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
+#' @export
+graph_model_q <- function(model, ...) UseMethod('graph_model_q')
 
 
 #' Graph linear interactions.
@@ -131,16 +155,17 @@ graph_model.lm <- function(model, y, x, lines=NULL, split=NULL,
 #'   used to transform the y-axis (i.e., e to the power of y). Useful for
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A ggplot object of the plotted variables in the model.
 #' @seealso \code{\link{graph_model.lm}}
 #' @examples
 #' # iris data
 #' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
-#' graph_model_q.lm(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
+#' graph_model_q(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
 #' @export
 graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
-    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
+    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE, ...) {
     
     call <- as.list(match.call())[-1]
     call$type <- 'response'
@@ -175,7 +200,7 @@ graph_model.aov <- function(model, y, x, lines=NULL, split=NULL,
 #' @export
 graph_model_q.aov <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
-    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
+    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE, ...) {
     
     call <- as.list(match.call())[-1]
     
@@ -307,17 +332,18 @@ graph_model.glm <- function(model, y, x, lines=NULL, split=NULL,
 #'   used to transform the y-axis (i.e., e to the power of y). Useful for
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A ggplot object of the plotted variables in the model.
 #' @seealso \code{\link{graph_model.glm}}, \code{\link{graph_model_q.lm}}
 #' @examples
 #' # iris data
 #' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
-#' graph_model_q.lm(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
+#' graph_model_q(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
 #' @export
 graph_model_q.glm <- function(model, y, x, lines=NULL, split=NULL,
     type=c('link', 'response'), errorbars=c('CI', 'SE', 'none'), ymin=NULL,
     ymax=NULL, labels=NULL, bargraph=FALSE, draw.legend=TRUE, dodge=0,
-    exp=FALSE) {
+    exp=FALSE, ...) {
     
     type <- match.arg(type)
     errorbars <- match.arg(errorbars)
@@ -512,7 +538,7 @@ graph_model_q.glm <- function(model, y, x, lines=NULL, split=NULL,
 #' @return A ggplot2 graph of the plotted variables in the model.
 #' @seealso \code{\link{graph_model.merMod}}, \code{\link{graph_model.lm}}
 #' @examples
-#' # iris data
+#' # Orthodont data
 #' if (require(nlme, quietly=TRUE)) {
 #'     model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
 #'     graph_model(model, y=distance, x=age, lines=Sex)
@@ -590,11 +616,12 @@ graph_model.lme <- function(model, y, x, lines=NULL, split=NULL,
 #'   used to transform the y-axis (i.e., e to the power of y). Useful for
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A ggplot2 graph of the plotted variables in the model.
 #' @seealso \code{\link{graph_model.lme}}, \code{\link{graph_model_q.merMod}},
 #'   \code{\link{graph_model_q.lm}}
 #' @examples
-#' # iris data
+#' # Orthodont data
 #' if (require(nlme, quietly=TRUE)) {
 #'     model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
 #'     graph_model_q(model, y='distance', x='age', lines='Sex')
@@ -602,7 +629,7 @@ graph_model.lme <- function(model, y, x, lines=NULL, split=NULL,
 #' @export
 graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
-    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
+    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE, ...) {
     
     errorbars <- match.arg(errorbars)
     
@@ -802,10 +829,10 @@ graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
 #' @return A ggplot2 graph of the plotted variables in the model.
 #' @seealso \code{\link{graph_model.lme}}, \code{\link{graph_model.lm}}
 #' @examples
-#' # iris data
+#' # Arabidopsis data
 #' if (require(lme4, quietly=TRUE)) {
-#'     model <- lmer(distance ~ age * Sex + (1|Subject), data=Orthodont)
-#'     graph_model(model, y=distance, x=age, lines=Sex)
+#'     model <- lmer(total.fruits ~ nutrient * amd + rack + (1|gen), data=Arabidopsis)
+#'     graph_model(model, y=total.fruits, x=nutrient, lines=amd)
 #' }
 #' @export
 graph_model.merMod <- function(model, y, x, lines=NULL, split=NULL,
@@ -879,19 +906,20 @@ graph_model.merMod <- function(model, y, x, lines=NULL, split=NULL,
 #'   used to transform the y-axis (i.e., e to the power of y). Useful for
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A ggplot2 graph of the plotted variables in the model.
 #' @seealso \code{\link{graph_model.merMod}}, \code{\link{graph_model_q.lme}},
 #'   \code{\link{graph_model_q.lm}}
 #' @examples
-#' # iris data
+#' # Arabidopsis data
 #' if (require(lme4, quietly=TRUE)) {
-#'     model <- lmer(distance ~ age * Sex + (1|Subject), data=Orthodont)
-#'     graph_model_q(model, y='distance', x='age', lines='Sex')
+#'     model <- lmer(total.fruits ~ nutrient * amd + rack + (1|gen), data=Arabidopsis)
+#'     graph_model_q(model, y='total.fruits', x='nutrient', lines='amd')
 #' }
 #' @export
 graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
-    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
+    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE, ...) {
     
     errorbars <- match.arg(errorbars)
     

@@ -75,10 +75,10 @@ respective means. In the case of a categorical covariate, the results will be
 averaged across all its levels.
 }
 \examples{
-# iris data
+# Arabidopsis data
 if (require(lme4, quietly=TRUE)) {
-    model <- lmer(distance ~ age * Sex + (1|Subject), data=Orthodont)
-    graph_model(model, y=distance, x=age, lines=Sex)
+    model <- lmer(total.fruits ~ nutrient * amd + rack + (1|gen), data=Arabidopsis)
+    graph_model(model, y=total.fruits, x=nutrient, lines=amd)
 }
 }
 \seealso{

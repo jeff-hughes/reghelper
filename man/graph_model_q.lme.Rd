@@ -4,10 +4,10 @@
 \alias{graph_model_q.lme}
 \title{Graph multi-level model interactions.}
 \usage{
-graph_model_q.lme(model, y, x, lines = NULL, split = NULL,
+\method{graph_model_q}{lme}(model, y, x, lines = NULL, split = NULL,
   errorbars = c("CI", "SE", "none"), ymin = NULL, ymax = NULL,
   labels = NULL, bargraph = FALSE, draw.legend = TRUE, dodge = 0,
-  exp = FALSE)
+  exp = FALSE, ...)
 }
 \arguments{
 \item{model}{A fitted linear model of type 'lme'.}
@@ -52,6 +52,8 @@ in most cases.}
 used to transform the y-axis (i.e., e to the power of y). Useful for
 logistic regressions or for converting log-transformed y-values to their
 original units.}
+
+\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
 }
 \value{
 A ggplot2 graph of the plotted variables in the model.
@@ -78,7 +80,7 @@ pass variable names in directly instead of strings of variable names.
 evaluation is easier.
 }
 \examples{
-# iris data
+# Orthodont data
 if (require(nlme, quietly=TRUE)) {
     model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
     graph_model_q(model, y='distance', x='age', lines='Sex')

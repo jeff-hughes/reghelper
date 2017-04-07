@@ -75,7 +75,7 @@ respective means. In the case of a categorical covariate, the results will be
 averaged across all its levels.
 }
 \examples{
-# iris data
+# Orthodont data
 if (require(nlme, quietly=TRUE)) {
     model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
     graph_model(model, y=distance, x=age, lines=Sex)
