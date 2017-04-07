@@ -126,7 +126,8 @@ build_model <- function(dv, ..., data=NULL, opts=NULL, model='lm') {
 #' coef(model1)
 #' 
 #' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
-#' model2 <- build_model_q('Sepal.Length', list('Species', 'Petal.Length * Petal.Width')), data=iris, model='lm')
+#' model2 <- build_model_q('Sepal.Length', list('Species', 'Petal.Length * Petal.Width'),
+#'     data=iris, model='lm')
 #' summary(model2)
 #' coef(model2)
 #' @export
@@ -138,7 +139,8 @@ build_model_q <- function(dv, blocks=NULL, data=NULL, opts=NULL, model='lm') {
         formulas[[i]] <- as.formula(paste(dv, '~', blocks[[i]]))
     }
     
-    allterms <- as.character(attr(terms(formulas[[length(formulas)]]), 'variables'))[-1]
+    allterms <- as.character(attr(terms(formulas[[length(formulas)]]),
+        'variables'))[-1]
     
     # omit missing data so that all models are built on same number of rows
     if (!is.null(data)) {
@@ -169,7 +171,7 @@ build_model_q <- function(dv, blocks=NULL, data=NULL, opts=NULL, model='lm') {
 #' 
 #' \code{summary} method for class "\code{block_lm}".
 #' 
-#' @param model An object of class "\code{block_lm}", usually, a result of a
+#' @param object An object of class "\code{block_lm}", usually, a result of a
 #'   call to \code{\link{build_model}}.
 #' @param ... Further arguments passed to or from other methods.
 #' @return The function computes and returns a named list of summary statistics
@@ -200,7 +202,8 @@ build_model_q <- function(dv, blocks=NULL, data=NULL, opts=NULL, model='lm') {
 #' summary(model2)
 #' coef(model2)
 #' @export
-summary.block_lm <- function(model, ...) {
+summary.block_lm <- function(object, ...) {
+    model <- object
     obj <- list()
     obj$formulas <- model$formulas
     
@@ -279,7 +282,7 @@ summary.block_lm <- function(model, ...) {
 #' 
 #' \code{print} method for class "\code{block_lm_summary}".
 #' 
-#' @param model An object of class "\code{block_lm_summary}", usually, a result
+#' @param x An object of class "\code{block_lm_summary}", usually, a result
 #'   of a call to \code{\link{summary.block_lm}}.
 #' @param digits The number of significant digits to use when printing.
 #' @param signif.stars Logical. If \code{TRUE}, 'significance stars' are printed
@@ -298,10 +301,12 @@ summary.block_lm <- function(model, ...) {
 #' coef(model2)
 #' @export
 print.block_lm_summary <- function(
-    model,
+    x,
     digits=max(3L, getOption('digits') - 3L),
     signif.stars=getOption('show.signif.stars'),
     ...) {
+    
+    model <- x
     
     writeLines('Residuals:')
     print(model$residuals, digits=digits, ...)
@@ -318,7 +323,7 @@ print.block_lm_summary <- function(
             frm <- paste0('lm(formula = ', frm, ')')
         }
         writeLines(frm)
-        coefs <- capture.output(printCoefmat(model$coefficients[[m]],
+        coefs <- utils::capture.output(printCoefmat(model$coefficients[[m]],
                 digits=digits,
                 signif.stars=signif.stars,
                 na.print='NA', ...))
@@ -355,7 +360,7 @@ print.block_lm_summary <- function(
 #' 
 #' \code{coef} method for class "\code{block_lm}".
 #' 
-#' @param model An object of class "\code{block_lm}", usually, a result of a
+#' @param object An object of class "\code{block_lm}", usually, a result of a
 #'   call to \code{\link{build_model}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   coefficients.
@@ -375,7 +380,8 @@ print.block_lm_summary <- function(
 #' summary(model2)
 #' coef(model2, num=2)  # returns second block
 #' @export
-coef.block_lm <- function(model, num=NULL, ...) {
+coef.block_lm <- function(object, num=NULL, ...) {
+    model <- object
     if (!is.null(num)) {
         if (length(num) > 1) {
             return(lapply(model$models[num], coef, ...))
@@ -392,7 +398,7 @@ coef.block_lm <- function(model, num=NULL, ...) {
 #' 
 #' \code{coef} method for class "\code{block_lm_summary}".
 #' 
-#' @param model An object of class "\code{block_lm_summary}", usually, a result
+#' @param object An object of class "\code{block_lm_summary}", usually, a result
 #'   of a call to \code{\link{summary.block_lm}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   coefficients.
@@ -410,7 +416,8 @@ coef.block_lm <- function(model, num=NULL, ...) {
 #' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
 #' coef(summary(model2), num=2)  # returns second block
 #' @export
-coef.block_lm_summary <- function(model, num=NULL, ...) {
+coef.block_lm_summary <- function(object, num=NULL, ...) {
+    model <- object
     if (!is.null(num)) {
         if (length(num) > 1) {
             return(model$coefficients[num])
@@ -427,7 +434,7 @@ coef.block_lm_summary <- function(model, num=NULL, ...) {
 #' 
 #' \code{residuals} method for class "\code{block_lm}".
 #' 
-#' @param model An object of class "\code{block_lm}", usually, a result of a
+#' @param object An object of class "\code{block_lm}", usually, a result of a
 #'   call to \code{\link{build_model}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   residuals.
@@ -447,7 +454,8 @@ coef.block_lm_summary <- function(model, num=NULL, ...) {
 #' summary(model2)
 #' residuals(model2, num=2)  # returns second block
 #' @export
-residuals.block_lm <- function(model, num=NULL, ...) {
+residuals.block_lm <- function(object, num=NULL, ...) {
+    model <- object
     if (!is.null(num)) {
         if (length(num) > 1) {
             return(lapply(model$models[num], residuals, ...))
@@ -464,7 +472,7 @@ residuals.block_lm <- function(model, num=NULL, ...) {
 #' 
 #' \code{residuals} method for class "\code{block_lm_summary}".
 #' 
-#' @param model An object of class "\code{block_lm_summary}", usually, a result
+#' @param object An object of class "\code{block_lm_summary}", usually, a result
 #'   of a call to \code{\link{summary.block_lm}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   residuals.
@@ -482,7 +490,8 @@ residuals.block_lm <- function(model, num=NULL, ...) {
 #' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
 #' residuals(summary(model2), num=2)  # returns second block
 #' @export
-residuals.block_lm_summary <- function(model, num=NULL, ...) {
+residuals.block_lm_summary <- function(object, num=NULL, ...) {
+    model <- object
     if (!is.null(num)) {
         return(model$residuals[num, ])
     } else {
@@ -495,7 +504,7 @@ residuals.block_lm_summary <- function(model, num=NULL, ...) {
 #' 
 #' \code{fitted} method for class "\code{block_lm}".
 #' 
-#' @param model An object of class "\code{block_lm}", usually, a result of a
+#' @param object An object of class "\code{block_lm}", usually, a result of a
 #'   call to \code{\link{build_model}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   fitted values.
@@ -515,7 +524,8 @@ residuals.block_lm_summary <- function(model, num=NULL, ...) {
 #' summary(model2)
 #' fitted(model2, num=2)  # returns second block
 #' @export
-fitted.block_lm <- function(model, num=NULL, ...) {
+fitted.block_lm <- function(object, num=NULL, ...) {
+    model <- object
     if (!is.null(num)) {
         if (length(num) > 1) {
             return(lapply(model$models[num], fitted, ...))
@@ -532,7 +542,7 @@ fitted.block_lm <- function(model, num=NULL, ...) {
 #' 
 #' \code{summary} method for class "\code{block_aov}".
 #' 
-#' @param model An object of class "\code{block_aov}", usually, a result of a
+#' @param object An object of class "\code{block_aov}", usually, a result of a
 #'   call to \code{\link{build_model}}.
 #' @param ... Further arguments passed to or from other methods.
 #' @return The function computes and returns a named list of summary statistics
@@ -558,7 +568,8 @@ fitted.block_lm <- function(model, num=NULL, ...) {
 #' summary(model2)
 #' coef(model2)
 #' @export
-summary.block_aov <- function(model, ...) {
+summary.block_aov <- function(object, ...) {
+    model <- object
     obj <- list()
     obj$formulas <- model$formulas
     
@@ -593,7 +604,7 @@ summary.block_aov <- function(model, ...) {
 #' 
 #' \code{print} method for class "\code{block_aov_summary}".
 #' 
-#' @param model An object of class "\code{block_aov_summary}", usually, a result
+#' @param x An object of class "\code{block_aov_summary}", usually, a result
 #'   of a call to \code{\link{summary.block_aov}}.
 #' @param digits The number of significant digits to use when printing.
 #' @param signif.stars Logical. If \code{TRUE}, 'significance stars' are printed
@@ -612,10 +623,12 @@ summary.block_aov <- function(model, ...) {
 #' coef(model2)
 #' @export
 print.block_aov_summary <- function(
-    model,
+    x,
     digits=max(3L, getOption('digits') - 3L),
     signif.stars=getOption('show.signif.stars'),
     ...) {
+    
+    model <- x
     
     writeLines('Residuals:')
     print(model$residuals, digits=digits, ...)
@@ -625,7 +638,7 @@ print.block_aov_summary <- function(
     num_models <- length(model$summaries)
     for (m in 1:num_models) {
         writeLines(paste0('aov(formula = ', format(model$formulas[[m]]), ')'))
-        summ <- capture.output(print(model$summaries[[m]],
+        summ <- utils::capture.output(print(model$summaries[[m]],
             digits=digits,
             signif.stars=signif.stars,
             na.print='NA', ...))
@@ -647,7 +660,7 @@ print.block_aov_summary <- function(
 #' 
 #' \code{coef} method for class "\code{block_aov}".
 #' 
-#' @param model An object of class "\code{block_aov}", usually, a result of a
+#' @param object An object of class "\code{block_aov}", usually, a result of a
 #'   call to \code{\link{build_model}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   coefficients.
@@ -667,7 +680,8 @@ print.block_aov_summary <- function(
 #' summary(model2)
 #' coef(model2, num=2)  # returns second block
 #' @export
-coef.block_aov <- function(model, num=NULL, ...) {
+coef.block_aov <- function(object, num=NULL, ...) {
+    model <- object
     if (!is.null(num)) {
         if (length(num) > 1) {
             return(lapply(model$models[num], coef, ...))
@@ -684,7 +698,7 @@ coef.block_aov <- function(model, num=NULL, ...) {
 #' 
 #' \code{residuals} method for class "\code{block_aov}".
 #' 
-#' @param model An object of class "\code{block_aov}", usually, a result of a
+#' @param object An object of class "\code{block_aov}", usually, a result of a
 #'   call to \code{\link{build_model}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   residuals.
@@ -704,7 +718,8 @@ coef.block_aov <- function(model, num=NULL, ...) {
 #' summary(model2)
 #' residuals(model2, num=2)  # returns second block
 #' @export
-residuals.block_aov <- function(model, num=NULL, ...) {
+residuals.block_aov <- function(object, num=NULL, ...) {
+    model <- object
     if (!is.null(num)) {
         if (length(num) > 1) {
             return(lapply(model$models[num], residuals, ...))
@@ -721,7 +736,7 @@ residuals.block_aov <- function(model, num=NULL, ...) {
 #' 
 #' \code{fitted} method for class "\code{block_aov}".
 #' 
-#' @param model An object of class "\code{block_aov}", usually, a result of a
+#' @param object An object of class "\code{block_aov}", usually, a result of a
 #'   call to \code{\link{build_model}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   fitted values.
@@ -741,7 +756,8 @@ residuals.block_aov <- function(model, num=NULL, ...) {
 #' summary(model2)
 #' fitted(model2, num=2)  # returns second block
 #' @export
-fitted.block_aov <- function(model, num=NULL, ...) {
+fitted.block_aov <- function(object, num=NULL, ...) {
+    model <- object
     if (!is.null(num)) {
         if (length(num) > 1) {
             return(lapply(model$models[num], fitted, ...))
@@ -758,7 +774,7 @@ fitted.block_aov <- function(model, num=NULL, ...) {
 #' 
 #' \code{summary} method for class "\code{block_glm}".
 #' 
-#' @param model An object of class "\code{block_glm}", usually, a result of a
+#' @param object An object of class "\code{block_glm}", usually, a result of a
 #'   call to \code{\link{build_model}}.
 #' @param ... Further arguments passed to or from other methods.
 #' @return The function computes and returns a named list of summary statistics
@@ -790,7 +806,8 @@ fitted.block_aov <- function(model, num=NULL, ...) {
 #' summary(model2)
 #' coef(model2)
 #' @export
-summary.block_glm <- function(model, ...) {
+summary.block_glm <- function(object, ...) {
+    model <- object
     obj <- list()
     obj$formulas <- model$formulas
     obj$family <- model$models[[1]]$family$family
@@ -826,7 +843,7 @@ summary.block_glm <- function(model, ...) {
 #' 
 #' \code{print} method for class "\code{block_glm_summary}".
 #' 
-#' @param model An object of class "\code{block_glm_summary}", usually, a result
+#' @param x An object of class "\code{block_glm_summary}", usually, a result
 #'   of a call to \code{\link{summary.block_glm}}.
 #' @param digits The number of significant digits to use when printing.
 #' @param signif.stars Logical. If \code{TRUE}, 'significance stars' are printed
@@ -845,10 +862,12 @@ summary.block_glm <- function(model, ...) {
 #' coef(model2)
 #' @export
 print.block_glm_summary <- function(
-    model,
+    x,
     digits=max(3L, getOption('digits') - 3L),
     signif.stars=getOption('show.signif.stars'),
     ...) {
+    
+    model <- x
     
     writeLines('Deviance Residuals:')
     print(model$residuals, digits=digits, ...)
@@ -859,7 +878,7 @@ print.block_glm_summary <- function(
     for (m in 1:num_models) {
         writeLines(paste0('glm(formula = ', format(model$formulas[[m]]),
             ', family = "', model$family, '")'))
-        coefs <- capture.output(printCoefmat(model$coefficients[[m]],
+        coefs <- utils::capture.output(printCoefmat(model$coefficients[[m]],
             digits=digits,
             signif.stars=signif.stars,
             na.print='NA', ...))
@@ -881,7 +900,7 @@ print.block_glm_summary <- function(
 #' 
 #' \code{coef} method for class "\code{block_glm}".
 #' 
-#' @param model An object of class "\code{block_glm}", usually, a result of a
+#' @param object An object of class "\code{block_glm}", usually, a result of a
 #'   call to \code{\link{build_model}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   coefficients.
@@ -901,7 +920,8 @@ print.block_glm_summary <- function(
 #' summary(model2)
 #' coef(model2, num=2)  # returns second block
 #' @export
-coef.block_glm <- function(model, num=NULL, ...) {
+coef.block_glm <- function(object, num=NULL, ...) {
+    model <- object
     if (!is.null(num)) {
         if (length(num) > 1) {
             return(lapply(model$models[num], coef, ...))
@@ -918,7 +938,7 @@ coef.block_glm <- function(model, num=NULL, ...) {
 #' 
 #' \code{coef} method for class "\code{block_glm_summary}".
 #' 
-#' @param model An object of class "\code{block_glm_summary}", usually, a result
+#' @param object An object of class "\code{block_glm_summary}", usually, a result
 #'   of a call to \code{\link{summary.block_glm}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   coefficients.
@@ -936,7 +956,8 @@ coef.block_glm <- function(model, num=NULL, ...) {
 #' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
 #' coef(summary(model2), num=2)  # returns second block
 #' @export
-coef.block_glm_summary <- function(model, num=NULL, ...) {
+coef.block_glm_summary <- function(object, num=NULL, ...) {
+    model <- object
     if (!is.null(num)) {
         if (length(num) > 1) {
             return(model$coefficients[num])
@@ -953,7 +974,7 @@ coef.block_glm_summary <- function(model, num=NULL, ...) {
 #' 
 #' \code{residuals} method for class "\code{block_glm}".
 #' 
-#' @param model An object of class "\code{block_glm}", usually, a result of a
+#' @param object An object of class "\code{block_glm}", usually, a result of a
 #'   call to \code{\link{build_model}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   residuals.
@@ -973,7 +994,8 @@ coef.block_glm_summary <- function(model, num=NULL, ...) {
 #' summary(model2)
 #' residuals(model2, num=2)  # returns second block
 #' @export
-residuals.block_glm <- function(model, num=NULL, ...) {
+residuals.block_glm <- function(object, num=NULL, ...) {
+    model <- object
     if (!is.null(num)) {
         if (length(num) > 1) {
             return(lapply(model$models[num], residuals, ...))
@@ -990,7 +1012,7 @@ residuals.block_glm <- function(model, num=NULL, ...) {
 #' 
 #' \code{residuals} method for class "\code{block_glm_summary}".
 #' 
-#' @param model An object of class "\code{block_glm_summary}", usually, a result
+#' @param object An object of class "\code{block_glm_summary}", usually, a result
 #'   of a call to \code{\link{summary.block_glm}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   residuals.
@@ -1008,7 +1030,8 @@ residuals.block_glm <- function(model, num=NULL, ...) {
 #' model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data=iris, model='lm')
 #' residuals(summary(model2), num=2)  # returns second block
 #' @export
-residuals.block_glm_summary <- function(model, num=NULL, ...) {
+residuals.block_glm_summary <- function(object, num=NULL, ...) {
+    model <- object
     if (!is.null(num)) {
         return(model$residuals[num, ])
     } else {
@@ -1021,7 +1044,7 @@ residuals.block_glm_summary <- function(model, num=NULL, ...) {
 #' 
 #' \code{fitted} method for class "\code{block_glm}".
 #' 
-#' @param model An object of class "\code{block_glm}", usually, a result of a
+#' @param object An object of class "\code{block_glm}", usually, a result of a
 #'   call to \code{\link{build_model}}.
 #' @param num Numeric vector with the index of model(s) from which to return the
 #'   fitted values.
@@ -1041,7 +1064,8 @@ residuals.block_glm_summary <- function(model, num=NULL, ...) {
 #' summary(model2)
 #' fitted(model2, num=2)  # returns second block
 #' @export
-fitted.block_glm <- function(model, num=NULL, ...) {
+fitted.block_glm <- function(object, num=NULL, ...) {
+    model <- object
     if (!is.null(num)) {
         if (length(num) > 1) {
             return(lapply(model$models[num], fitted, ...))

@@ -53,6 +53,7 @@ simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 #'   continuous variables) at which to test that variable. \strong{Note:} If you
 #'   do not include 'sstest' as one of these levels, the function will not test
 #'   the simple effects for that variable.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A data frame with a row for each simple effect. The first few columns
 #'   identify the level at which each variable in your model was set for that
 #'   test. A 'sstest' value in a particular column indicates that this was the
@@ -70,7 +71,7 @@ simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 #' simple_slopes(model,
 #'     levels=list(wt=c(2, 3, 4, 'sstest'), am=c(0, 1, 'sstest')))  # test at specific levels
 #' @export
-simple_slopes.lm <- function(model, levels=NULL) {
+simple_slopes.lm <- function(model, levels=NULL, ...) {
     call <- model$call
     mdata <- model$model
     
@@ -171,13 +172,9 @@ simple_slopes.lm <- function(model, levels=NULL) {
 }
 
 
-#' Simple slopes of interaction.
-#' 
-#' \code{simple_slopes.aov} is an alias of simple_slopes.lm.
-#' 
-#' @seealso \code{\link{simple_slopes.lm}}
+#' @rdname simple_slopes.lm
 #' @export
-simple_slopes.aov <- function(model, levels=NULL) {
+simple_slopes.aov <- function(model, levels=NULL, ...) {
     simple_slopes.lm(model, levels)
 }
 
@@ -210,6 +207,7 @@ simple_slopes.aov <- function(model, levels=NULL) {
 #'   continuous variables) at which to test that variable. \strong{Note:} If you
 #'   do not include 'sstest' as one of these levels, the function will not test
 #'   the simple effects for that variable.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A data frame with a row for each simple effect. The first few columns
 #'   identify the level at which each variable in your model was set for that
 #'   test. A 'sstest' value in a particular column indicates that this was the
@@ -226,7 +224,7 @@ simple_slopes.aov <- function(model, levels=NULL) {
 #' simple_slopes(model,
 #'     levels=list(gear=c(2, 3, 4, 'sstest'), wt=c(2, 3, 'sstest')))  # test at specific levels
 #' @export
-simple_slopes.glm <- function(model, levels=NULL) {
+simple_slopes.glm <- function(model, levels=NULL, ...) {
     simple_slopes.lm(model, levels)
 }
 
@@ -259,6 +257,7 @@ simple_slopes.glm <- function(model, levels=NULL) {
 #'   continuous variables) at which to test that variable. \strong{Note:} If you
 #'   do not include 'sstest' as one of these levels, the function will not test
 #'   the simple effects for that variable.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A data frame with a row for each simple effect. The first few columns
 #'   identify the level at which each variable in your model was set for that
 #'   test. A 'sstest' value in a particular column indicates that this was the
@@ -269,13 +268,16 @@ simple_slopes.glm <- function(model, levels=NULL) {
 #'   \code{\link{simple_slopes.merMod}}
 #' @examples
 #' # iris data
-#' model <- lme(Sepal.Width ~ Sepal.Length * Petal.Length, random=~1|Species, data=iris)
-#' summary(model)  # significant interaction
-#' simple_slopes(model)
-#' simple_slopes(model,
-#'     levels=list(Sepal.Length=c(4, 5, 6, 'sstest'), Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
+#' if (require(nlme, quietly=TRUE)) {
+#'     model <- lme(Sepal.Width ~ Sepal.Length * Petal.Length, random=~1|Species, data=iris)
+#'     summary(model)  # significant interaction
+#'     simple_slopes(model)
+#'     simple_slopes(model,
+#'         levels=list(Sepal.Length=c(4, 5, 6, 'sstest'),
+#'         Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
+#' }
 #' @export
-simple_slopes.lme <- function(model, levels=NULL) {
+simple_slopes.lme <- function(model, levels=NULL, ...) {
     call <- model$call
     mdata <- model$data
     
@@ -283,6 +285,19 @@ simple_slopes.lme <- function(model, levels=NULL) {
         # get location of highest interaction term
     int_vars <- names(which(attr(terms(model), 'factors')[, int_term] == 1))
         # get location of variables in the interaction
+    
+    # figure out which variables are categorical
+    factor_vars_log <- vapply(int_vars, function(v) {
+        is.factor(mdata[, v])
+    }, logical(1))
+    factor_vars <- names(factor_vars_log)[which(factor_vars_log == 1)]
+    
+    original_contrasts <- list()
+    if (length(factor_vars) > 0) {
+        for (i in 1:length(factor_vars)) {
+            original_contrasts[[factor_vars[i]]] <- contrasts(mdata[, factor_vars[i]])
+        }
+    }
     
     # get points at which to test each variable
     factors <- .set_factors(mdata, int_vars, levels)
@@ -318,6 +333,12 @@ simple_slopes.lme <- function(model, levels=NULL) {
                     # formula to shift the 0 point
                     new_var <- paste0('I(', vname, ' - ', template[i, j], ')')
                     new_form <- gsub(vname, new_var, new_form)
+                }
+            } else {
+                # when testing a factor effect, revert to original contrasts
+                # that the user had set
+                if (is.factor(mdata[[vname]])) {
+                    contrasts(mdata[[vname]]) <- original_contrasts[[vname]]
                 }
             }
         }
@@ -389,6 +410,7 @@ simple_slopes.lme <- function(model, levels=NULL) {
 #'   continuous variables) at which to test that variable. \strong{Note:} If you
 #'   do not include 'sstest' as one of these levels, the function will not test
 #'   the simple effects for that variable.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A data frame with a row for each simple effect. The first few columns
 #'   identify the level at which each variable in your model was set for that
 #'   test. A 'sstest' value in a particular column indicates that this was the
@@ -399,13 +421,16 @@ simple_slopes.lme <- function(model, levels=NULL) {
 #'   \code{\link{simple_slopes.lme}}
 #' @examples
 #' # iris data
-#' model <- lmer(Sepal.Width ~ Sepal.Length * Petal.Length + (1|Species), data=iris)
-#' summary(model)
-#' simple_slopes(model)
-#' simple_slopes(model,
-#'     levels=list(Sepal.Length=c(4, 5, 6, 'sstest'), Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
+#' if (require(lme4, quietly=TRUE)) {
+#'     model <- lmer(Sepal.Width ~ Sepal.Length * Petal.Length + (1|Species), data=iris)
+#'     summary(model)
+#'     simple_slopes(model)
+#'     simple_slopes(model,
+#'         levels=list(Sepal.Length=c(4, 5, 6, 'sstest'),
+#'         Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
+#' }
 #' @export
-simple_slopes.merMod <- function(model, levels=NULL) {
+simple_slopes.merMod <- function(model, levels=NULL, ...) {
     call <- model@call
     mdata <- model@frame
     
@@ -413,6 +438,19 @@ simple_slopes.merMod <- function(model, levels=NULL) {
     # get location of highest interaction term
     int_vars <- names(which(attr(terms(model), 'factors')[, int_term] == 1))
     # get location of variables in the interaction
+    
+    # figure out which variables are categorical
+    factor_vars_log <- vapply(int_vars, function(v) {
+        is.factor(mdata[, v])
+    }, logical(1))
+    factor_vars <- names(factor_vars_log)[which(factor_vars_log == 1)]
+    
+    original_contrasts <- list()
+    if (length(factor_vars) > 0) {
+        for (i in 1:length(factor_vars)) {
+            original_contrasts[[factor_vars[i]]] <- contrasts(mdata[, factor_vars[i]])
+        }
+    }
     
     # get points at which to test each variable
     factors <- .set_factors(mdata, int_vars, levels)
@@ -447,6 +485,12 @@ simple_slopes.merMod <- function(model, levels=NULL) {
                     # formula to shift the 0 point
                     new_var <- paste0('I(', vname, ' - ', template[i, j], ')')
                     new_form <- gsub(vname, new_var, new_form)
+                }
+            } else {
+                # when testing a factor effect, revert to original contrasts
+                # that the user had set
+                if (is.factor(mdata[[vname]])) {
+                    contrasts(mdata[[vname]]) <- original_contrasts[[vname]]
                 }
             }
         }
@@ -489,7 +533,7 @@ simple_slopes.merMod <- function(model, levels=NULL) {
 #' 
 #' \code{print} method for class "\code{simple_slopes}".
 #' 
-#' @param model An object of class "\code{simple_slopes}", usually, a result
+#' @param x An object of class "\code{simple_slopes}", usually, a result
 #'   of a call to \code{\link{simple_slopes}}.
 #' @param digits The number of significant digits to use when printing.
 #' @param signif.stars Logical. If \code{TRUE}, 'significance stars' are printed
@@ -498,7 +542,7 @@ simple_slopes.merMod <- function(model, levels=NULL) {
 #' @seealso \code{\link{simple_slopes}}
 #' @export
 print.simple_slopes <- function(
-    model,
+    x,
     digits=max(3L, getOption('digits') - 3L),
     signif.stars=getOption('show.signif.stars'),
     ...) {

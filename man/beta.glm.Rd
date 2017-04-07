@@ -4,7 +4,7 @@
 \alias{beta.glm}
 \title{Standardized coeffients of a model.}
 \usage{
-\method{beta}{glm}(model, x = TRUE, y = FALSE, skip = NULL)
+\method{beta}{glm}(model, x = TRUE, y = FALSE, skip = NULL, ...)
 }
 \arguments{
 \item{model}{A fitted generalized linear model of type 'glm'.}
@@ -15,6 +15,8 @@
 
 \item{skip}{A string vector indicating any variables you do \emph{not} wish
 to be standarized.}
+
+\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
 }
 \value{
 Returns the summary of a generalized linear model, with the output

@@ -79,8 +79,10 @@ evaluation is easier.
 }
 \examples{
 # iris data
-model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
-graph_model_q(model, y='distance', x='age', lines='Sex')
+if (require(nlme, quietly=TRUE)) {
+    model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
+    graph_model_q(model, y='distance', x='age', lines='Sex')
+}
 }
 \seealso{
 \code{\link{graph_model.lme}}, \code{\link{graph_model_q.merMod}},

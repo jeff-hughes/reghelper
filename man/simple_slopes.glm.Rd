@@ -4,7 +4,7 @@
 \alias{simple_slopes.glm}
 \title{Simple slopes of interaction.}
 \usage{
-\method{simple_slopes}{glm}(model, levels = NULL)
+\method{simple_slopes}{glm}(model, levels = NULL, ...)
 }
 \arguments{
 \item{model}{A fitted linear model of type 'glm' with at least one
@@ -16,6 +16,8 @@ of factor levels (for categorical variables) or numeric values (for
 continuous variables) at which to test that variable. \strong{Note:} If you
 do not include 'sstest' as one of these levels, the function will not test
 the simple effects for that variable.}
+
+\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
 }
 \value{
 A data frame with a row for each simple effect. The first few columns

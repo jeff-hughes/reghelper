@@ -4,7 +4,7 @@
 \alias{simple_slopes.lme}
 \title{Simple slopes of interaction.}
 \usage{
-\method{simple_slopes}{lme}(model, levels = NULL)
+\method{simple_slopes}{lme}(model, levels = NULL, ...)
 }
 \arguments{
 \item{model}{A fitted linear model of type 'lme' with at least one
@@ -16,6 +16,8 @@ of factor levels (for categorical variables) or numeric values (for
 continuous variables) at which to test that variable. \strong{Note:} If you
 do not include 'sstest' as one of these levels, the function will not test
 the simple effects for that variable.}
+
+\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
 }
 \value{
 A data frame with a row for each simple effect. The first few columns
@@ -47,11 +49,14 @@ that variable; the order is in the same order shown in \code{contrasts()}.
 }
 \examples{
 # iris data
-model <- lme(Sepal.Width ~ Sepal.Length * Petal.Length, random=~1|Species, data=iris)
-summary(model)  # significant interaction
-simple_slopes(model)
-simple_slopes(model,
-    levels=list(Sepal.Length=c(4, 5, 6, 'sstest'), Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
+if (require(nlme, quietly=TRUE)) {
+    model <- lme(Sepal.Width ~ Sepal.Length * Petal.Length, random=~1|Species, data=iris)
+    summary(model)  # significant interaction
+    simple_slopes(model)
+    simple_slopes(model,
+        levels=list(Sepal.Length=c(4, 5, 6, 'sstest'),
+        Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
+}
 }
 \seealso{
 \code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.glm}},

@@ -52,7 +52,8 @@ summary(model1)
 coef(model1)
 
 # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
-model2 <- build_model_q('Sepal.Length', list('Species', 'Petal.Length * Petal.Width')), data=iris, model='lm')
+model2 <- build_model_q('Sepal.Length', list('Species', 'Petal.Length * Petal.Width'),
+    data=iris, model='lm')
 summary(model2)
 coef(model2)
 }

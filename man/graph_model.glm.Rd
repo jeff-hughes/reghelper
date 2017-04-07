@@ -7,7 +7,7 @@
 \method{graph_model}{glm}(model, y, x, lines = NULL, split = NULL,
   type = c("link", "response"), errorbars = c("CI", "SE", "none"),
   ymin = NULL, ymax = NULL, labels = NULL, bargraph = FALSE,
-  draw.legend = TRUE, dodge = 0, exp = FALSE)
+  draw.legend = TRUE, dodge = 0, exp = FALSE, ...)
 }
 \arguments{
 \item{model}{A fitted linear model of type 'glm'.}
@@ -57,6 +57,8 @@ in most cases.}
 used to transform the y-axis (i.e., e to the power of y). Useful for
 logistic regressions or for converting log-transformed y-values to their
 original units.}
+
+\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
 }
 \value{
 A ggplot2 graph of the plotted variables in the model.

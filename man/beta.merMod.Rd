@@ -4,7 +4,7 @@
 \alias{beta.merMod}
 \title{Standardized coeffients of a model.}
 \usage{
-\method{beta}{merMod}(model, x = TRUE, y = TRUE, skip = NULL)
+\method{beta}{merMod}(model, x = TRUE, y = TRUE, skip = NULL, ...)
 }
 \arguments{
 \item{model}{A fitted linear model of type 'merMod' (from the 'lme4' package).}
@@ -15,6 +15,8 @@
 
 \item{skip}{A string vector indicating any variables you do \emph{not} wish
 to be standarized.}
+
+\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
 }
 \value{
 Returns the summary of a multi-level linear model, with the output
@@ -36,10 +38,12 @@ individual predictor variables).
 }
 \examples{
 # iris data
-model <- lmer(Sepal.Width ~ Sepal.Length + Petal.Length + (1|Species), data=iris)
-beta(model)  # all variables standardized
+if (require(lme4, quietly=TRUE)) {
+    model <- lmer(Sepal.Width ~ Sepal.Length + Petal.Length + (1|Species), data=iris)
+    beta(model)  # all variables standardized
 
-beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
+    beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
+}
 }
 \seealso{
 \code{\link{beta.lm}}, \code{\link{beta.glm}}, \code{\link{beta.lme}}

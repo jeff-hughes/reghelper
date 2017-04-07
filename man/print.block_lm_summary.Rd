@@ -4,11 +4,11 @@
 \alias{print.block_lm_summary}
 \title{Summarizing block regression.}
 \usage{
-\method{print}{block_lm_summary}(model, digits = max(3L, getOption("digits") -
+\method{print}{block_lm_summary}(x, digits = max(3L, getOption("digits") -
   3L), signif.stars = getOption("show.signif.stars"), ...)
 }
 \arguments{
-\item{model}{An object of class "\code{block_lm_summary}", usually, a result
+\item{x}{An object of class "\code{block_lm_summary}", usually, a result
 of a call to \code{\link{summary.block_lm}}.}
 
 \item{digits}{The number of significant digits to use when printing.}

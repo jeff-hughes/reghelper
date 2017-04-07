@@ -58,6 +58,7 @@ graph_model <- function(model, ...) UseMethod('graph_model')
 #'   used to transform the y-axis (i.e., e to the power of y). Useful for
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A ggplot2 graph of the plotted variables in the model.
 #' @examples
 #' # iris data
@@ -66,7 +67,7 @@ graph_model <- function(model, ...) UseMethod('graph_model')
 #' @export
 graph_model.lm <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
-    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
+    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE, ...) {
     
     call <- as.list(match.call())[-1]
     
@@ -148,15 +149,11 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
 }
 
 
-#' Graph linear interactions.
-#' 
-#' \code{graph_model.aov}  is an alias of graph_model.lm.
-#' 
-#' @seealso \code{\link{graph_model.lm}}, \code{\link{graph_model.glm}}
+#' @rdname graph_model.lm
 #' @export
 graph_model.aov <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
-    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
+    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE, ...) {
     
     call <- as.list(match.call())[-1]
     
@@ -174,11 +171,7 @@ graph_model.aov <- function(model, y, x, lines=NULL, split=NULL,
 }
 
 
-#' Graph linear interactions.
-#' 
-#' \code{graph_model_q.aov}  is an alias of graph_model_q.lm.
-#' 
-#' @seealso \code{\link{graph_model_q.lm}}, \code{\link{graph_model_q.glm}}
+#' @rdname graph_model_q.lm
 #' @export
 graph_model_q.aov <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
@@ -235,6 +228,7 @@ graph_model_q.aov <- function(model, y, x, lines=NULL, split=NULL,
 #'   used to transform the y-axis (i.e., e to the power of y). Useful for
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A ggplot2 graph of the plotted variables in the model.
 #' @seealso \code{\link{graph_model.lm}}
 #' @examples
@@ -245,7 +239,7 @@ graph_model_q.aov <- function(model, y, x, lines=NULL, split=NULL,
 graph_model.glm <- function(model, y, x, lines=NULL, split=NULL,
     type=c('link', 'response'), errorbars=c('CI', 'SE', 'none'), ymin=NULL,
     ymax=NULL, labels=NULL, bargraph=FALSE, draw.legend=TRUE, dodge=0,
-    exp=FALSE) {
+    exp=FALSE, ...) {
     
     call <- as.list(match.call())[-1]
     
@@ -514,16 +508,20 @@ graph_model_q.glm <- function(model, y, x, lines=NULL, split=NULL,
 #'   used to transform the y-axis (i.e., e to the power of y). Useful for
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A ggplot2 graph of the plotted variables in the model.
 #' @seealso \code{\link{graph_model.merMod}}, \code{\link{graph_model.lm}}
 #' @examples
 #' # iris data
-#' model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
-#' graph_model(model, y=distance, x=age, lines=Sex)
+#' if (require(nlme, quietly=TRUE)) {
+#'     model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
+#'     graph_model(model, y=distance, x=age, lines=Sex)
+#' }
+#' @importFrom nlme lme
 #' @export
 graph_model.lme <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
-    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
+    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE, ...) {
     
     call <- as.list(match.call())[-1]
     
@@ -597,8 +595,10 @@ graph_model.lme <- function(model, y, x, lines=NULL, split=NULL,
 #'   \code{\link{graph_model_q.lm}}
 #' @examples
 #' # iris data
-#' model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
-#' graph_model_q(model, y='distance', x='age', lines='Sex')
+#' if (require(nlme, quietly=TRUE)) {
+#'     model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
+#'     graph_model_q(model, y='distance', x='age', lines='Sex')
+#' }
 #' @export
 graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
@@ -798,16 +798,19 @@ graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
 #'   used to transform the y-axis (i.e., e to the power of y). Useful for
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A ggplot2 graph of the plotted variables in the model.
 #' @seealso \code{\link{graph_model.lme}}, \code{\link{graph_model.lm}}
 #' @examples
 #' # iris data
-#' model <- lmer(distance ~ age * Sex + (1|Subject), data=Orthodont)
-#' graph_model(model, y=distance, x=age, lines=Sex)
+#' if (require(lme4, quietly=TRUE)) {
+#'     model <- lmer(distance ~ age * Sex + (1|Subject), data=Orthodont)
+#'     graph_model(model, y=distance, x=age, lines=Sex)
+#' }
 #' @export
 graph_model.merMod <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
-    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE) {
+    bargraph=FALSE, draw.legend=TRUE, dodge=0, exp=FALSE, ...) {
     
     call <- as.list(match.call())[-1]
     
@@ -881,8 +884,10 @@ graph_model.merMod <- function(model, y, x, lines=NULL, split=NULL,
 #'   \code{\link{graph_model_q.lm}}
 #' @examples
 #' # iris data
-#' model <- lmer(distance ~ age * Sex + (1|Subject), data=Orthodont)
-#' graph_model_q(model, y='distance', x='age', lines='Sex')
+#' if (require(lme4, quietly=TRUE)) {
+#'     model <- lmer(distance ~ age * Sex + (1|Subject), data=Orthodont)
+#'     graph_model_q(model, y='distance', x='age', lines='Sex')
+#' }
 #' @export
 graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
@@ -1105,7 +1110,7 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
     # add in error bars
     if (errors) {
         graph <- graph + ggplot2::geom_errorbar(
-            ggplot2::aes(ymax=error_upper, ymin=error_lower),
+            ggplot2::aes_string(ymax='error_upper', ymin='error_lower'),
             width=0.1,
             position=pd)
     }

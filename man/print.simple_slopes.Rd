@@ -4,11 +4,11 @@
 \alias{print.simple_slopes}
 \title{Print simple slopes.}
 \usage{
-\method{print}{simple_slopes}(model, digits = max(3L, getOption("digits") -
-  3L), signif.stars = getOption("show.signif.stars"), ...)
+\method{print}{simple_slopes}(x, digits = max(3L, getOption("digits") - 3L),
+  signif.stars = getOption("show.signif.stars"), ...)
 }
 \arguments{
-\item{model}{An object of class "\code{simple_slopes}", usually, a result
+\item{x}{An object of class "\code{simple_slopes}", usually, a result
 of a call to \code{\link{simple_slopes}}.}
 
 \item{digits}{The number of significant digits to use when printing.}

@@ -7,7 +7,7 @@
 \method{graph_model}{merMod}(model, y, x, lines = NULL, split = NULL,
   errorbars = c("CI", "SE", "none"), ymin = NULL, ymax = NULL,
   labels = NULL, bargraph = FALSE, draw.legend = TRUE, dodge = 0,
-  exp = FALSE)
+  exp = FALSE, ...)
 }
 \arguments{
 \item{model}{A fitted linear model of type 'merMod' (from the 'lme4' package).}
@@ -52,6 +52,8 @@ in most cases.}
 used to transform the y-axis (i.e., e to the power of y). Useful for
 logistic regressions or for converting log-transformed y-values to their
 original units.}
+
+\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
 }
 \value{
 A ggplot2 graph of the plotted variables in the model.
@@ -74,8 +76,10 @@ averaged across all its levels.
 }
 \examples{
 # iris data
-model <- lmer(distance ~ age * Sex + (1|Subject), data=Orthodont)
-graph_model(model, y=distance, x=age, lines=Sex)
+if (require(lme4, quietly=TRUE)) {
+    model <- lmer(distance ~ age * Sex + (1|Subject), data=Orthodont)
+    graph_model(model, y=distance, x=age, lines=Sex)
+}
 }
 \seealso{
 \code{\link{graph_model.lme}}, \code{\link{graph_model.lm}}

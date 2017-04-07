@@ -4,10 +4,10 @@
 \alias{summary.block_aov}
 \title{Summarizing block ANOVA.}
 \usage{
-\method{summary}{block_aov}(model, ...)
+\method{summary}{block_aov}(object, ...)
 }
 \arguments{
-\item{model}{An object of class "\code{block_aov}", usually, a result of a
+\item{object}{An object of class "\code{block_aov}", usually, a result of a
 call to \code{\link{build_model}}.}
 
 \item{...}{Further arguments passed to or from other methods.}

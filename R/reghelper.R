@@ -6,7 +6,7 @@
 #' The following methods are currently implemented:
 #' \tabular{ll}{
 #'   \code{\link{beta}} \tab Calculates standardized beta coefficients.\cr
-#'   \code{\link{block_lm}} \tab Allows variables to be added to a series of
+#'   \code{\link{build_model}} \tab Allows variables to be added to a series of
 #'   regression models sequentially.\cr
 #'   \code{\link{ICC}} \tab Calculates the intra-class correlation for a
 #'   multi-level model.\cr
@@ -22,4 +22,5 @@
 #'
 #' @docType package
 #' @name reghelper
+#' @import stats
 NULL

@@ -4,10 +4,10 @@
 \alias{coef.block_lm}
 \title{Extract model coefficients.}
 \usage{
-\method{coef}{block_lm}(model, num = NULL, ...)
+\method{coef}{block_lm}(object, num = NULL, ...)
 }
 \arguments{
-\item{model}{An object of class "\code{block_lm}", usually, a result of a
+\item{object}{An object of class "\code{block_lm}", usually, a result of a
 call to \code{\link{build_model}}.}
 
 \item{num}{Numeric vector with the index of model(s) from which to return the

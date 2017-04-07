@@ -103,9 +103,9 @@
             new_df2 <- cbind(new_cols, new_df)
         } else {
             new_df2 <- cbind(
-                new_df[, 1:(new_splice-1)],
+                new_df[, 1:(splice_point-1)],
                 new_cols,
-                new_df[, -c(1:(new_splice-1))])
+                new_df[, -c(1:(splice_point-1))])
         }
     } else {
         new_df2 <- new_df

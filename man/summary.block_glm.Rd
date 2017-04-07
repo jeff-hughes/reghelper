@@ -4,10 +4,10 @@
 \alias{summary.block_glm}
 \title{Summarizing block general linear models.}
 \usage{
-\method{summary}{block_glm}(model, ...)
+\method{summary}{block_glm}(object, ...)
 }
 \arguments{
-\item{model}{An object of class "\code{block_glm}", usually, a result of a
+\item{object}{An object of class "\code{block_glm}", usually, a result of a
 call to \code{\link{build_model}}.}
 
 \item{...}{Further arguments passed to or from other methods.}
