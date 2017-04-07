@@ -142,11 +142,7 @@ cell_means_q.lm <- function(model, vars=NULL, levels=NULL) {
 }
 
 
-#' Estimated values of a linear model.
-#' 
-#' \code{cell_means.aov} is an alias of cell_means.lm.
-#' 
-#' @seealso \code{\link{cell_means.lm}}
+#' @rdname cell_means.lm
 #' @export
 cell_means.aov <- function(model, ..., levels=NULL) {
     # grab variable names
@@ -317,7 +313,8 @@ cell_means_q.glm <- function(model, vars=NULL, levels=NULL,
     grid_predicted <- cbind(grid, predicted)
     vars_list <- paste(non_agg_vars, collapse=' + ')
     formula <- paste('cbind(fit, se.fit, df) ~', vars_list)
-    new_grid <- aggregate(as.formula(formula), grid_predicted, mean, na.rm=TRUE)
+    new_grid <- aggregate(as.formula(formula), grid_predicted,
+        mean, na.rm=TRUE)
     return(new_grid)
 }
 

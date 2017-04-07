@@ -4,10 +4,10 @@
 \alias{residuals.block_lm_summary}
 \title{Extract model residuals.}
 \usage{
-\method{residuals}{block_lm_summary}(model, num = NULL, ...)
+\method{residuals}{block_lm_summary}(object, num = NULL, ...)
 }
 \arguments{
-\item{model}{An object of class "\code{block_lm_summary}", usually, a result
+\item{object}{An object of class "\code{block_lm_summary}", usually, a result
 of a call to \code{\link{summary.block_lm}}.}
 
 \item{num}{Numeric vector with the index of model(s) from which to return the

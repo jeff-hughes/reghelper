@@ -4,10 +4,12 @@
 \alias{ICC.lme}
 \title{Intra-class correlation.}
 \usage{
-\method{ICC}{lme}(model)
+\method{ICC}{lme}(model, ...)
 }
 \arguments{
 \item{model}{A fitted model of type 'lme'.}
+
+\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
 }
 \value{
 The intra-class correlation of the model.
@@ -23,8 +25,10 @@ more information, see
 }
 \examples{
 # iris data
-model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
-ICC(model)  # .49 of variance is between-subjects
+if (require(nlme, quietly=TRUE)) {
+    model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
+    ICC(model)  # .49 of variance is between-subjects
+}
 }
 \seealso{
 \code{\link{ICC.merMod}}

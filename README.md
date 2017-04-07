@@ -4,7 +4,7 @@ reghelper
 
 The `reghelper` R package includes a set of functions used to automate commonly used methods in regression analysis. This includes plotting interactions, calculating simple slopes, calculating standardized coefficients, etc.
 
-Version 0.3.2 has been released. However, be aware that this package is still in development, and as such, bugs may still exist, and functions and function parameters may still be subject to change.
+Version 0.3.3 has been released. However, be aware that this package is still in development, and as such, bugs may still exist, and functions and function parameters may still be subject to change.
 
 To install the most recent stable release, use the following code:
 
@@ -55,11 +55,3 @@ The table below shows the current types of models for which each function has be
 | graph\_model   |  ✓  |  ✓  |  ✓  |  ✓  |   ✓  |
 | sig\_regions   |  ✓  |  ✓  |  –  |     |      |
 | simple\_slopes |  ✓  |  ✓  |  ✓  |  ✓  |   ✓  |
-
-Things to do
-------------
-
-There is still much work to be done. Below is a list of areas yet to be completed, so if you are interested in helping out, these may be good places to start:
-
--   At minimum, I would like to extend these functions to `aov`, `glm`, `lme`, and `lmer` models.
--   The package does include test cases, but more thorough testing needs to be done to ensure these functions work on a variety of models.

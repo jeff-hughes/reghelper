@@ -4,10 +4,10 @@
 \alias{fitted.block_aov}
 \title{Extract model fitted values.}
 \usage{
-\method{fitted}{block_aov}(model, num = NULL, ...)
+\method{fitted}{block_aov}(object, num = NULL, ...)
 }
 \arguments{
-\item{model}{An object of class "\code{block_aov}", usually, a result of a
+\item{object}{An object of class "\code{block_aov}", usually, a result of a
 call to \code{\link{build_model}}.}
 
 \item{num}{Numeric vector with the index of model(s) from which to return the

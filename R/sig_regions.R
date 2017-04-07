@@ -43,6 +43,7 @@ sig_regions <- function(model, ...) UseMethod('sig_regions')
 #'   .05.
 #' @param precision The number of decimal places to which to round the alpha
 #'   level (e.g., precision=5 would look for regions of significance at .05000).
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A named vector with a 'lower' and an 'upper' J-N point. If one or
 #'   more of the J-N points fall outside the range of your predictor, the
 #'   function will return NA for that point. If your interaction is not
@@ -55,7 +56,7 @@ sig_regions <- function(model, ...) UseMethod('sig_regions')
 #' summary(model)  # significant interaction
 #' sig_regions(model)
 #' @export
-sig_regions.lm <- function(model, alpha=.05, precision=4) {
+sig_regions.lm <- function(model, alpha=.05, precision=4, ...) {
     int_term <- which(attr(terms(model), 'order') == 2)
         # get location of interaction term
     
@@ -131,13 +132,9 @@ sig_regions.lm <- function(model, alpha=.05, precision=4) {
 }
 
 
-#' Regions of significance for an interaction.
-#' 
-#' \code{sig_regions.glm} is an alias of sig_regions.lm.
-#' 
-#' @seealso \code{\link{sig_regions.lm}}
+#' @rdname sig_regions.lm
 #' @export
-sig_regions.glm <- function(model, alpha=.05, precision=4) {
+sig_regions.glm <- function(model, alpha=.05, precision=4, ...) {
     sig_regions.lm(model, alpha, precision)
 }
 

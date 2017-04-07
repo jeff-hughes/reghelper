@@ -4,10 +4,10 @@
 \alias{graph_model_q.glm}
 \title{Graph general linear interactions.}
 \usage{
-graph_model_q.glm(model, y, x, lines = NULL, split = NULL,
+\method{graph_model_q}{glm}(model, y, x, lines = NULL, split = NULL,
   type = c("link", "response"), errorbars = c("CI", "SE", "none"),
   ymin = NULL, ymax = NULL, labels = NULL, bargraph = FALSE,
-  draw.legend = TRUE, dodge = 0, exp = FALSE)
+  draw.legend = TRUE, dodge = 0, exp = FALSE, ...)
 }
 \arguments{
 \item{model}{A fitted linear model of type 'glm'.}
@@ -57,6 +57,8 @@ in most cases.}
 used to transform the y-axis (i.e., e to the power of y). Useful for
 logistic regressions or for converting log-transformed y-values to their
 original units.}
+
+\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
 }
 \value{
 A ggplot object of the plotted variables in the model.
@@ -80,7 +82,7 @@ evaluation is easier.
 \examples{
 # iris data
 model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
-graph_model_q.lm(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
+graph_model_q(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
 }
 \seealso{
 \code{\link{graph_model.glm}}, \code{\link{graph_model_q.lm}}

@@ -4,10 +4,10 @@
 \alias{coef.block_glm_summary}
 \title{Extract model coefficients.}
 \usage{
-\method{coef}{block_glm_summary}(model, num = NULL, ...)
+\method{coef}{block_glm_summary}(object, num = NULL, ...)
 }
 \arguments{
-\item{model}{An object of class "\code{block_glm_summary}", usually, a result
+\item{object}{An object of class "\code{block_glm_summary}", usually, a result
 of a call to \code{\link{summary.block_glm}}.}
 
 \item{num}{Numeric vector with the index of model(s) from which to return the

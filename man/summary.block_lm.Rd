@@ -4,10 +4,10 @@
 \alias{summary.block_lm}
 \title{Summarizing block regression.}
 \usage{
-\method{summary}{block_lm}(model, ...)
+\method{summary}{block_lm}(object, ...)
 }
 \arguments{
-\item{model}{An object of class "\code{block_lm}", usually, a result of a
+\item{object}{An object of class "\code{block_lm}", usually, a result of a
 call to \code{\link{build_model}}.}
 
 \item{...}{Further arguments passed to or from other methods.}

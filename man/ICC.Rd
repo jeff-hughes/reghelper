@@ -23,8 +23,10 @@ The form of the value returned by \code{ICC} depends on the class of
 }
 \examples{
 # iris data
-model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
-ICC(model)  # .49 of variance is between-subjects
+if (require(nlme, quietly=TRUE)) {
+    model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
+    ICC(model)  # .49 of variance is between-subjects
+}
 }
 \seealso{
 \code{\link{ICC.lme}}, \code{\link{ICC.merMod}}

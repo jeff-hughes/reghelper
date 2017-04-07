@@ -40,6 +40,7 @@ beta <- function(model, ...) UseMethod('beta')
 #' @param y Logical. Whether or not to standardize criterion variables.
 #' @param skip A string vector indicating any variables you do \emph{not} wish
 #'   to be standarized.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return Returns the summary of a linear model, with the output showing the
 #'   beta coefficients, standard error, t-values, and p-values for each
 #'   predictor.
@@ -52,7 +53,7 @@ beta <- function(model, ...) UseMethod('beta')
 #' model2 <- lm(Sepal.Width ~ Petal.Width + Species, iris)
 #' beta(model2, skip='Species')  # all variables except Species standardized
 #' @export
-beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL) {
+beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
     call <- model$call
     vars <- names(model$model)
     formula <- format(formula(model))
@@ -78,13 +79,9 @@ beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL) {
 }
 
 
-#' Standardized coeffients of a model.
-#' 
-#' \code{beta.aov} is an alias of beta.lm.
-#' 
-#' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}}
+#' @rdname beta.lm
 #' @export
-beta.aov <- function(model, x=TRUE, y=TRUE, skip=NULL) {
+beta.aov <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
     model$call[[1]] <- quote(lm)  # need to change this so lm is returned
                                   # instead of aov
     beta.lm(model, x, y, skip)
@@ -108,6 +105,7 @@ beta.aov <- function(model, x=TRUE, y=TRUE, skip=NULL) {
 #' @param y Logical. Whether or not to standardize criterion variables.
 #' @param skip A string vector indicating any variables you do \emph{not} wish
 #'   to be standarized.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return Returns the summary of a generalized linear model, with the output
 #'   showing the beta coefficients, standard error, t-values, and p-values for
 #'   each predictor.
@@ -117,7 +115,7 @@ beta.aov <- function(model, x=TRUE, y=TRUE, skip=NULL) {
 #' model1 <- glm(vs ~ wt + hp, data=mtcars, family='binomial')
 #' beta(model1)  # wt and hp standardized, vs is not by default
 #' @export
-beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL) {
+beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL, ...) {
     beta.lm(model, x, y, skip)
 }
 
@@ -140,18 +138,21 @@ beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL) {
 #' @param y Logical. Whether or not to standardize criterion variables.
 #' @param skip A string vector indicating any variables you do \emph{not} wish
 #'   to be standarized.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return Returns the summary of a multi-level linear model, with the output
 #'   showing the beta coefficients, standard error, t-values, and p-values for
 #'   each predictor.
 #' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}}, \code{\link{beta.merMod}}
 #' @examples
 #' # iris data
-#' model <- lme(Sepal.Width ~ Sepal.Length + Petal.Length, random=~1|Species, data=iris)
-#' beta(model)  # all three variables standardized
+#' if (require(nlme, quietly=TRUE)) {
+#'     model <- lme(Sepal.Width ~ Sepal.Length + Petal.Length, random=~1|Species, data=iris)
+#'     beta(model)  # all three variables standardized
 #' 
-#' beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
+#'     beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
+#' }
 #' @export
-beta.lme <- function(model, x=TRUE, y=TRUE, skip=NULL) {
+beta.lme <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
     call <- model$call
     vars <- names(model$data)
     formula <- format(formula(model))
@@ -195,18 +196,21 @@ beta.lme <- function(model, x=TRUE, y=TRUE, skip=NULL) {
 #' @param y Logical. Whether or not to standardize criterion variables.
 #' @param skip A string vector indicating any variables you do \emph{not} wish
 #'   to be standarized.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return Returns the summary of a multi-level linear model, with the output
 #'   showing the beta coefficients, standard error, t-values, and p-values for
 #'   each predictor.
 #' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}}, \code{\link{beta.lme}}
 #' @examples
 #' # iris data
-#' model <- lmer(Sepal.Width ~ Sepal.Length + Petal.Length + (1|Species), data=iris)
-#' beta(model)  # all variables standardized
+#' if (require(lme4, quietly=TRUE)) {
+#'     model <- lmer(Sepal.Width ~ Sepal.Length + Petal.Length + (1|Species), data=iris)
+#'     beta(model)  # all variables standardized
 #' 
-#' beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
+#'     beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
+#' }
 #' @export
-beta.merMod <- function(model, x=TRUE, y=TRUE, skip=NULL) {
+beta.merMod <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
     call <- model@call
     vars <- names(model@frame)
     formula <- format(formula(model))

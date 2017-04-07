@@ -4,11 +4,11 @@
 \alias{print.block_aov_summary}
 \title{Summarizing block ANOVA.}
 \usage{
-\method{print}{block_aov_summary}(model, digits = max(3L, getOption("digits")
-  - 3L), signif.stars = getOption("show.signif.stars"), ...)
+\method{print}{block_aov_summary}(x, digits = max(3L, getOption("digits") -
+  3L), signif.stars = getOption("show.signif.stars"), ...)
 }
 \arguments{
-\item{model}{An object of class "\code{block_aov_summary}", usually, a result
+\item{x}{An object of class "\code{block_aov_summary}", usually, a result
 of a call to \code{\link{summary.block_aov}}.}
 
 \item{digits}{The number of significant digits to use when printing.}

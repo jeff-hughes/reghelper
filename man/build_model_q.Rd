@@ -10,9 +10,9 @@ build_model_q(dv, blocks = NULL, data = NULL, opts = NULL, model = "lm")
 \item{dv}{String of the variable name to be used as the dependent variable.}
 
 \item{blocks}{List of variable names (or interaction terms) to add for each
-block. Each list element should be a vector or list of strings with terms
-for that block. Variables from previous blocks will be included with each
-subsequent block.}
+block. Each list element should be a single string with terms for that
+block. Variables from previous blocks will be included with each subsequent
+block.}
 
 \item{data}{An optional data frame containing the variables in the model. If
 not found in \code{data}, the variables are taken from the environment from
@@ -47,12 +47,14 @@ on the same number of cases.
 }
 \examples{
 # 2 blocks: Petal.Length; Petal.Length + Petal.Width
-model1 <- build_model_q('Sepal.Length', list('Petal.Length', 'Petal.Width'), data=iris, model='lm')
+model1 <- build_model_q('Sepal.Length', list('Petal.Length + Petal.Width'),
+    data=iris, model='lm')
 summary(model1)
 coef(model1)
 
 # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
-model2 <- build_model_q('Sepal.Length', list('Species', 'Petal.Length * Petal.Width')), data=iris, model='lm')
+model2 <- build_model_q('Sepal.Length', list('Species', 'Species + Petal.Length * Petal.Width'),
+    data=iris, model='lm')
 summary(model2)
 coef(model2)
 }
