@@ -347,7 +347,7 @@ simple_slopes.lme <- function(model, levels=NULL, ...) {
         new_model <- eval(call)
         
         if (is.factor(test_var)) {
-            contr <- contrasts(test_var)
+            contr <- original_contrasts[[test_var_name]]
             dummy_names <- paste0(test_var_name, colnames(contr))
             
             estimates <- as.data.frame(
@@ -499,7 +499,7 @@ simple_slopes.merMod <- function(model, levels=NULL, ...) {
         new_model <- eval(call)
         
         if (is.factor(test_var)) {
-            contr <- contrasts(test_var)
+            contr <- original_contrasts[[test_var_name]]
             dummy_names <- paste0(test_var_name, colnames(contr))
             
             estimates <- as.data.frame(
@@ -524,7 +524,7 @@ simple_slopes.merMod <- function(model, levels=NULL, ...) {
             est_count <- est_count + 1
         }
     }
-    class(models) <- c('simple_slopes', 'data.frame')
+    class(models) <- c('simple_slopes_lme4', 'data.frame')
     return(models)
 }
 
@@ -546,6 +546,8 @@ print.simple_slopes <- function(
     digits=max(3L, getOption('digits') - 3L),
     signif.stars=getOption('show.signif.stars'),
     ...) {
+    
+    model <- x
 
     if (!is.logical(signif.stars) || is.na(signif.stars)) {
         warning("option \"show.signif.stars\" is invalid: assuming TRUE")
@@ -567,6 +569,33 @@ print.simple_slopes <- function(
     
     if (signif.stars) {
         model[, 'Sig.'] <- as.character(stars)
+    }
+    
+    print.data.frame(model, quote=FALSE, right=TRUE, na.print='NA')
+    invisible(model)
+}
+
+
+#' Print simple slopes.
+#' 
+#' \code{print} method for class "\code{simple_slopes_lme4}".
+#' 
+#' @param x An object of class "\code{simple_slopes_lme4}", usually, a result
+#'   of a call to \code{\link{simple_slopes}}.
+#' @param digits The number of significant digits to use when printing.
+#' @param ... Further arguments passed to or from other methods.
+#' @seealso \code{\link{simple_slopes}}
+#' @export
+print.simple_slopes_lme4 <- function(
+    x,
+    digits=max(3L, getOption('digits') - 3L),
+    ...) {
+    
+    model <- x
+    
+    index <- c('Test Estimate', 'Std. Error', 't value')
+    for (i in index) {
+        model[, i] <- round(model[, i], digits=digits)
     }
     
     print.data.frame(model, quote=FALSE, right=TRUE, na.print='NA')

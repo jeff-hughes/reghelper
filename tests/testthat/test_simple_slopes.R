@@ -329,6 +329,7 @@ test_that('lme with interaction works', {
     expect_equal(round(slopes[2, 'Test Estimate'], 3),
         get_coef.lme(model_c_1, 'pre_post1'))
     
+    contrasts(data$condition) <- c(0, 1)  # revert to original contrast
     contrasts(data$pre_post) <- c(0, 1)
     model_p_0 <- summary(lme(dv ~ condition * pre_post, random=~1|id, data))
     expect_equal(round(slopes[3, 'Test Estimate'], 3),
@@ -376,6 +377,7 @@ test_that('lmer with interaction works', {
     expect_equal(round(slopes[2, 'Test Estimate'], 3),
         get_coef(model_c_1, 'pre_post1'))
     
+    contrasts(data$condition) <- c(0, 1)  # revert to original contrast
     contrasts(data$pre_post) <- c(0, 1)
     model_p_0 <- summary(lmer(dv ~ condition * pre_post + (1|id), data))
     expect_equal(round(slopes[3, 'Test Estimate'], 3),
