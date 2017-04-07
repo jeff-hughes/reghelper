@@ -1,4 +1,21 @@
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
+reghelper 0.3.3
+===============
+
+This is a patch release covering changes necessary to prepare for submission to CRAN. Most changes will not affect current code; however, be aware of the following changes:
+
+-   Many of the functions have had the dots parameter (...) added, to ensure consistency with the S3 generic function. However, any extra parameters will simply be ignored. Thus, this does not impact any user code.
+
+-   Package functions which implement the following generic methods have had their first parameter renamed, again for consistency with the S3 generic: summary, print, coef, residuals, fitted. In most cases, this will not impact user code, unless you have used named parameters, e.g., `summary(model=results)` should now be `summary(object=results)`.
+
+BUG FIXES
+
+-   Fixed bug when using `build_model` but only providing a single model to be run.
+
+-   Created special print method for `simple_slopes` so that "lme4" models print correctly.
+
+-   Fixed bug (correctly this time) with `simple_slopes` using incorrect contrasts for factor variables.
+
 reghelper 0.3.2
 ===============
 
