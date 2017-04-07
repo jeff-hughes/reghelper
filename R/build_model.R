@@ -104,9 +104,9 @@ build_model <- function(dv, ..., data=NULL, opts=NULL, model='lm') {
 #' 
 #' @param dv String of the variable name to be used as the dependent variable.
 #' @param blocks List of variable names (or interaction terms) to add for each
-#'   block. Each list element should be a vector or list of strings with terms
-#'   for that block. Variables from previous blocks will be included with each
-#'   subsequent block.
+#'   block. Each list element should be a single string with terms for that
+#'   block. Variables from previous blocks will be included with each subsequent
+#'   block.
 #' @param data An optional data frame containing the variables in the model. If
 #'   not found in \code{data}, the variables are taken from the environment from
 #'   which the function is called.
@@ -121,12 +121,13 @@ build_model <- function(dv, ..., data=NULL, opts=NULL, model='lm') {
 #' @seealso \code{\link{build_model}}
 #' @examples
 #' # 2 blocks: Petal.Length; Petal.Length + Petal.Width
-#' model1 <- build_model_q('Sepal.Length', list('Petal.Length', 'Petal.Width'), data=iris, model='lm')
+#' model1 <- build_model_q('Sepal.Length', list('Petal.Length + Petal.Width'),
+#'     data=iris, model='lm')
 #' summary(model1)
 #' coef(model1)
 #' 
 #' # 2 blocks: Species; Species + Petal.Length + Petal.Width + Petal.Length:Petal.Width
-#' model2 <- build_model_q('Sepal.Length', list('Species', 'Petal.Length * Petal.Width'),
+#' model2 <- build_model_q('Sepal.Length', list('Species', 'Species + Petal.Length * Petal.Width'),
 #'     data=iris, model='lm')
 #' summary(model2)
 #' coef(model2)
@@ -208,7 +209,7 @@ summary.block_lm <- function(object, ...) {
     obj$formulas <- model$formulas
     
     model_names <- paste('Model', 1:length(model$models))
-    delta_anova <- do.call(anova, model$models) 
+    delta_anova <- do.call(anova, model$models)
     
     resids <- list()
     coefs <- list()
@@ -242,6 +243,16 @@ summary.block_lm <- function(object, ...) {
                 delta_r_sq <- summ$r.squared - r_sq[m-1]
             }
             
+            # the anova() function works differently for one model than it does
+            # for multiple models; if there is only one model, just set it to NA
+            if (length(model$models) == 1) {
+                delta_F <- NA
+                delta_p <- NA
+            } else {
+                delta_F <- delta_anova[m, 'F']
+                delta_p <- delta_anova[m, 'Pr(>F)']
+            }
+            
             overall[m, ] <- c(
                 summ$r.squared,
                 summ$adj.r.squared,
@@ -250,8 +261,8 @@ summary.block_lm <- function(object, ...) {
                 f_data[3],
                 pf(f_data[1], f_data[2], f_data[3], lower.tail=FALSE),
                 delta_r_sq,
-                delta_anova[m, 'F'],
-                delta_anova[m, 'Pr(>F)']
+                delta_F,
+                delta_p
             )
         } else {
             # only one coefficient signals an intercept-only model, which means
@@ -574,7 +585,6 @@ summary.block_aov <- function(object, ...) {
     obj$formulas <- model$formulas
     
     model_names <- paste('Model', 1:length(model$models))
-    delta_anova <- do.call(anova, model$models) 
     
     resids <- list()
     summ <- list()
