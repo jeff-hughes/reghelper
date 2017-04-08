@@ -6,14 +6,20 @@ The `reghelper` R package includes a set of functions used to automate commonly 
 
 Version 0.3.3 has been released. However, be aware that this package is still in development, and as such, bugs may still exist, and functions and function parameters may still be subject to change.
 
-To install the most recent stable release, use the following code:
+The most recent stable release is available on CRAN, and can be installed like so:
+
+``` r
+install.packages("reghelper")
+```
+
+You can also install the stable release from Github:
 
 ``` r
 install.packages("devtools")
 devtools::install_github("jeff-hughes/reghelper")
 ```
 
-If you are interested in helping out with the development process, you can install the development branch with the following code:
+If you would like to install the latest development version, you can do so with the following code:
 
 ``` r
 install.packages("devtools")
