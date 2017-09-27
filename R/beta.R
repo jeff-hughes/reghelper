@@ -1,57 +1,59 @@
-#' Standardized coeffients of a model.
+#' Standardized coefficients of a model.
 #' 
-#' \code{beta} is a generic function for producing standardized coefficients
-#' from regression models.
-#' 
-#' @param model A fitted linear model of type 'lm', 'glm' or 'aov'.
-#' @param ... Additional arguments to be passed to the particular method for the
-#'   given model.
-#' @return The form of the value returned by \code{beta} depends on the class of
-#'   its argument. See the documentation of the particular methods for details
-#'   of what is produced by that method.
-#' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}},
-#'   \code{\link{beta.aov}}
-#' @examples
-#' # iris data
-#' model1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
-#' beta(model1)  # all three variables standardized
-#' 
-#' model2 <- lm(Sepal.Width ~ Petal.Width + Species, iris)
-#' beta(model2, skip='Species')  # all variables except Species standardized
-#' @export
-beta <- function(model, ...) UseMethod('beta')
-
-
-#' Standardized coeffients of a model.
-#' 
-#' \code{beta.lm} returns the summary of a linear model where all variables have
+#' \code{beta} returns the summary of a linear model where all variables have
 #' been standardized.
 #' 
-#' This function takes a linear regression model and standardizes the variables,
-#' in order to produce standardized (i.e., beta) coefficients rather than
+#' This function takes a regression model and standardizes the variables, in
+#' order to produce standardized (i.e., beta) coefficients rather than
 #' unstandardized (i.e., B) coefficients.
 #' 
 #' Unlike similar functions, this function properly calculates standardized
 #' estimates for interaction terms (by first standardizing each of the
 #' individual predictor variables).
 #' 
-#' @param model A fitted linear model of type 'lm'.
+#' @param model A fitted linear model of type 'lm', 'glm', 'aov', 'lme', or
+#'   'merMod'.
 #' @param x Logical. Whether or not to standardize predictor variables.
 #' @param y Logical. Whether or not to standardize criterion variables.
 #' @param skip A string vector indicating any variables you do \emph{not} wish
-#'   to be standarized.
+#'   to be standardized.
 #' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return Returns the summary of a linear model, with the output showing the
-#'   beta coefficients, standard error, t-values, and p-values for each
-#'   predictor.
-#' @seealso \code{\link{beta.glm}}
+#' @return Returns the summary of a regression model, with the output showing 
+#'   the standardized coefficients, standard error, t-values, and p-values for
+#'   each predictor. The exact form of the values returned depends on the class
+#'   of regression model used.
 #' @examples
-#' # iris data
+#' # iris data, showing use with lm()
 #' model1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
 #' beta(model1)  # all three variables standardized
 #' 
 #' model2 <- lm(Sepal.Width ~ Petal.Width + Species, iris)
 #' beta(model2, skip='Species')  # all variables except Species standardized
+#' 
+#' # mtcars data, showing use with glm()
+#' model1 <- glm(vs ~ wt + hp, data=mtcars, family='binomial')
+#' beta(model1)  # wt and hp standardized, vs is not by default
+#' 
+#' # iris data, showing use with lme()
+#' if (require(nlme, quietly=TRUE)) {
+#'     model <- lme(Sepal.Width ~ Sepal.Length + Petal.Length, random=~1|Species, data=iris)
+#'     beta(model)  # all three variables standardized
+#' 
+#'     beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
+#' }
+#' 
+#' # iris data, showing use with lmer()
+#' if (require(lme4, quietly=TRUE)) {
+#'     model <- lmer(Sepal.Width ~ Sepal.Length + Petal.Length + (1|Species), data=iris)
+#'     beta(model)  # all variables standardized
+#' 
+#'     beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
+#' }
+#' @export
+beta <- function(model, ...) UseMethod('beta')
+
+
+#' @describeIn beta Standardized coefficients for a linear model.
 #' @export
 beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
     call <- model$call
@@ -79,7 +81,7 @@ beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
 }
 
 
-#' @rdname beta.lm
+#' @describeIn beta Standardized coefficients for ANOVA.
 #' @export
 beta.aov <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
     model$call[[1]] <- quote(lm)  # need to change this so lm is returned
@@ -88,69 +90,14 @@ beta.aov <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
 }
 
 
-#' Standardized coeffients of a model.
-#' 
-#' \code{beta.glm} returns the summary of a linear model where all variables
-#' have been standardized.
-#' 
-#' This function takes a generalized linear regression model and standardizes
-#' the variables, in order to produce standardized (i.e., beta) coefficients
-#' rather than unstandardized (i.e., B) coefficients.
-#' 
-#' Note: Unlike \code{\link{beta.lm}}, the \code{y} parameter is set to FALSE by
-#' default, to avoid issues with some family functions (e.g., binomial).
-#' 
-#' @param model A fitted generalized linear model of type 'glm'.
-#' @param x Logical. Whether or not to standardize predictor variables.
-#' @param y Logical. Whether or not to standardize criterion variables.
-#' @param skip A string vector indicating any variables you do \emph{not} wish
-#'   to be standarized.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return Returns the summary of a generalized linear model, with the output
-#'   showing the beta coefficients, standard error, t-values, and p-values for
-#'   each predictor.
-#' @seealso \code{\link{beta.glm}}
-#' @examples
-#' # mtcars data
-#' model1 <- glm(vs ~ wt + hp, data=mtcars, family='binomial')
-#' beta(model1)  # wt and hp standardized, vs is not by default
+#' @describeIn beta Standardized coefficients for a generalized linear model.
 #' @export
 beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL, ...) {
     beta.lm(model, x, y, skip)
 }
 
 
-#' Standardized coeffients of a model.
-#' 
-#' \code{beta.lme} returns the summary of a linear model where all variables
-#' have been standardized.
-#' 
-#' This function takes a multi-level model and standardizes the variables,
-#' in order to produce standardized (i.e., beta) coefficients rather than
-#' unstandardized (i.e., B) coefficients.
-#' 
-#' Unlike similar functions, this function properly calculates standardized
-#' estimates for interaction terms (by first standardizing each of the
-#' individual predictor variables).
-#' 
-#' @param model A fitted linear model of type 'lme'.
-#' @param x Logical. Whether or not to standardize predictor variables.
-#' @param y Logical. Whether or not to standardize criterion variables.
-#' @param skip A string vector indicating any variables you do \emph{not} wish
-#'   to be standarized.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return Returns the summary of a multi-level linear model, with the output
-#'   showing the beta coefficients, standard error, t-values, and p-values for
-#'   each predictor.
-#' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}}, \code{\link{beta.merMod}}
-#' @examples
-#' # iris data
-#' if (require(nlme, quietly=TRUE)) {
-#'     model <- lme(Sepal.Width ~ Sepal.Length + Petal.Length, random=~1|Species, data=iris)
-#'     beta(model)  # all three variables standardized
-#' 
-#'     beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
-#' }
+#' @describeIn beta Standardized coefficients for a hierarchical linear model (nlme).
 #' @export
 beta.lme <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
     call <- model$call
@@ -178,37 +125,7 @@ beta.lme <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
 }
 
 
-#' Standardized coeffients of a model.
-#' 
-#' \code{beta.merMod} returns the summary of a linear model where all variables
-#' have been standardized.
-#' 
-#' This function takes a multi-level model and standardizes the variables,
-#' in order to produce standardized (i.e., beta) coefficients rather than
-#' unstandardized (i.e., B) coefficients.
-#' 
-#' Unlike similar functions, this function properly calculates standardized
-#' estimates for interaction terms (by first standardizing each of the
-#' individual predictor variables).
-#' 
-#' @param model A fitted linear model of type 'merMod' (from the 'lme4' package).
-#' @param x Logical. Whether or not to standardize predictor variables.
-#' @param y Logical. Whether or not to standardize criterion variables.
-#' @param skip A string vector indicating any variables you do \emph{not} wish
-#'   to be standarized.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return Returns the summary of a multi-level linear model, with the output
-#'   showing the beta coefficients, standard error, t-values, and p-values for
-#'   each predictor.
-#' @seealso \code{\link{beta.lm}}, \code{\link{beta.glm}}, \code{\link{beta.lme}}
-#' @examples
-#' # iris data
-#' if (require(lme4, quietly=TRUE)) {
-#'     model <- lmer(Sepal.Width ~ Sepal.Length + Petal.Length + (1|Species), data=iris)
-#'     beta(model)  # all variables standardized
-#' 
-#'     beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
-#' }
+#' @describeIn beta Standardized coefficients for a hierarchical linear model (lme4).
 #' @export
 beta.merMod <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
     call <- model@call

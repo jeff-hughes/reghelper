@@ -2,27 +2,55 @@
 % Please edit documentation in R/sig_regions.R
 \name{sig_regions}
 \alias{sig_regions}
+\alias{sig_regions.glm}
+\alias{sig_regions.lm}
 \title{Regions of significance for an interaction.}
 \usage{
 sig_regions(model, ...)
+
+\method{sig_regions}{lm}(model, alpha = 0.05, precision = 4, ...)
+
+\method{sig_regions}{glm}(model, alpha = 0.05, precision = 4, ...)
 }
 \arguments{
-\item{model}{A fitted linear model of type 'lm'.}
+\item{model}{A fitted linear model of type 'lm' or 'glm' with one two-way
+interaction including one categorical predictor and one continuous variable.}
 
-\item{...}{Additional arguments to be passed to the particular method for the
-given model.}
+\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
+
+\item{alpha}{The level at which to test for significance. Default value is
+.05.}
+
+\item{precision}{The number of decimal places to which to round the alpha
+level (e.g., precision=5 would look for regions of significance at .05000).}
 }
 \value{
-The form of the value returned by \code{sig_regions} depends on the
-  class of its argument. See the documentation of the particular methods for
-  details of what is produced by that method.
+A named vector with a 'lower' and an 'upper' J-N point. If one or
+  more of the J-N points fall outside the range of your predictor, the
+  function will return NA for that point. If your interaction is not
+  significant, both J-N points will be NA.
 }
 \description{
-\code{sig_regions} is a generic function for calculating the Johnson-Neyman
-regions of significance for an interaction, the points at which the simple
-effect of the categorical predictor changes from non-significant to
-significant.
+\code{sig_regions} calculates the Johnson-Neyman (J-N) regions of
+significance for an interaction, the points at which the simple effect of the
+categorical predictor changes from non-significant to significant.
 }
+\details{
+This function takes a linear or generalized linear model with one two-way
+interaction, where one of the predictors in the interaction is categorical
+(factor) and the other is continuous. For other types of interaction terms,
+use the \code{\link{simple_slopes}} function instead.
+
+For more information about regions of significance, see
+\href{http://ssrn.com/abstract=2208103}{Spiller, Fitzsimons, Lynch, &
+McClelland (2012)}.
+}
+\section{Methods (by class)}{
+\itemize{
+\item \code{lm}: Johnson-Neyman points for linear models.
+
+\item \code{glm}: Johnson-Neyman points for generalized linear models.
+}}
 \examples{
 # mtcars data
 mtcars$am <- factor(mtcars$am)  # make 'am' categorical
@@ -31,6 +59,6 @@ summary(model)  # significant interaction
 sig_regions(model)
 }
 \seealso{
-\code{\link{sig_regions.lm}}, \code{\link{simple_slopes}}
+\code{\link{simple_slopes}}
 }
 

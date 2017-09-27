@@ -2,30 +2,129 @@
 % Please edit documentation in R/graph_model.R
 \name{graph_model}
 \alias{graph_model}
-\title{Graph fitted model interactions.}
+\alias{graph_model.aov}
+\alias{graph_model.glm}
+\alias{graph_model.lm}
+\alias{graph_model.lme}
+\alias{graph_model.merMod}
+\title{Graph interactions for fitted models.}
 \usage{
 graph_model(model, ...)
+
+\method{graph_model}{lm}(model, y, x, lines = NULL, split = NULL,
+  errorbars = c("CI", "SE", "none"), ymin = NULL, ymax = NULL,
+  labels = NULL, bargraph = FALSE, draw.legend = TRUE, dodge = 0,
+  exp = FALSE, ...)
+
+\method{graph_model}{aov}(model, y, x, lines = NULL, split = NULL,
+  errorbars = c("CI", "SE", "none"), ymin = NULL, ymax = NULL,
+  labels = NULL, bargraph = FALSE, draw.legend = TRUE, dodge = 0,
+  exp = FALSE, ...)
+
+\method{graph_model}{glm}(model, y, x, lines = NULL, split = NULL,
+  type = c("link", "response"), errorbars = c("CI", "SE", "none"),
+  ymin = NULL, ymax = NULL, labels = NULL, bargraph = FALSE,
+  draw.legend = TRUE, dodge = 0, exp = FALSE, ...)
+
+\method{graph_model}{lme}(model, y, x, lines = NULL, split = NULL,
+  errorbars = c("CI", "SE", "none"), ymin = NULL, ymax = NULL,
+  labels = NULL, bargraph = FALSE, draw.legend = TRUE, dodge = 0,
+  exp = FALSE, ...)
+
+\method{graph_model}{merMod}(model, y, x, lines = NULL, split = NULL,
+  errorbars = c("CI", "SE", "none"), ymin = NULL, ymax = NULL,
+  labels = NULL, bargraph = FALSE, draw.legend = TRUE, dodge = 0,
+  exp = FALSE, ...)
 }
 \arguments{
-\item{model}{A fitted linear model of type 'lm', 'glm', 'lme', or 'merMod'.}
+\item{model}{A fitted linear model of type 'lm', 'aov', 'glm', 'lme', or
+'merMod'.}
 
-\item{...}{Additional arguments to be passed to the particular method for the
-given model.}
+\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
+
+\item{y}{The variable to be plotted on the y-axis. This variable is required
+for the graph.}
+
+\item{x}{The variable to be plotted on the x-axis. This variable is required
+for the graph.}
+
+\item{lines}{The variable to be plotted using separate lines (optional).}
+
+\item{split}{The variable to be split among separate graphs (optional).}
+
+\item{errorbars}{A string indicating what kind of error bars to show.
+Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
+error of the predicted means), or "none".}
+
+\item{ymin}{Number indicating the minimum value for the y-axis scale. Default
+NULL value will adjust position to the lowest y value.}
+
+\item{ymax}{Number indicating the maximum value for the y-axis scale. Default
+NULL value will adjust position to the highest y value.}
+
+\item{labels}{A named list with strings for the various plot labels: 'title'
+will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
+label, 'lines' sets the legend label, and 'split' sets the label for the 
+facet. If any label is not set, the names of the variables will be used.
+Setting a label explicitly to NA will set an empty label.}
+
+\item{bargraph}{Logical. TRUE will draw a bar graph of the results; FALSE
+will draw a line graph of the results.}
+
+\item{draw.legend}{Logical. Whether or not to draw legend on the graph.}
+
+\item{dodge}{A numeric value indicating the amount each point on the graph
+should be shifted left or right, which can help for readability when points
+are close together. Default value is 0, with .1 or .2 probably sufficient
+in most cases.}
+
+\item{exp}{Logical. If TRUE, the exponential function \code{exp()} will be
+used to transform the y-axis (i.e., e to the power of y). Useful for
+logistic regressions or for converting log-transformed y-values to their
+original units.}
 }
 \value{
 A ggplot2 graph of the plotted variables in the model.
 }
 \description{
 \code{graph_model} provides an easy way to graph interactions in fitted
-models. Selected variables will be graphed at +/- 1 SD (if continuous) or at
-each level of the factor (if categorical).
+models (linear, generalized linear, hierarchical linear, or ANOVA). Selected
+variables will be graphed at +/- 1 SD (if continuous) or at each level of the
+factor (if categorical).
 }
+\details{
+If there are additional covariates in the model other than what is indicated
+to be graphed by the function, these variables will be plotted at their
+respective means. In the case of a categorical covariate, the results will be
+averaged across all its levels.
+}
+\section{Methods (by class)}{
+\itemize{
+\item \code{lm}: Graphing linear models.
+
+\item \code{aov}: Graphing ANOVA.
+
+\item \code{glm}: Graphing generalized linear models.
+
+\item \code{lme}: Graphing hierarchical linear models (nlme).
+
+\item \code{merMod}: Graphing hierarchical linear models (lme4).
+}}
 \examples{
 # iris data
 model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
-graph_model(model, y=Sepal.Width, x=Sepal.Length, lines=Species)
+graph_model_q(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
+
+# Orthodont data
+if (require(nlme, quietly=TRUE)) {
+    model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
+    graph_model_q(model, y='distance', x='age', lines='Sex')
 }
-\seealso{
-\code{\link{graph_model.lm}}, \code{\link{graph_model.glm}}
+
+# Arabidopsis data
+if (require(lme4, quietly=TRUE)) {
+    model <- lmer(total.fruits ~ nutrient * amd + rack + (1|gen), data=Arabidopsis)
+    graph_model_q(model, y='total.fruits', x='nutrient', lines='amd')
+}
 }
 

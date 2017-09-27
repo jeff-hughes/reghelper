@@ -1,17 +1,30 @@
 #' Regions of significance for an interaction.
 #' 
-#' \code{sig_regions} is a generic function for calculating the Johnson-Neyman
-#' regions of significance for an interaction, the points at which the simple
-#' effect of the categorical predictor changes from non-significant to
-#' significant.
+#' \code{sig_regions} calculates the Johnson-Neyman (J-N) regions of
+#' significance for an interaction, the points at which the simple effect of the
+#' categorical predictor changes from non-significant to significant.
 #' 
-#' @param model A fitted linear model of type 'lm'.
-#' @param ... Additional arguments to be passed to the particular method for the
-#'   given model.
-#' @return The form of the value returned by \code{sig_regions} depends on the
-#'   class of its argument. See the documentation of the particular methods for
-#'   details of what is produced by that method.
-#' @seealso \code{\link{sig_regions.lm}}, \code{\link{simple_slopes}}
+#' This function takes a linear or generalized linear model with one two-way
+#' interaction, where one of the predictors in the interaction is categorical
+#' (factor) and the other is continuous. For other types of interaction terms,
+#' use the \code{\link{simple_slopes}} function instead.
+#' 
+#' For more information about regions of significance, see
+#' \href{http://ssrn.com/abstract=2208103}{Spiller, Fitzsimons, Lynch, &
+#' McClelland (2012)}.
+#' 
+#' @param model A fitted linear model of type 'lm' or 'glm' with one two-way
+#'   interaction including one categorical predictor and one continuous variable.
+#' @param alpha The level at which to test for significance. Default value is
+#'   .05.
+#' @param precision The number of decimal places to which to round the alpha
+#'   level (e.g., precision=5 would look for regions of significance at .05000).
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
+#' @return A named vector with a 'lower' and an 'upper' J-N point. If one or
+#'   more of the J-N points fall outside the range of your predictor, the
+#'   function will return NA for that point. If your interaction is not
+#'   significant, both J-N points will be NA.
+#' @seealso \code{\link{simple_slopes}}
 #' @examples
 #' # mtcars data
 #' mtcars$am <- factor(mtcars$am)  # make 'am' categorical
@@ -22,39 +35,7 @@
 sig_regions <- function(model, ...) UseMethod('sig_regions')
 
 
-#' Regions of significance for an interaction.
-#' 
-#' \code{sig_regions.lm} calculates the Johnson-Neyman (J-N) regions of
-#' significance for an interaction, the points at which the simple effect of the
-#' categorical predictor changes from non-significant to significant.
-#' 
-#' This function takes a regression model with one two-way interaction, where
-#' one of the predictors in the interaction is categorical (factor) and the
-#' other is continuous. For other types of interaction terms, use the
-#' \code{\link{simple_slopes}} function instead.
-#' 
-#' For more information about regions of significance, see
-#' \href{http://ssrn.com/abstract=2208103}{Spiller, Fitzsimons, Lynch, &
-#' McClelland (2012)}.
-#' 
-#' @param model A fitted linear model of type 'lm' with one two-way interaction
-#'   including one categorical predictor and one continuous variable.
-#' @param alpha The level at which to test for significance. Default value is
-#'   .05.
-#' @param precision The number of decimal places to which to round the alpha
-#'   level (e.g., precision=5 would look for regions of significance at .05000).
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return A named vector with a 'lower' and an 'upper' J-N point. If one or
-#'   more of the J-N points fall outside the range of your predictor, the
-#'   function will return NA for that point. If your interaction is not
-#'   significant, both J-N points will be NA.
-#' @seealso \code{\link{simple_slopes.lm}}
-#' @examples
-#' # mtcars data
-#' mtcars$am <- factor(mtcars$am)  # make 'am' categorical
-#' model <- lm(mpg ~ wt * am, data=mtcars)
-#' summary(model)  # significant interaction
-#' sig_regions(model)
+#' @describeIn sig_regions Johnson-Neyman points for linear models.
 #' @export
 sig_regions.lm <- function(model, alpha=.05, precision=4, ...) {
     int_term <- which(attr(terms(model), 'order') == 2)
@@ -132,7 +113,7 @@ sig_regions.lm <- function(model, alpha=.05, precision=4, ...) {
 }
 
 
-#' @rdname sig_regions.lm
+#' @describeIn sig_regions Johnson-Neyman points for generalized linear models.
 #' @export
 sig_regions.glm <- function(model, alpha=.05, precision=4, ...) {
     sig_regions.lm(model, alpha, precision)

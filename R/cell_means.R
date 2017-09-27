@@ -1,15 +1,28 @@
-#' Estimated means.
+#' Estimated values of a linear model.
 #' 
-#' \code{cell_means} is a generic function for calculating the estimated means
-#' of a linear model.
+#' \code{cell_means} calculates the predicted values at specific points, given
+#' a fitted regression model (linear, generalized, or ANOVA).
 #' 
-#' @param model A fitted linear model of type 'lm' or 'aov'.
-#' @param ... Additional arguments to be passed to the particular method for the
-#'   given model.
-#' @return The form of the value returned by \code{cell_means} depends on the
-#'   class of its argument. See the documentation of the particular methods for
-#'   details of what is produced by that method.
-#' @seealso \code{\link{cell_means.lm}}, \code{\link{cell_means.aov}}
+#' By default, this function will provide means at -1 SD, the mean, and +1 SD
+#' for continuous variables, and at each level of categorical variables. This
+#' can be overridden with the \code{levels} parameter.
+#' 
+#' If there are additional covariates in the model other than what are selected
+#' in the function call, these variables will be set to their respective means.
+#' In the case of a categorical covariate, the results will be averaged across
+#' all its levels.
+#' 
+#' @param model A fitted linear model of type 'lm', 'aov', or 'glm'.
+#' @param ... Pass through variable names to add them to the table.
+#' @param levels A list with element names corresponding to some or all of the
+#'   variables in the model. Each list element should be a vector with the names
+#'   of factor levels (for categorical variables) or numeric points (for
+#'   continuous variables) at which to test that variable.
+#' @return A data frame with a row for each predicted value. The first few
+#'   columns identify the level at which each variable in your model was set.
+#'   After columns for each variable, the data frame has columns for the
+#'   predicted value, the standard error of the predicted mean, and the 95%
+#'   confidence interval.
 #' @examples
 #' # iris data
 #' model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
@@ -21,24 +34,30 @@ cell_means <- function(model, ...) UseMethod('cell_means')
 
 #' Estimated values of a linear model.
 #' 
-#' \code{cell_means.lm} calculates the predicted values at specific points,
-#' given a fitted regression model.
+#' \code{cell_means_q} calculates the predicted values at specific points,
+#' given a fitted regression model (linear, generalized, or ANOVA).
 #' 
-#' By default, this function will provide means at -1SD, the mean, and +1SD for
-#' continuous variables, and at each levele of categorical variables. This can
-#' be overridden with the \code{levels} parameter.
+#' By default, this function will provide means at -1 SD, the mean, and +1 SD
+#' for continuous variables, and at each level of categorical variables. This
+#' can be overridden with the \code{levels} parameter.
 #' 
 #' If there are additional covariates in the model other than what are selected
 #' in the function call, these variables will be set to their respective means.
 #' In the case of a categorical covariate, the results will be averaged across
 #' all its levels.
 #' 
-#' @param model A fitted linear model of type 'lm'.
-#' @param ... Pass through variable names to add them to the table.
+#' Note that in most cases it is easier to use \code{\link{cell_means}} and
+#' pass variable names in directly instead of strings of variable names.
+#' \code{cell_means_q} uses standard evaluation in cases where such evaluation
+#' is easier.
+#' 
+#' @param model A fitted linear model of type 'lm', 'aov', or 'glm'.
+#' @param vars A vector or list with variable names to be added to the table.
 #' @param levels A list with element names corresponding to some or all of the
 #'   variables in the model. Each list element should be a vector with the names
 #'   of factor levels (for categorical variables) or numeric points (for
 #'   continuous variables) at which to test that variable.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A data frame with a row for each predicted value. The first few
 #'   columns identify the level at which each variable in your model was set.
 #'   After columns for each variable, the data frame has columns for the
@@ -49,7 +68,12 @@ cell_means <- function(model, ...) UseMethod('cell_means')
 #' # iris data
 #' model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
 #' summary(model)
-#' cell_means(model, Petal.Length)
+#' cell_means_q(model, 'Petal.Length')
+#' @export
+cell_means_q <- function(model, ...) UseMethod('cell_means_q')
+
+
+#' @describeIn cell_means Estimated values for a linear model.
 #' @export
 cell_means.lm <- function(model, ..., levels=NULL) {
     # grab variable names
@@ -65,44 +89,9 @@ cell_means.lm <- function(model, ..., levels=NULL) {
 }
 
 
-#' Estimated values of a linear model.
-#' 
-#' \code{cell_means_q.lm} calculates the predicted values at specific points,
-#' given a fitted regression model.
-#' 
-#' By default, this function will provide means at -1SD, the mean, and +1SD for
-#' continuous variables, and at each levele of categorical variables. This can
-#' be overridden with the \code{levels} parameter.
-#' 
-#' If there are additional covariates in the model other than what are selected
-#' in the function call, these variables will be set to their respective means.
-#' In the case of a categorical covariate, the results will be averaged across
-#' all its levels.
-#' 
-#' Note that in most cases it is easier to use \code{\link{cell_means.lm}} and
-#' pass variable names in directly instead of strings of variable names.
-#' \code{cell_means_q.lm} uses standard evaluation in cases where such
-#' evaluation is easier.
-#' 
-#' @param model A fitted linear model of type 'lm'.
-#' @param vars A vector or list with variable names to be added to the table.
-#' @param levels A list with element names corresponding to some or all of the
-#'   variables in the model. Each list element should be a vector with the names
-#'   of factor levels (for categorical variables) or numeric points (for
-#'   continuous variables) at which to test that variable.
-#' @return A data frame with a row for each predicted value. The first few
-#'   columns identify the level at which each variable in your model was set.
-#'   After columns for each variable, the data frame has columns for the
-#'   predicted value, the standard error of the predicted mean, and the 95%
-#'   confidence interval.
-#' @seealso \code{\link{cell_means.lm}}
-#' @examples
-#' # iris data
-#' model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
-#' summary(model)
-#' cell_means_q.lm(model, 'Petal.Length')
+#' @describeIn cell_means_q Estimated values for a linear model.
 #' @export
-cell_means_q.lm <- function(model, vars=NULL, levels=NULL) {
+cell_means_q.lm <- function(model, vars=NULL, levels=NULL, ...) {
     factors <- .set_factors(model$model, vars, levels, sstest=FALSE)
     final_grid <- with(model$model, expand.grid(factors))
     
@@ -142,57 +131,21 @@ cell_means_q.lm <- function(model, vars=NULL, levels=NULL) {
 }
 
 
-#' @rdname cell_means.lm
+#' @describeIn cell_means Estimated means for ANOVA.
 #' @export
 cell_means.aov <- function(model, ..., levels=NULL) {
-    # grab variable names
-    call_list <- as.list(match.call())[-1]
-    call_list[which(names(call_list) %in% c('model', 'levels'))] <- NULL
-    
-    var_names <- NULL
-    if (length(call_list) > 0) {
-        # turn variable names into strings
-        var_names <- sapply(call_list, deparse)
-    }    
-    return(cell_means_q.lm(model, var_names, levels))
+    cell_means.lm(model, ..., levels)
 }
 
 
-#' Estimated values of a general linear model.
-#' 
-#' \code{cell_means.glm} calculates the predicted values at specific points,
-#' given a fitted general linear model.
-#' 
-#' By default, this function will provide means at -1SD, the mean, and +1SD for
-#' continuous variables, and at each levele of categorical variables. This can
-#' be overridden with the \code{levels} parameter.
-#' 
-#' If there are additional covariates in the model other than what are selected
-#' in the function call, these variables will be set to their respective means.
-#' In the case of a categorical covariate, the results will be averaged across
-#' all its levels.
-#' 
-#' @param model A fitted linear model of type 'glm'.
-#' @param ... Pass through variable names to add them to the table.
-#' @param levels A list with element names corresponding to some or all of the
-#'   variables in the model. Each list element should be a vector with the names
-#'   of factor levels (for categorical variables) or numeric points (for
-#'   continuous variables) at which to test that variable.
-#' @param type The type of prediction required. The default 'link' is on the
-#'   scale of the linear predictors; the alternative 'response' is on the scale
-#'   of the response variable. For more information, see
-#'   \code{\link{predict.glm}}.
-#' @return A data frame with a row for each predicted value. The first few
-#'   columns identify the level at which each variable in your model was set.
-#'   After columns for each variable, the data frame has columns for the
-#'   predicted value, the standard error of the predicted mean, and the 95%
-#'   confidence interval.
-#' @seealso \code{\link{cell_means.lm}}
-#' @examples
-#' # iris data
-#' model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
-#' summary(model)
-#' cell_means(model, Petal.Length)
+#' @describeIn cell_means_q Estimated means for ANOVA.
+#' @export
+cell_means_q.aov <- function(model, vars=NULL, levels=NULL, ...) {
+    cell_means_q.lm(model, vars, levels)
+}
+
+
+#' @describeIn cell_means Estimated values for a generalized linear model.
 #' @export
 cell_means.glm <- function(model, ..., levels=NULL,
     type=c('link', 'response')) {
@@ -210,49 +163,10 @@ cell_means.glm <- function(model, ..., levels=NULL,
 }
 
 
-#' Estimated values of a general linear model.
-#' 
-#' \code{cell_means_q.glm} calculates the predicted values at specific points,
-#' given a fitted general linear model.
-#' 
-#' By default, this function will provide means at -1SD, the mean, and +1SD for
-#' continuous variables, and at each levele of categorical variables. This can
-#' be overridden with the \code{levels} parameter.
-#' 
-#' If there are additional covariates in the model other than what are selected
-#' in the function call, these variables will be set to their respective means.
-#' In the case of a categorical covariate, the results will be averaged across
-#' all its levels.
-#' 
-#' Note that in most cases it is easier to use \code{\link{cell_means.glm}} and
-#' pass variable names in directly instead of strings of variable names.
-#' \code{cell_means_q.glm} uses standard evaluation in cases where such
-#' evaluation is easier.
-#' 
-#' @param model A fitted linear model of type 'glm'.
-#' @param vars A vector or list with variable names to be added to the table.
-#' @param levels A list with element names corresponding to some or all of the
-#'   variables in the model. Each list element should be a vector with the names
-#'   of factor levels (for categorical variables) or numeric points (for
-#'   continuous variables) at which to test that variable.
-#' @param type The type of prediction required. The default 'link' is on the
-#'   scale of the linear predictors; the alternative 'response' is on the scale
-#'   of the response variable. For more information, see
-#'   \code{\link{predict.glm}}.
-#' @return A data frame with a row for each predicted value. The first few
-#'   columns identify the level at which each variable in your model was set.
-#'   After columns for each variable, the data frame has columns for the
-#'   predicted value, the standard error of the predicted mean, and the 95%
-#'   confidence interval.
-#' @seealso \code{\link{cell_means.glm}}, \code{\link{cell_means_q.lm}}
-#' @examples
-#' # iris data
-#' model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
-#' summary(model)
-#' cell_means_q.lm(model, 'Petal.Length')
+#' @describeIn cell_means_q Estimated values for a generalized linear model.
 #' @export
 cell_means_q.glm <- function(model, vars=NULL, levels=NULL,
-    type=c('link', 'response')) {
+    type=c('link', 'response'), ...) {
     
     type <- match.arg(type)
     

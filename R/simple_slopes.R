@@ -1,34 +1,7 @@
-#' Simple slopes of interaction.
+#' Simple slopes of an interaction.
 #' 
-#' \code{simple_slopes} is a generic function for calculating the simple effects
-#' of an interaction in a regression model.
-#' 
-#' @param model A fitted linear model of type 'lm', 'glm', 'aov', 'lme' (nlme),
-#'   or 'merMod' (lme4).
-#' @param ... Additional arguments to be passed to the particular method for the
-#'   given model.
-#' @return The form of the value returned by \code{simple_slopes} depends on the
-#'   class of its argument. See the documentation of the particular methods for
-#'   details of what is produced by that method.
-#' @seealso \code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.glm}},
-#'   \code{\link{simple_slopes.aov}}, \code{\link{simple_slopes.lme}},
-#'   \code{\link{simple_slopes.merMod}}
-#' @examples
-#' # mtcars data
-#' mtcars$am <- factor(mtcars$am)  # make 'am' categorical
-#' model <- lm(mpg ~ wt * am, data=mtcars)
-#' summary(model)  # significant interaction
-#' simple_slopes(model)
-#' simple_slopes(model,
-#'     levels=list(wt=c(2, 3, 4, 'sstest'), am=c(0, 1, 'sstest')))  # test at specific levels
-#' @export
-simple_slopes <- function(model, ...) UseMethod('simple_slopes')
-
-
-#' Simple slopes of interaction.
-#' 
-#' \code{simple_slopes.lm} calculates all the simple effects of an interaction
-#' in a regression model.
+#' \code{simple_slopes} calculates all the simple effects of an interaction
+#' in a fitted model (linear, generalized linear, hierarchical linear, or ANOVA).
 #' 
 #' If the model includes interactions at different levels (e.g., three two-way
 #' interactions and one three-way interaction), the function will test the
@@ -45,8 +18,8 @@ simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 #' see multiple rows for that test. One row will be shown for each contrast for
 #' that variable; the order is in the same order shown in \code{contrasts()}.
 #' 
-#' @param model A fitted linear model of type 'lm' with at least one interaction
-#'   term.
+#' @param model A fitted linear model of type 'lm', 'glm', 'aov', 'lme' (nlme),
+#'   or 'merMod' (lme4), with at least one interaction term.
 #' @param levels A list with element names corresponding to some or all of the
 #'   variables in the model. Each list element should be a vector with the names
 #'   of factor levels (for categorical variables) or numeric values (for
@@ -60,16 +33,46 @@ simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 #'   variable being tested. After columns for each variable, the data frame has
 #'   columns for the slope of the test variable, the standard error, t-value,
 #'   p-value, and degrees of freedom for the model.
-#' @seealso \code{\link{simple_slopes.glm}},\code{\link{simple_slopes.lme}},
-#'   \code{\link{simple_slopes.merMod}}
 #' @examples
-#' # mtcars data
+#' # linear model
 #' mtcars$am <- factor(mtcars$am)  # make 'am' categorical
 #' model <- lm(mpg ~ wt * am, data=mtcars)
 #' summary(model)  # significant interaction
 #' simple_slopes(model)
 #' simple_slopes(model,
 #'     levels=list(wt=c(2, 3, 4, 'sstest'), am=c(0, 1, 'sstest')))  # test at specific levels
+#' 
+#' # generalized linear model
+#' model <- glm(vs ~ gear * wt, data=mtcars, family='binomial')
+#' summary(model)  # marginal interaction
+#' simple_slopes(model)
+#' simple_slopes(model,
+#'     levels=list(gear=c(2, 3, 4, 'sstest'), wt=c(2, 3, 'sstest')))  # test at specific levels
+#' 
+#' # hierarchical linear model (nlme)
+#' if (require(nlme, quietly=TRUE)) {
+#'     model <- lme(Sepal.Width ~ Sepal.Length * Petal.Length, random=~1|Species, data=iris)
+#'     summary(model)  # significant interaction
+#'     simple_slopes(model)
+#'     simple_slopes(model,
+#'         levels=list(Sepal.Length=c(4, 5, 6, 'sstest'),
+#'         Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
+#' }
+#' 
+#' # hierarchical linear model (lme4)
+#' if (require(lme4, quietly=TRUE)) {
+#'     model <- lmer(Sepal.Width ~ Sepal.Length * Petal.Length + (1|Species), data=iris)
+#'     summary(model)
+#'     simple_slopes(model)
+#'     simple_slopes(model,
+#'         levels=list(Sepal.Length=c(4, 5, 6, 'sstest'),
+#'         Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
+#' }
+#' @export
+simple_slopes <- function(model, ...) UseMethod('simple_slopes')
+
+
+#' @describeIn simple_slopes Simple slopes for linear models.
 #' @export
 simple_slopes.lm <- function(model, levels=NULL, ...) {
     call <- model$call
@@ -172,110 +175,21 @@ simple_slopes.lm <- function(model, levels=NULL, ...) {
 }
 
 
-#' @rdname simple_slopes.lm
+#' @describeIn simple_slopes Simple slopes for ANOVA.
 #' @export
 simple_slopes.aov <- function(model, levels=NULL, ...) {
     simple_slopes.lm(model, levels)
 }
 
 
-#' Simple slopes of interaction.
-#' 
-#' \code{simple_slopes.glm} calculates all the simple effects of an interaction
-#' in a regression model.
-#' 
-#' If the model includes interactions at different levels (e.g., three two-way
-#' interactions and one three-way interaction), the function will test the
-#' simple effects of the highest-order interaction. If there are multiple
-#' interactions in the highest order, it will test the first one in the model.
-#' If you wish to test simple effects for a different interaction, simply switch
-#' the order in the formula.
-#' 
-#' By default, this function will provide slopes at -1SD, the mean, and +1SD for
-#' continuous variables, and at each level of categorical variables. This can be
-#' overridden with the \code{levels} parameter.
-#' 
-#' If a categorical variable with more than two levels is being tested, you may
-#' see multiple rows for that test. One row will be shown for each contrast for
-#' that variable; the order is in the same order shown in \code{contrasts()}.
-#' 
-#' @param model A fitted linear model of type 'glm' with at least one
-#'   interaction term.
-#' @param levels A list with element names corresponding to some or all of the
-#'   variables in the model. Each list element should be a vector with the names
-#'   of factor levels (for categorical variables) or numeric values (for
-#'   continuous variables) at which to test that variable. \strong{Note:} If you
-#'   do not include 'sstest' as one of these levels, the function will not test
-#'   the simple effects for that variable.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return A data frame with a row for each simple effect. The first few columns
-#'   identify the level at which each variable in your model was set for that
-#'   test. A 'sstest' value in a particular column indicates that this was the
-#'   variable being tested. After columns for each variable, the data frame has
-#'   columns for the slope of the test variable, the standard error, t-value,
-#'   p-value, and degrees of freedom for the model.
-#' @seealso \code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.lme}},
-#'   \code{\link{simple_slopes.merMod}}
-#' @examples
-#' # mtcars data
-#' model <- glm(vs ~ gear * wt, data=mtcars, family='binomial')
-#' summary(model)  # marginal interaction
-#' simple_slopes(model)
-#' simple_slopes(model,
-#'     levels=list(gear=c(2, 3, 4, 'sstest'), wt=c(2, 3, 'sstest')))  # test at specific levels
+#' @describeIn simple_slopes Simple slopes for generalized linear models.
 #' @export
 simple_slopes.glm <- function(model, levels=NULL, ...) {
     simple_slopes.lm(model, levels)
 }
 
 
-#' Simple slopes of interaction.
-#' 
-#' \code{simple_slopes.lme} calculates all the simple effects of an interaction
-#' in a regression model.
-#' 
-#' If the model includes interactions at different levels (e.g., three two-way
-#' interactions and one three-way interaction), the function will test the
-#' simple effects of the highest-order interaction. If there are multiple
-#' interactions in the highest order, it will test the first one in the model.
-#' If you wish to test simple effects for a different interaction, simply switch
-#' the order in the formula.
-#' 
-#' By default, this function will provide slopes at -1SD, the mean, and +1SD for
-#' continuous variables, and at each level of categorical variables. This can be
-#' overridden with the \code{levels} parameter.
-#' 
-#' If a categorical variable with more than two levels is being tested, you may
-#' see multiple rows for that test. One row will be shown for each contrast for
-#' that variable; the order is in the same order shown in \code{contrasts()}.
-#' 
-#' @param model A fitted linear model of type 'lme' with at least one
-#'   interaction term.
-#' @param levels A list with element names corresponding to some or all of the
-#'   variables in the model. Each list element should be a vector with the names
-#'   of factor levels (for categorical variables) or numeric values (for
-#'   continuous variables) at which to test that variable. \strong{Note:} If you
-#'   do not include 'sstest' as one of these levels, the function will not test
-#'   the simple effects for that variable.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return A data frame with a row for each simple effect. The first few columns
-#'   identify the level at which each variable in your model was set for that
-#'   test. A 'sstest' value in a particular column indicates that this was the
-#'   variable being tested. After columns for each variable, the data frame has
-#'   columns for the slope of the test variable, the standard error, t-value,
-#'   p-value, and degrees of freedom for the model.
-#' @seealso \code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.glm}},
-#'   \code{\link{simple_slopes.merMod}}
-#' @examples
-#' # iris data
-#' if (require(nlme, quietly=TRUE)) {
-#'     model <- lme(Sepal.Width ~ Sepal.Length * Petal.Length, random=~1|Species, data=iris)
-#'     summary(model)  # significant interaction
-#'     simple_slopes(model)
-#'     simple_slopes(model,
-#'         levels=list(Sepal.Length=c(4, 5, 6, 'sstest'),
-#'         Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
-#' }
+#' @describeIn simple_slopes Simple slopes for hierarchical linear models (nlme).
 #' @export
 simple_slopes.lme <- function(model, levels=NULL, ...) {
     call <- model$call
@@ -382,53 +296,7 @@ simple_slopes.lme <- function(model, levels=NULL, ...) {
 }
 
 
-#' Simple slopes of interaction.
-#' 
-#' \code{simple_slopes.merMod} calculates all the simple effects of an
-#' interaction in a regression model.
-#' 
-#' If the model includes interactions at different levels (e.g., three two-way
-#' interactions and one three-way interaction), the function will test the
-#' simple effects of the highest-order interaction. If there are multiple
-#' interactions in the highest order, it will test the first one in the model.
-#' If you wish to test simple effects for a different interaction, simply switch
-#' the order in the formula.
-#' 
-#' By default, this function will provide slopes at -1SD, the mean, and +1SD for
-#' continuous variables, and at each level of categorical variables. This can be
-#' overridden with the \code{levels} parameter.
-#' 
-#' If a categorical variable with more than two levels is being tested, you may
-#' see multiple rows for that test. One row will be shown for each contrast for
-#' that variable; the order is in the same order shown in \code{contrasts()}.
-#' 
-#' @param model A fitted linear model of type 'merMod' with at least one
-#'   interaction term.
-#' @param levels A list with element names corresponding to some or all of the
-#'   variables in the model. Each list element should be a vector with the names
-#'   of factor levels (for categorical variables) or numeric values (for
-#'   continuous variables) at which to test that variable. \strong{Note:} If you
-#'   do not include 'sstest' as one of these levels, the function will not test
-#'   the simple effects for that variable.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return A data frame with a row for each simple effect. The first few columns
-#'   identify the level at which each variable in your model was set for that
-#'   test. A 'sstest' value in a particular column indicates that this was the
-#'   variable being tested. After columns for each variable, the data frame has
-#'   columns for the slope of the test variable, the standard error, and t-value
-#'   for the model.
-#' @seealso \code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.glm}},
-#'   \code{\link{simple_slopes.lme}}
-#' @examples
-#' # iris data
-#' if (require(lme4, quietly=TRUE)) {
-#'     model <- lmer(Sepal.Width ~ Sepal.Length * Petal.Length + (1|Species), data=iris)
-#'     summary(model)
-#'     simple_slopes(model)
-#'     simple_slopes(model,
-#'         levels=list(Sepal.Length=c(4, 5, 6, 'sstest'),
-#'         Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
-#' }
+#' @describeIn simple_slopes Simple slopes for hierarchical linear models (lme4).
 #' @export
 simple_slopes.merMod <- function(model, levels=NULL, ...) {
     call <- model@call
