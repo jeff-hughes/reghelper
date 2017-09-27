@@ -82,6 +82,11 @@ in most cases.}
 used to transform the y-axis (i.e., e to the power of y). Useful for
 logistic regressions or for converting log-transformed y-values to their
 original units.}
+
+\item{type}{The type of prediction required. The default 'link' is on the
+scale of the linear predictors; the alternative 'response' is on the scale
+of the response variable. For more information, see
+\code{\link{predict.glm}}.}
 }
 \value{
 A ggplot2 graph of the plotted variables in the model.

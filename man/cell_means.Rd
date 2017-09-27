@@ -25,6 +25,11 @@ cell_means(model, ...)
 variables in the model. Each list element should be a vector with the names
 of factor levels (for categorical variables) or numeric points (for
 continuous variables) at which to test that variable.}
+
+\item{type}{The type of prediction required. The default 'link' is on the
+scale of the linear predictors; the alternative 'response' is on the scale
+of the response variable. For more information, see
+\code{\link{predict.glm}}.}
 }
 \value{
 A data frame with a row for each predicted value. The first few

@@ -18,6 +18,10 @@
 #'   variables in the model. Each list element should be a vector with the names
 #'   of factor levels (for categorical variables) or numeric points (for
 #'   continuous variables) at which to test that variable.
+#' @param type The type of prediction required. The default 'link' is on the
+#'   scale of the linear predictors; the alternative 'response' is on the scale
+#'   of the response variable. For more information, see
+#'   \code{\link{predict.glm}}.
 #' @return A data frame with a row for each predicted value. The first few
 #'   columns identify the level at which each variable in your model was set.
 #'   After columns for each variable, the data frame has columns for the
@@ -57,6 +61,10 @@ cell_means <- function(model, ...) UseMethod('cell_means')
 #'   variables in the model. Each list element should be a vector with the names
 #'   of factor levels (for categorical variables) or numeric points (for
 #'   continuous variables) at which to test that variable.
+#' @param type The type of prediction required. The default 'link' is on the
+#'   scale of the linear predictors; the alternative 'response' is on the scale
+#'   of the response variable. For more information, see
+#'   \code{\link{predict.glm}}.
 #' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A data frame with a row for each predicted value. The first few
 #'   columns identify the level at which each variable in your model was set.
@@ -134,7 +142,16 @@ cell_means_q.lm <- function(model, vars=NULL, levels=NULL, ...) {
 #' @describeIn cell_means Estimated means for ANOVA.
 #' @export
 cell_means.aov <- function(model, ..., levels=NULL) {
-    cell_means.lm(model, ..., levels)
+    # grab variable names
+    call_list <- as.list(match.call())[-1]
+    call_list[which(names(call_list) %in% c('model', 'levels'))] <- NULL
+    
+    var_names <- NULL
+    if (length(call_list) > 0) {
+        # turn variable names into strings
+        var_names <- sapply(call_list, deparse)
+    }    
+    return(cell_means_q.aov(model, var_names, levels))
 }
 
 
