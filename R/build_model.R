@@ -1,26 +1,26 @@
 #' Incremental block modelling.
 #' 
-#' \code{build_model} allows you to incrementally add terms to a linear regression
-#' model.
+#' \code{build_model} allows you to incrementally add terms to a linear
+#' regression model. Given a list of names of variables at each step, this
+#' function will run a series of models, adding the terms for each block
+#' incrementally to "build up" to a final model including all the terms.
 #' 
-#' Given a list of names of variables at each step, this function will run a
-#' series of models, adding the terms for each block incrementally.
-#' 
-#' Note: Cases with missing data are dropped based on the final model that
-#' includes all the relevant terms. This ensures that all the models are tested
-#' on the same number of cases.
+#' \strong{Note:} Cases with missing data are dropped based on the \emph{final}
+#' model that includes all the relevant terms. This ensures that all the models
+#' are tested on the same number of cases.
 #' 
 #' @param dv The variable name to be used as the dependent variable.
 #' @param ... Pass through variable names (or interaction terms) to add for each
 #'   block. To add one term to a block, just pass it through directly; to
 #'   add multiple terms, pass it through in a vector or list. Blocks will be
 #'   added in the order they are passed to the function, and variables from
-#'   previous blocks will be included with each subsequent block.
+#'   previous blocks will be included with each subsequent block, so they do not
+#'   need to be repeated.
 #' @param data An optional data frame containing the variables in the model. If
 #'   not found in \code{data}, the variables are taken from the environment from
 #'   which the function is called.
 #' @param opts List of arguments to be passed to the model function.
-#' @param model The type of model to use; only supports 'lm' at this time.
+#' @param model The type of model to use; supports 'lm', 'aov', and 'glm'.
 #' @return A named list with the following elements:
 #' \tabular{ll}{
 #'   \code{formulas} \tab A list of the regression formulas used for each block.
@@ -90,28 +90,29 @@ build_model <- function(dv, ..., data=NULL, opts=NULL, model='lm') {
 #' Incremental block modelling.
 #' 
 #' \code{build_model_q} allows you to incrementally add terms to a linear
-#' regression model.
+#' regression model. Given a list of names of variables at each step, this
+#' function will run a series of models, adding the terms for each block
+#' incrementally to "build up" to a final model including all the terms.
 #' 
-#' Given a list of names of variables at each step, this function will run a
-#' series of models, adding the terms for each block incrementally. Note that in
-#' most cases it is easier to use \code{\link{build_model}} and pass variable names
-#' in directly instead of strings of variable names. \code{build_model_q} uses
-#' standard evaluation in cases where such evaluation is easier.
+#' Note that in most cases it is easier to use \code{\link{build_model}} and
+#' pass variable names in directly instead of strings of variable names.
+#' \code{build_model_q} uses standard evaluation in cases where such evaluation
+#' is easier.
 #' 
-#' Note: Cases with missing data are dropped based on the final model that
-#' includes all the relevant terms. This ensures that all the models are tested
-#' on the same number of cases.
+#' \strong{Note:} Cases with missing data are dropped based on the \emph{final}
+#' model that includes all the relevant terms. This ensures that all the models
+#' are tested on the same number of cases.
 #' 
 #' @param dv String of the variable name to be used as the dependent variable.
 #' @param blocks List of variable names (or interaction terms) to add for each
 #'   block. Each list element should be a single string with terms for that
 #'   block. Variables from previous blocks will be included with each subsequent
-#'   block.
+#'   block, so they do not need to be repeated.
 #' @param data An optional data frame containing the variables in the model. If
 #'   not found in \code{data}, the variables are taken from the environment from
 #'   which the function is called.
 #' @param opts List of arguments to be passed to the model function.
-#' @param model The type of model to use; only supports 'lm' at this time.
+#' @param model The type of model to use; supports 'lm', 'aov', and 'glm'.
 #' @return A named list with the following elements:
 #' \tabular{ll}{
 #'   \code{formulas} \tab A list of the regression formulas used for each block.

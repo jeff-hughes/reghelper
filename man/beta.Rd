@@ -42,16 +42,15 @@ Returns the summary of a regression model, with the output showing
 }
 \description{
 \code{beta} returns the summary of a linear model where all variables have
-been standardized.
+been standardized. It takes a regression model and standardizes the variables,
+in order to produce standardized (i.e., beta) coefficients rather than
+unstandardized (i.e., B) coefficients.
 }
 \details{
-This function takes a regression model and standardizes the variables, in
-order to produce standardized (i.e., beta) coefficients rather than
-unstandardized (i.e., B) coefficients.
-
 Unlike similar functions, this function properly calculates standardized
-estimates for interaction terms (by first standardizing each of the
-individual predictor variables).
+estimates for interaction terms (by first standardizing each of the predictor
+variables separately, rather than using the standard deviation of the
+interaction term itself).
 }
 \section{Methods (by class)}{
 \itemize{

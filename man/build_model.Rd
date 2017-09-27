@@ -13,7 +13,8 @@ build_model(dv, ..., data = NULL, opts = NULL, model = "lm")
 block. To add one term to a block, just pass it through directly; to
 add multiple terms, pass it through in a vector or list. Blocks will be
 added in the order they are passed to the function, and variables from
-previous blocks will be included with each subsequent block.}
+previous blocks will be included with each subsequent block, so they do not
+need to be repeated.}
 
 \item{data}{An optional data frame containing the variables in the model. If
 not found in \code{data}, the variables are taken from the environment from
@@ -21,7 +22,7 @@ which the function is called.}
 
 \item{opts}{List of arguments to be passed to the model function.}
 
-\item{model}{The type of model to use; only supports 'lm' at this time.}
+\item{model}{The type of model to use; supports 'lm', 'aov', and 'glm'.}
 }
 \value{
 A named list with the following elements:
@@ -32,16 +33,15 @@ A named list with the following elements:
 }
 }
 \description{
-\code{build_model} allows you to incrementally add terms to a linear regression
-model.
+\code{build_model} allows you to incrementally add terms to a linear
+regression model. Given a list of names of variables at each step, this
+function will run a series of models, adding the terms for each block
+incrementally to "build up" to a final model including all the terms.
 }
 \details{
-Given a list of names of variables at each step, this function will run a
-series of models, adding the terms for each block incrementally.
-
-Note: Cases with missing data are dropped based on the final model that
-includes all the relevant terms. This ensures that all the models are tested
-on the same number of cases.
+\strong{Note:} Cases with missing data are dropped based on the \emph{final}
+model that includes all the relevant terms. This ensures that all the models
+are tested on the same number of cases.
 }
 \examples{
 # 2 blocks: Petal.Length; Petal.Length + Petal.Width

@@ -1,8 +1,8 @@
 #' Regions of significance for an interaction.
 #' 
 #' \code{sig_regions} calculates the Johnson-Neyman (J-N) regions of
-#' significance for an interaction, the points at which the simple effect of the
-#' categorical predictor changes from non-significant to significant.
+#' significance for an interaction -- the points at which the simple effect of
+#' the categorical predictor changes from non-significant to significant.
 #' 
 #' This function takes a linear or generalized linear model with one two-way
 #' interaction, where one of the predictors in the interaction is categorical

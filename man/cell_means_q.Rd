@@ -37,7 +37,7 @@ of the response variable. For more information, see
 A data frame with a row for each predicted value. The first few
   columns identify the level at which each variable in your model was set.
   After columns for each variable, the data frame has columns for the
-  predicted value, the standard error of the predicted mean, and the 95%
+  predicted value, the standard error of the predicted mean, and the 95\%
   confidence interval.
 }
 \description{

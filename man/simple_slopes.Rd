@@ -37,10 +37,12 @@ the simple effects for that variable.}
 \value{
 A data frame with a row for each simple effect. The first few columns
   identify the level at which each variable in your model was set for that
-  test. A 'sstest' value in a particular column indicates that this was the
-  variable being tested. After columns for each variable, the data frame has
-  columns for the slope of the test variable, the standard error, t-value,
-  p-value, and degrees of freedom for the model.
+  test. A 'sstest' value in a particular column indicates that the simple
+  slope for this variable was being tested. After columns for each variable,
+  the data frame has columns for the slope of the test variable, the standard
+  error, t-value, p-value, and degrees of freedom for the model. For `merMod`
+  models, the degrees of freedom and p-values will not appear, as these are
+  not calculated by the lme4 package.
 }
 \description{
 \code{simple_slopes} calculates all the simple effects of an interaction
@@ -54,9 +56,9 @@ interactions in the highest order, it will test the first one in the model.
 If you wish to test simple effects for a different interaction, simply switch
 the order in the formula.
 
-By default, this function will provide slopes at -1SD, the mean, and +1SD for
-continuous variables, and at each level of categorical variables. This can be
-overridden with the \code{levels} parameter.
+By default, this function will provide slopes at -1 SD, the mean, and +1 SD
+for continuous variables, and at each level of categorical variables. This
+can be overridden with the \code{levels} parameter.
 
 If a categorical variable with more than two levels is being tested, you may
 see multiple rows for that test. One row will be shown for each contrast for

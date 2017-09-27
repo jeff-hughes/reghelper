@@ -32,8 +32,8 @@ A named vector with a 'lower' and an 'upper' J-N point. If one or
 }
 \description{
 \code{sig_regions} calculates the Johnson-Neyman (J-N) regions of
-significance for an interaction, the points at which the simple effect of the
-categorical predictor changes from non-significant to significant.
+significance for an interaction -- the points at which the simple effect of
+the categorical predictor changes from non-significant to significant.
 }
 \details{
 This function takes a linear or generalized linear model with one two-way

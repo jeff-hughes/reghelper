@@ -53,7 +53,7 @@ for the graph.}
 \item{split}{The variable to be split among separate graphs (optional).}
 
 \item{errorbars}{A string indicating what kind of error bars to show.
-Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
+Acceptable values are "CI" (95\% confidence intervals), "SE" (+/-1 standard
 error of the predicted means), or "none".}
 
 \item{ymin}{Number indicating the minimum value for the y-axis scale. Default
@@ -66,7 +66,7 @@ NULL value will adjust position to the highest y value.}
 will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
 label, 'lines' sets the legend label, and 'split' sets the label for the 
 facet. If any label is not set, the names of the variables will be used.
-Setting a label explicitly to NA will set an empty label.}
+Setting a label explicitly to NA will set a label with an empty string.}
 
 \item{bargraph}{Logical. TRUE will draw a bar graph of the results; FALSE
 will draw a line graph of the results.}

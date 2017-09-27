@@ -10,9 +10,7 @@
 #' @param model A fitted linear model of type 'lme' (nlme) or 'merMod' (lme4;
 #'   linear, generalized, or nonlinear).
 #' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return The form of the value returned by \code{ICC} depends on the class of
-#'   its argument. See the documentation of the particular methods for details
-#'   of what is produced by that method.
+#' @return The intra-class correlation of the model.
 #' @examples
 #' # iris data, showing use with lme()
 #' if (require(nlme, quietly=TRUE)) {

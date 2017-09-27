@@ -19,9 +19,7 @@ linear, generalized, or nonlinear).}
 \item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
 }
 \value{
-The form of the value returned by \code{ICC} depends on the class of
-  its argument. See the documentation of the particular methods for details
-  of what is produced by that method.
+The intra-class correlation of the model.
 }
 \description{
 \code{ICC} calculates the intra-class correlation (ICC) from a fitted
