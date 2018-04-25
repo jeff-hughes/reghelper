@@ -148,7 +148,12 @@ simple_slopes.lm <- function(model, levels=NULL, ...) {
         
         if (is.factor(test_var)) {
             contr <- original_contrasts[[test_var_name]]
-            dummy_names <- paste0(test_var_name, colnames(contr))
+            
+            if (!is.null(colnames(contr))) {
+                dummy_names <- paste0(test_var_name, colnames(contr))
+            } else {
+                dummy_names <- paste0(test_var_name, 1:ncol(contr))
+            }
             
             estimates <- as.data.frame(
                 summary(new_model)$coefficients[dummy_names, , drop=FALSE])
