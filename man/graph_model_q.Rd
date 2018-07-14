@@ -2,9 +2,9 @@
 % Please edit documentation in R/graph_model.R
 \name{graph_model_q}
 \alias{graph_model_q}
+\alias{graph_model_q.lm}
 \alias{graph_model_q.aov}
 \alias{graph_model_q.glm}
-\alias{graph_model_q.lm}
 \alias{graph_model_q.lme}
 \alias{graph_model_q.merMod}
 \title{Graph interactions for fitted models.}
@@ -120,6 +120,7 @@ evaluation is easier.
 
 \item \code{merMod}: Graphing hierarchical linear models (lme4).
 }}
+
 \examples{
 # iris data
 model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
@@ -140,4 +141,3 @@ if (require(lme4, quietly=TRUE)) {
 \seealso{
 \code{\link{graph_model}}
 }
-

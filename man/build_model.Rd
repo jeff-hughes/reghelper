@@ -54,4 +54,3 @@ model2 <- build_model(Sepal.Length, Species, c(Petal.Length * Petal.Width), data
 summary(model2)
 coef(model2)
 }
-

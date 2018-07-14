@@ -36,6 +36,7 @@ more information, see
 
 \item \code{merMod}: Intra-class correlation for lmer (lme4).
 }}
+
 \examples{
 # iris data, showing use with lme()
 if (require(nlme, quietly=TRUE)) {
@@ -49,4 +50,3 @@ if (require(lme4, quietly=TRUE)) {
     ICC(model)  # .49 of variance is between-subjects
 }
 }
-

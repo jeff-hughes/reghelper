@@ -2,9 +2,9 @@
 % Please edit documentation in R/beta.R
 \name{beta}
 \alias{beta}
+\alias{beta.lm}
 \alias{beta.aov}
 \alias{beta.glm}
-\alias{beta.lm}
 \alias{beta.lme}
 \alias{beta.merMod}
 \title{Standardized coefficients of a model.}
@@ -64,6 +64,7 @@ interaction term itself).
 
 \item \code{merMod}: Standardized coefficients for a hierarchical linear model (lme4).
 }}
+
 \examples{
 # iris data, showing use with lm()
 model1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
@@ -92,4 +93,3 @@ if (require(lme4, quietly=TRUE)) {
     beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
 }
 }
-

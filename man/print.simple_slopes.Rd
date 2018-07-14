@@ -24,4 +24,3 @@ for each coefficient.}
 \seealso{
 \code{\link{simple_slopes}}
 }
-

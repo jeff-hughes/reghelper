@@ -2,9 +2,9 @@
 % Please edit documentation in R/cell_means.R
 \name{cell_means}
 \alias{cell_means}
+\alias{cell_means.lm}
 \alias{cell_means.aov}
 \alias{cell_means.glm}
-\alias{cell_means.lm}
 \title{Estimated values of a linear model.}
 \usage{
 cell_means(model, ...)
@@ -60,10 +60,10 @@ all its levels.
 
 \item \code{glm}: Estimated values for a generalized linear model.
 }}
+
 \examples{
 # iris data
 model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
 summary(model)
 cell_means(model, Petal.Length)
 }
-

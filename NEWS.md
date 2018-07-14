@@ -1,4 +1,13 @@
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
+reghelper 0.3.4
+===============
+
+This is a patch release to cover changes made to the ggplot2 package.
+
+BUG FIXES
+
+-   Fixed simple\_slopes() to cover cases of contrasts that have no column names.
+
 reghelper 0.3.3
 ===============
 

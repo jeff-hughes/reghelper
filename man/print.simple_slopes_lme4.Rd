@@ -21,4 +21,3 @@ of a call to \code{\link{simple_slopes}}.}
 \seealso{
 \code{\link{simple_slopes}}
 }
-

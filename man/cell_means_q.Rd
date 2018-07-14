@@ -2,9 +2,9 @@
 % Please edit documentation in R/cell_means.R
 \name{cell_means_q}
 \alias{cell_means_q}
+\alias{cell_means_q.lm}
 \alias{cell_means_q.aov}
 \alias{cell_means_q.glm}
-\alias{cell_means_q.lm}
 \title{Estimated values of a linear model.}
 \usage{
 cell_means_q(model, ...)
@@ -67,6 +67,7 @@ is easier.
 
 \item \code{glm}: Estimated values for a generalized linear model.
 }}
+
 \examples{
 # iris data
 model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
@@ -76,4 +77,3 @@ cell_means_q(model, 'Petal.Length')
 \seealso{
 \code{\link{cell_means}}
 }
-

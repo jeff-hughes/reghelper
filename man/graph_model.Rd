@@ -2,9 +2,9 @@
 % Please edit documentation in R/graph_model.R
 \name{graph_model}
 \alias{graph_model}
+\alias{graph_model.lm}
 \alias{graph_model.aov}
 \alias{graph_model.glm}
-\alias{graph_model.lm}
 \alias{graph_model.lme}
 \alias{graph_model.merMod}
 \title{Graph interactions for fitted models.}
@@ -115,6 +115,7 @@ averaged across all its levels.
 
 \item \code{merMod}: Graphing hierarchical linear models (lme4).
 }}
+
 \examples{
 # iris data
 model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
@@ -132,4 +133,3 @@ if (require(lme4, quietly=TRUE)) {
     graph_model_q(model, y='total.fruits', x='nutrient', lines='amd')
 }
 }
-

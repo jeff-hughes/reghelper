@@ -2,9 +2,9 @@
 % Please edit documentation in R/simple_slopes.R
 \name{simple_slopes}
 \alias{simple_slopes}
+\alias{simple_slopes.lm}
 \alias{simple_slopes.aov}
 \alias{simple_slopes.glm}
-\alias{simple_slopes.lm}
 \alias{simple_slopes.lme}
 \alias{simple_slopes.merMod}
 \title{Simple slopes of an interaction.}
@@ -76,6 +76,7 @@ that variable; the order is in the same order shown in \code{contrasts()}.
 
 \item \code{merMod}: Simple slopes for hierarchical linear models (lme4).
 }}
+
 \examples{
 # linear model
 mtcars$am <- factor(mtcars$am)  # make 'am' categorical
@@ -112,4 +113,3 @@ if (require(lme4, quietly=TRUE)) {
         Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
 }
 }
-

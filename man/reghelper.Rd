@@ -27,4 +27,3 @@ The following methods are currently implemented:
   significance for an interaction.\cr
 }
 }
-

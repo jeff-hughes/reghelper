@@ -2,8 +2,8 @@
 % Please edit documentation in R/sig_regions.R
 \name{sig_regions}
 \alias{sig_regions}
-\alias{sig_regions.glm}
 \alias{sig_regions.lm}
+\alias{sig_regions.glm}
 \title{Regions of significance for an interaction.}
 \usage{
 sig_regions(model, ...)
@@ -51,6 +51,7 @@ McClelland (2012)}.
 
 \item \code{glm}: Johnson-Neyman points for generalized linear models.
 }}
+
 \examples{
 # mtcars data
 mtcars$am <- factor(mtcars$am)  # make 'am' categorical
@@ -61,4 +62,3 @@ sig_regions(model)
 \seealso{
 \code{\link{simple_slopes}}
 }
-

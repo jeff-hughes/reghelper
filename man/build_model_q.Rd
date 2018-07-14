@@ -62,4 +62,3 @@ coef(model2)
 \seealso{
 \code{\link{build_model}}
 }
-
