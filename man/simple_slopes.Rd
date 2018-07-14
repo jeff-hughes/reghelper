@@ -2,38 +2,114 @@
 % Please edit documentation in R/simple_slopes.R
 \name{simple_slopes}
 \alias{simple_slopes}
-\title{Simple slopes of interaction.}
+\alias{simple_slopes.lm}
+\alias{simple_slopes.aov}
+\alias{simple_slopes.glm}
+\alias{simple_slopes.lme}
+\alias{simple_slopes.merMod}
+\title{Simple slopes of an interaction.}
 \usage{
 simple_slopes(model, ...)
+
+\method{simple_slopes}{lm}(model, levels = NULL, ...)
+
+\method{simple_slopes}{aov}(model, levels = NULL, ...)
+
+\method{simple_slopes}{glm}(model, levels = NULL, ...)
+
+\method{simple_slopes}{lme}(model, levels = NULL, ...)
+
+\method{simple_slopes}{merMod}(model, levels = NULL, ...)
 }
 \arguments{
 \item{model}{A fitted linear model of type 'lm', 'glm', 'aov', 'lme' (nlme),
-or 'merMod' (lme4).}
+or 'merMod' (lme4), with at least one interaction term.}
 
-\item{...}{Additional arguments to be passed to the particular method for the
-given model.}
+\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
+
+\item{levels}{A list with element names corresponding to some or all of the
+variables in the model. Each list element should be a vector with the names
+of factor levels (for categorical variables) or numeric values (for
+continuous variables) at which to test that variable. \strong{Note:} If you
+do not include 'sstest' as one of these levels, the function will not test
+the simple effects for that variable.}
 }
 \value{
-The form of the value returned by \code{simple_slopes} depends on the
-  class of its argument. See the documentation of the particular methods for
-  details of what is produced by that method.
+A data frame with a row for each simple effect. The first few columns
+  identify the level at which each variable in your model was set for that
+  test. A 'sstest' value in a particular column indicates that the simple
+  slope for this variable was being tested. After columns for each variable,
+  the data frame has columns for the slope of the test variable, the standard
+  error, t-value, p-value, and degrees of freedom for the model. For `merMod`
+  models, the degrees of freedom and p-values will not appear, as these are
+  not calculated by the lme4 package.
 }
 \description{
-\code{simple_slopes} is a generic function for calculating the simple effects
-of an interaction in a regression model.
+\code{simple_slopes} calculates all the simple effects of an interaction
+in a fitted model (linear, generalized linear, hierarchical linear, or ANOVA).
 }
+\details{
+If the model includes interactions at different levels (e.g., three two-way
+interactions and one three-way interaction), the function will test the
+simple effects of the highest-order interaction. If there are multiple
+interactions in the highest order, it will test the first one in the model.
+If you wish to test simple effects for a different interaction, simply switch
+the order in the formula.
+
+By default, this function will provide slopes at -1 SD, the mean, and +1 SD
+for continuous variables, and at each level of categorical variables. This
+can be overridden with the \code{levels} parameter.
+
+If a categorical variable with more than two levels is being tested, you may
+see multiple rows for that test. One row will be shown for each contrast for
+that variable; the order is in the same order shown in \code{contrasts()}.
+}
+\section{Methods (by class)}{
+\itemize{
+\item \code{lm}: Simple slopes for linear models.
+
+\item \code{aov}: Simple slopes for ANOVA.
+
+\item \code{glm}: Simple slopes for generalized linear models.
+
+\item \code{lme}: Simple slopes for hierarchical linear models (nlme).
+
+\item \code{merMod}: Simple slopes for hierarchical linear models (lme4).
+}}
+
 \examples{
-# mtcars data
+# linear model
 mtcars$am <- factor(mtcars$am)  # make 'am' categorical
 model <- lm(mpg ~ wt * am, data=mtcars)
 summary(model)  # significant interaction
 simple_slopes(model)
 simple_slopes(model,
     levels=list(wt=c(2, 3, 4, 'sstest'), am=c(0, 1, 'sstest')))  # test at specific levels
-}
-\seealso{
-\code{\link{simple_slopes.lm}}, \code{\link{simple_slopes.glm}},
-  \code{\link{simple_slopes.aov}}, \code{\link{simple_slopes.lme}},
-  \code{\link{simple_slopes.merMod}}
+
+# generalized linear model
+model <- glm(vs ~ gear * wt, data=mtcars, family='binomial')
+summary(model)  # marginal interaction
+simple_slopes(model)
+simple_slopes(model,
+    levels=list(gear=c(2, 3, 4, 'sstest'), wt=c(2, 3, 'sstest')))  # test at specific levels
+
+# hierarchical linear model (nlme)
+if (require(nlme, quietly=TRUE)) {
+    model <- lme(Sepal.Width ~ Sepal.Length * Petal.Length, random=~1|Species, data=iris)
+    summary(model)  # significant interaction
+    simple_slopes(model)
+    simple_slopes(model,
+        levels=list(Sepal.Length=c(4, 5, 6, 'sstest'),
+        Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
 }
 
+# hierarchical linear model (lme4)
+if (require(lme4, quietly=TRUE)) {
+    model <- lmer(Sepal.Width ~ Sepal.Length * Petal.Length + (1|Species), data=iris)
+    summary(model)
+    simple_slopes(model)
+    simple_slopes(model,
+        levels=list(Sepal.Length=c(4, 5, 6, 'sstest'),
+        Petal.Length=c(2, 3, 'sstest')))  # test at specific levels
+}
+}

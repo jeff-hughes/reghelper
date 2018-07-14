@@ -17,9 +17,9 @@ test_that('lm with 2 continuous int. works', {
     expect_is(graph, 'ggplot')
     expect_equal(length(graph$layers), 3)  # geom_point, geom_line, geom_errorbar
     
-    expect_equal(as.character(graph$mapping$x), 'x1')
-    expect_equal(as.character(graph$mapping$y), 'y')
-    expect_equal(as.character(graph$mapping$colour), 'x2')
+    expect_equal(ggplot2::quo_name(graph$mapping$x), 'x1')
+    expect_equal(ggplot2::quo_name(graph$mapping$y), 'y')
+    expect_equal(ggplot2::quo_name(graph$mapping$colour), 'x2')
     
     expect_equal(levels(graph$data$x1), c('-1 SD', '+1 SD'))
     expect_equal(levels(graph$data$x2), c('-1 SD', '+1 SD'))
@@ -43,9 +43,9 @@ test_that('lm with continuous x 2-level categorical int. works', {
     expect_is(graph, 'ggplot')
     expect_equal(length(graph$layers), 3)  # geom_point, geom_line, geom_errorbar
     
-    expect_equal(as.character(graph$mapping$x), 'x1')
-    expect_equal(as.character(graph$mapping$y), 'y')
-    expect_equal(as.character(graph$mapping$colour), 'x2')
+    expect_equal(ggplot2::quo_name(graph$mapping$x), 'x1')
+    expect_equal(ggplot2::quo_name(graph$mapping$y), 'y')
+    expect_equal(ggplot2::quo_name(graph$mapping$colour), 'x2')
     
     expect_equal(levels(graph$data$x1), c('-1 SD', '+1 SD'))
     expect_equal(levels(graph$data$x2), c('0', '1'))
@@ -69,9 +69,9 @@ test_that('lm with continuous x 3-level categorical int. works', {
     expect_is(graph, 'ggplot')
     expect_equal(length(graph$layers), 3)  # geom_point, geom_line, geom_errorbar
     
-    expect_equal(as.character(graph$mapping$x), 'x1')
-    expect_equal(as.character(graph$mapping$y), 'y')
-    expect_equal(as.character(graph$mapping$colour), 'x2')
+    expect_equal(ggplot2::quo_name(graph$mapping$x), 'x1')
+    expect_equal(ggplot2::quo_name(graph$mapping$y), 'y')
+    expect_equal(ggplot2::quo_name(graph$mapping$colour), 'x2')
     
     expect_equal(levels(graph$data$x1), c('-1 SD', '+1 SD'))
     expect_equal(levels(graph$data$x2), c('0', '1', '2'))
@@ -97,9 +97,9 @@ test_that('lm with 3 continuous int. works', {
     expect_is(graph, 'ggplot')
     expect_equal(length(graph$layers), 3)  # geom_point, geom_line, geom_errorbar
     
-    expect_equal(as.character(graph$mapping$x), 'x1')
-    expect_equal(as.character(graph$mapping$y), 'y')
-    expect_equal(as.character(graph$mapping$colour), 'x2')
+    expect_equal(ggplot2::quo_name(graph$mapping$x), 'x1')
+    expect_equal(ggplot2::quo_name(graph$mapping$y), 'y')
+    expect_equal(ggplot2::quo_name(graph$mapping$colour), 'x2')
     expect_equal(names(graph$facet$params$cols), 'x3')
     
     expect_equal(levels(graph$data$x1), c('-1 SD', '+1 SD'))
@@ -128,9 +128,9 @@ test_that('binomial glm works', {
     expect_is(graph, 'ggplot')
     expect_equal(length(graph$layers), 3)  # geom_point, geom_line, geom_errorbar
     
-    expect_equal(as.character(graph$mapping$x), 'x1')
-    expect_equal(as.character(graph$mapping$y), 'y')
-    expect_equal(as.character(graph$mapping$colour), 'x2')
+    expect_equal(ggplot2::quo_name(graph$mapping$x), 'x1')
+    expect_equal(ggplot2::quo_name(graph$mapping$y), 'y')
+    expect_equal(ggplot2::quo_name(graph$mapping$colour), 'x2')
     
     expect_equal(levels(graph$data$x1), c('-1 SD', '+1 SD'))
     expect_equal(levels(graph$data$x2), c('-1 SD', '+1 SD'))
@@ -155,9 +155,9 @@ test_that('aov with 2-way interaction works', {
     expect_is(graph, 'ggplot')
     expect_equal(length(graph$layers), 2)  # geom_bar, geom_errorbar
     
-    expect_equal(as.character(graph$mapping$x), 'x1')
-    expect_equal(as.character(graph$mapping$y), 'y')
-    expect_equal(as.character(graph$mapping$fill), 'x2')
+    expect_equal(ggplot2::quo_name(graph$mapping$x), 'x1')
+    expect_equal(ggplot2::quo_name(graph$mapping$y), 'y')
+    expect_equal(ggplot2::quo_name(graph$mapping$fill), 'x2')
     
     expect_equal(levels(graph$data$x1), c('0', '1'))
     expect_equal(levels(graph$data$x2), c('0', '1'))

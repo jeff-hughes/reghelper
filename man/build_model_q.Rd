@@ -12,7 +12,7 @@ build_model_q(dv, blocks = NULL, data = NULL, opts = NULL, model = "lm")
 \item{blocks}{List of variable names (or interaction terms) to add for each
 block. Each list element should be a single string with terms for that
 block. Variables from previous blocks will be included with each subsequent
-block.}
+block, so they do not need to be repeated.}
 
 \item{data}{An optional data frame containing the variables in the model. If
 not found in \code{data}, the variables are taken from the environment from
@@ -20,7 +20,7 @@ which the function is called.}
 
 \item{opts}{List of arguments to be passed to the model function.}
 
-\item{model}{The type of model to use; only supports 'lm' at this time.}
+\item{model}{The type of model to use; supports 'lm', 'aov', and 'glm'.}
 }
 \value{
 A named list with the following elements:
@@ -32,18 +32,19 @@ A named list with the following elements:
 }
 \description{
 \code{build_model_q} allows you to incrementally add terms to a linear
-regression model.
+regression model. Given a list of names of variables at each step, this
+function will run a series of models, adding the terms for each block
+incrementally to "build up" to a final model including all the terms.
 }
 \details{
-Given a list of names of variables at each step, this function will run a
-series of models, adding the terms for each block incrementally. Note that in
-most cases it is easier to use \code{\link{build_model}} and pass variable names
-in directly instead of strings of variable names. \code{build_model_q} uses
-standard evaluation in cases where such evaluation is easier.
+Note that in most cases it is easier to use \code{\link{build_model}} and
+pass variable names in directly instead of strings of variable names.
+\code{build_model_q} uses standard evaluation in cases where such evaluation
+is easier.
 
-Note: Cases with missing data are dropped based on the final model that
-includes all the relevant terms. This ensures that all the models are tested
-on the same number of cases.
+\strong{Note:} Cases with missing data are dropped based on the \emph{final}
+model that includes all the relevant terms. This ensures that all the models
+are tested on the same number of cases.
 }
 \examples{
 # 2 blocks: Petal.Length; Petal.Length + Petal.Width
@@ -61,4 +62,3 @@ coef(model2)
 \seealso{
 \code{\link{build_model}}
 }
-

@@ -2,32 +2,68 @@
 % Please edit documentation in R/cell_means.R
 \name{cell_means}
 \alias{cell_means}
-\title{Estimated means.}
+\alias{cell_means.lm}
+\alias{cell_means.aov}
+\alias{cell_means.glm}
+\title{Estimated values of a linear model.}
 \usage{
 cell_means(model, ...)
+
+\method{cell_means}{lm}(model, ..., levels = NULL)
+
+\method{cell_means}{aov}(model, ..., levels = NULL)
+
+\method{cell_means}{glm}(model, ..., levels = NULL, type = c("link",
+  "response"))
 }
 \arguments{
-\item{model}{A fitted linear model of type 'lm' or 'aov'.}
+\item{model}{A fitted linear model of type 'lm', 'aov', or 'glm'.}
 
-\item{...}{Additional arguments to be passed to the particular method for the
-given model.}
+\item{...}{Pass through variable names to add them to the table.}
+
+\item{levels}{A list with element names corresponding to some or all of the
+variables in the model. Each list element should be a vector with the names
+of factor levels (for categorical variables) or numeric points (for
+continuous variables) at which to test that variable.}
+
+\item{type}{The type of prediction required. The default 'link' is on the
+scale of the linear predictors; the alternative 'response' is on the scale
+of the response variable. For more information, see
+\code{\link{predict.glm}}.}
 }
 \value{
-The form of the value returned by \code{cell_means} depends on the
-  class of its argument. See the documentation of the particular methods for
-  details of what is produced by that method.
+A data frame with a row for each predicted value. The first few
+  columns identify the level at which each variable in your model was set.
+  After columns for each variable, the data frame has columns for the
+  predicted value, the standard error of the predicted mean, and the 95\%
+  confidence interval.
 }
 \description{
-\code{cell_means} is a generic function for calculating the estimated means
-of a linear model.
+\code{cell_means} calculates the predicted values at specific points, given
+a fitted regression model (linear, generalized, or ANOVA).
 }
+\details{
+By default, this function will provide means at -1 SD, the mean, and +1 SD
+for continuous variables, and at each level of categorical variables. This
+can be overridden with the \code{levels} parameter.
+
+If there are additional covariates in the model other than what are selected
+in the function call, these variables will be set to their respective means.
+In the case of a categorical covariate, the results will be averaged across
+all its levels.
+}
+\section{Methods (by class)}{
+\itemize{
+\item \code{lm}: Estimated values for a linear model.
+
+\item \code{aov}: Estimated means for ANOVA.
+
+\item \code{glm}: Estimated values for a generalized linear model.
+}}
+
 \examples{
 # iris data
 model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
 summary(model)
 cell_means(model, Petal.Length)
 }
-\seealso{
-\code{\link{cell_means.lm}}, \code{\link{cell_means.aov}}
-}
-

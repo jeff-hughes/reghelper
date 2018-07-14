@@ -2,35 +2,94 @@
 % Please edit documentation in R/beta.R
 \name{beta}
 \alias{beta}
-\title{Standardized coeffients of a model.}
+\alias{beta.lm}
+\alias{beta.aov}
+\alias{beta.glm}
+\alias{beta.lme}
+\alias{beta.merMod}
+\title{Standardized coefficients of a model.}
 \usage{
 beta(model, ...)
+
+\method{beta}{lm}(model, x = TRUE, y = TRUE, skip = NULL, ...)
+
+\method{beta}{aov}(model, x = TRUE, y = TRUE, skip = NULL, ...)
+
+\method{beta}{glm}(model, x = TRUE, y = FALSE, skip = NULL, ...)
+
+\method{beta}{lme}(model, x = TRUE, y = TRUE, skip = NULL, ...)
+
+\method{beta}{merMod}(model, x = TRUE, y = TRUE, skip = NULL, ...)
 }
 \arguments{
-\item{model}{A fitted linear model of type 'lm', 'glm' or 'aov'.}
+\item{model}{A fitted linear model of type 'lm', 'glm', 'aov', 'lme', or
+'merMod'.}
 
-\item{...}{Additional arguments to be passed to the particular method for the
-given model.}
+\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
+
+\item{x}{Logical. Whether or not to standardize predictor variables.}
+
+\item{y}{Logical. Whether or not to standardize criterion variables.}
+
+\item{skip}{A string vector indicating any variables you do \emph{not} wish
+to be standardized.}
 }
 \value{
-The form of the value returned by \code{beta} depends on the class of
-  its argument. See the documentation of the particular methods for details
-  of what is produced by that method.
+Returns the summary of a regression model, with the output showing 
+  the standardized coefficients, standard error, t-values, and p-values for
+  each predictor. The exact form of the values returned depends on the class
+  of regression model used.
 }
 \description{
-\code{beta} is a generic function for producing standardized coefficients
-from regression models.
+\code{beta} returns the summary of a linear model where all variables have
+been standardized. It takes a regression model and standardizes the variables,
+in order to produce standardized (i.e., beta) coefficients rather than
+unstandardized (i.e., B) coefficients.
 }
+\details{
+Unlike similar functions, this function properly calculates standardized
+estimates for interaction terms (by first standardizing each of the predictor
+variables separately, rather than using the standard deviation of the
+interaction term itself).
+}
+\section{Methods (by class)}{
+\itemize{
+\item \code{lm}: Standardized coefficients for a linear model.
+
+\item \code{aov}: Standardized coefficients for ANOVA.
+
+\item \code{glm}: Standardized coefficients for a generalized linear model.
+
+\item \code{lme}: Standardized coefficients for a hierarchical linear model (nlme).
+
+\item \code{merMod}: Standardized coefficients for a hierarchical linear model (lme4).
+}}
+
 \examples{
-# iris data
+# iris data, showing use with lm()
 model1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
 beta(model1)  # all three variables standardized
 
 model2 <- lm(Sepal.Width ~ Petal.Width + Species, iris)
 beta(model2, skip='Species')  # all variables except Species standardized
-}
-\seealso{
-\code{\link{beta.lm}}, \code{\link{beta.glm}},
-  \code{\link{beta.aov}}
+
+# mtcars data, showing use with glm()
+model1 <- glm(vs ~ wt + hp, data=mtcars, family='binomial')
+beta(model1)  # wt and hp standardized, vs is not by default
+
+# iris data, showing use with lme()
+if (require(nlme, quietly=TRUE)) {
+    model <- lme(Sepal.Width ~ Sepal.Length + Petal.Length, random=~1|Species, data=iris)
+    beta(model)  # all three variables standardized
+
+    beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
 }
 
+# iris data, showing use with lmer()
+if (require(lme4, quietly=TRUE)) {
+    model <- lmer(Sepal.Width ~ Sepal.Length + Petal.Length + (1|Species), data=iris)
+    beta(model)  # all variables standardized
+
+    beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
+}
+}

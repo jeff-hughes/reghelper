@@ -1,4 +1,4 @@
-context('Beta function')
+context('beta function')
 
 library(nlme)
 library(lme4)

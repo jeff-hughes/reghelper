@@ -1,7 +1,7 @@
 Package: reghelper
 Type: Package
 Title: Helper Functions for Regression Analysis
-Version: 0.3.3
+Version: 0.3.4
 Date: 2017-04-07
 Authors@R: person("Jeffrey", "Hughes", email="jeff.hughes@gmail.com",
     role=c("aut", "cre"))
@@ -22,4 +22,4 @@ Imports:
     utils
 Suggests: 
     testthat (>= 0.8.1)
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

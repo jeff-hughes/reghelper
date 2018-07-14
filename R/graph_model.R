@@ -1,58 +1,17 @@
-#' Graph fitted model interactions.
+#' Graph interactions for fitted models.
 #' 
 #' \code{graph_model} provides an easy way to graph interactions in fitted
-#' models. Selected variables will be graphed at +/- 1 SD (if continuous) or at
-#' each level of the factor (if categorical).
-#' 
-#' @param model A fitted linear model of type 'lm', 'glm', 'lme', or 'merMod'.
-#' @param ... Additional arguments to be passed to the particular method for the
-#'   given model.
-#' @return A ggplot2 graph of the plotted variables in the model.
-#' @seealso \code{\link{graph_model.lm}}, \code{\link{graph_model.glm}}
-#' @examples
-#' # iris data
-#' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
-#' graph_model(model, y=Sepal.Width, x=Sepal.Length, lines=Species)
-#' @export
-graph_model <- function(model, ...) UseMethod('graph_model')
-
-
-#' Graph fitted model interactions.
-#' 
-#' \code{graph_model_q} provides an easy way to graph interactions in fitted
-#' models. Selected variables will be graphed at +/- 1 SD (if continuous) or at
-#' each level of the factor (if categorical).
-#' 
-#' Note that in most cases it is easier to use \code{\link{graph_model}} and
-#' pass variable names in directly instead of strings of variable names.
-#' \code{graph_model_q} uses standard evaluation in cases where such
-#' evaluation is easier.
-#' 
-#' @param model A fitted linear model of type 'lm', 'glm', 'lme', or 'merMod'.
-#' @param ... Additional arguments to be passed to the particular method for the
-#'   given model.
-#' @return A ggplot2 graph of the plotted variables in the model.
-#' @seealso \code{\link{graph_model.lm}}, \code{\link{graph_model.glm}}
-#' @examples
-#' # iris data
-#' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
-#' graph_model_q(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
-#' @export
-graph_model_q <- function(model, ...) UseMethod('graph_model_q')
-
-
-#' Graph linear interactions.
-#' 
-#' \code{graph_model.lm} provides an easy way to graph interactions in linear
-#' models. Selected variables will be graphed at +/- 1 SD (if continuous) or at
-#' each level of the factor (if categorical).
+#' models (linear, generalized linear, hierarchical linear, or ANOVA). Selected
+#' variables will be graphed at +/- 1 SD (if continuous) or at each level of the
+#' factor (if categorical).
 #' 
 #' If there are additional covariates in the model other than what is indicated
 #' to be graphed by the function, these variables will be plotted at their
 #' respective means. In the case of a categorical covariate, the results will be
 #' averaged across all its levels.
 #' 
-#' @param model A fitted linear model of type 'lm'.
+#' @param model A fitted linear model of type 'lm', 'aov', 'glm', 'lme', or
+#'   'merMod'.
 #' @param y The variable to be plotted on the y-axis. This variable is required
 #'   for the graph.
 #' @param x The variable to be plotted on the x-axis. This variable is required
@@ -60,7 +19,7 @@ graph_model_q <- function(model, ...) UseMethod('graph_model_q')
 #' @param lines The variable to be plotted using separate lines (optional).
 #' @param split The variable to be split among separate graphs (optional).
 #' @param errorbars A string indicating what kind of error bars to show.
-#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
+#'   Acceptable values are "CI" (95\% confidence intervals), "SE" (+/-1 standard
 #'   error of the predicted means), or "none".
 #' @param ymin Number indicating the minimum value for the y-axis scale. Default
 #'   NULL value will adjust position to the lowest y value.
@@ -70,7 +29,7 @@ graph_model_q <- function(model, ...) UseMethod('graph_model_q')
 #'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
 #'   label, 'lines' sets the legend label, and 'split' sets the label for the 
 #'   facet. If any label is not set, the names of the variables will be used.
-#'   Setting a label explicitly to NA will set an empty label.
+#'   Setting a label explicitly to NA will set a label with an empty string.
 #' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
 #'   will draw a line graph of the results.
 #' @param draw.legend Logical. Whether or not to draw legend on the graph.
@@ -82,12 +41,108 @@ graph_model_q <- function(model, ...) UseMethod('graph_model_q')
 #'   used to transform the y-axis (i.e., e to the power of y). Useful for
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
+#' @param type The type of prediction required. The default 'link' is on the
+#'   scale of the linear predictors; the alternative 'response' is on the scale
+#'   of the response variable. For more information, see
+#'   \code{\link{predict.glm}}.
 #' @param ... Not currently implemented; used to ensure consistency with S3 generic.
 #' @return A ggplot2 graph of the plotted variables in the model.
 #' @examples
 #' # iris data
 #' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
+#' graph_model_q(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
+#' 
+#' # Orthodont data
+#' if (require(nlme, quietly=TRUE)) {
+#'     model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
+#'     graph_model_q(model, y='distance', x='age', lines='Sex')
+#' }
+#' 
+#' # Arabidopsis data
+#' if (require(lme4, quietly=TRUE)) {
+#'     model <- lmer(total.fruits ~ nutrient * amd + rack + (1|gen), data=Arabidopsis)
+#'     graph_model_q(model, y='total.fruits', x='nutrient', lines='amd')
+#' }
+#' @export
+graph_model <- function(model, ...) UseMethod('graph_model')
+
+
+#' Graph interactions for fitted models.
+#' 
+#' \code{graph_model} provides an easy way to graph interactions in fitted
+#' models (linear, generalized linear, hierarchical linear, or ANOVA). Selected
+#' variables will be graphed at +/- 1 SD (if continuous) or at each level of the
+#' factor (if categorical).
+#' 
+#' If there are additional covariates in the model other than what is indicated
+#' to be graphed by the function, these variables will be plotted at their
+#' respective means. In the case of a categorical covariate, the results will be
+#' averaged across all its levels.
+#' 
+#' Note that in most cases it is easier to use \code{\link{graph_model}} and
+#' pass variable names in directly instead of strings of variable names.
+#' \code{graph_model_q} uses standard evaluation in cases where such
+#' evaluation is easier.
+#' 
+#' @param model A fitted linear model of type 'lm', 'aov', 'glm', 'lme', or
+#'   'merMod'.
+#' @param y The variable to be plotted on the y-axis. This variable is required
+#'   for the graph.
+#' @param x The variable to be plotted on the x-axis. This variable is required
+#'   for the graph.
+#' @param lines The variable to be plotted using separate lines (optional).
+#' @param split The variable to be split among separate graphs (optional).
+#' @param errorbars A string indicating what kind of error bars to show.
+#'   Acceptable values are "CI" (95\% confidence intervals), "SE" (+/-1 standard
+#'   error of the predicted means), or "none".
+#' @param ymin Number indicating the minimum value for the y-axis scale. Default
+#'   NULL value will adjust position to the lowest y value.
+#' @param ymax Number indicating the maximum value for the y-axis scale. Default
+#'   NULL value will adjust position to the highest y value.
+#' @param labels A named list with strings for the various plot labels: 'title'
+#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
+#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
+#'   facet. If any label is not set, the names of the variables will be used.
+#'   Setting a label explicitly to NA will set a label with an empty string.
+#' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
+#'   will draw a line graph of the results.
+#' @param draw.legend Logical. Whether or not to draw legend on the graph.
+#' @param dodge A numeric value indicating the amount each point on the graph
+#'   should be shifted left or right, which can help for readability when points
+#'   are close together. Default value is 0, with .1 or .2 probably sufficient
+#'   in most cases.
+#' @param exp Logical. If TRUE, the exponential function \code{exp()} will be
+#'   used to transform the y-axis (i.e., e to the power of y). Useful for
+#'   logistic regressions or for converting log-transformed y-values to their
+#'   original units.
+#' @param type The type of prediction required. The default 'link' is on the
+#'   scale of the linear predictors; the alternative 'response' is on the scale
+#'   of the response variable. For more information, see
+#'   \code{\link{predict.glm}}.
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
+#' @return A ggplot2 graph of the plotted variables in the model.
+#' @seealso \code{\link{graph_model}}
+#' @examples
+#' # iris data
+#' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
 #' graph_model(model, y=Sepal.Width, x=Sepal.Length, lines=Species)
+#' 
+#' # Orthodont data
+#' if (require(nlme, quietly=TRUE)) {
+#'     model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
+#'     graph_model(model, y=distance, x=age, lines=Sex)
+#' }
+#' 
+#' # Arabidopsis data
+#' if (require(lme4, quietly=TRUE)) {
+#'     model <- lmer(total.fruits ~ nutrient * amd + rack + (1|gen), data=Arabidopsis)
+#'     graph_model(model, y=total.fruits, x=nutrient, lines=amd)
+#' }
+#' @export
+graph_model_q <- function(model, ...) UseMethod('graph_model_q')
+
+
+#' @describeIn graph_model Graphing linear models.
 #' @export
 graph_model.lm <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
@@ -109,59 +164,7 @@ graph_model.lm <- function(model, y, x, lines=NULL, split=NULL,
 }
 
 
-#' Graph linear interactions.
-#' 
-#' \code{graph_model_q.lm} provides an easy way to graph interactions in linear
-#' models. Selected variables will be graphed at +/- 1 SD (if continuous) or at
-#' each level of the factor (if categorical).
-#' 
-#' If there are additional covariates in the model other than what is indicated
-#' to be graphed by the function, these variables will be plotted at their
-#' respective means. In the case of a categorical covariate, the results will be
-#' averaged across all its levels.
-#' 
-#' Note that in most cases it is easier to use \code{\link{graph_model.lm}} and
-#' pass variable names in directly instead of strings of variable names.
-#' \code{graph_model_q.lm} uses standard evaluation in cases where such
-#' evaluation is easier.
-#' 
-#' @param model A fitted linear model of type 'lm'.
-#' @param y The variable to be plotted on the y-axis. This variable is required
-#'   for the graph.
-#' @param x The variable to be plotted on the x-axis. This variable is required
-#'   for the graph.
-#' @param lines The variable to be plotted using separate lines (optional).
-#' @param split The variable to be split among separate graphs (optional).
-#' @param errorbars A string indicating what kind of error bars to show.
-#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
-#'   error of the predicted means), or "none".
-#' @param ymin Number indicating the minimum value for the y-axis scale. Default
-#'   NULL value will adjust position to the lowest y value.
-#' @param ymax Number indicating the maximum value for the y-axis scale. Default
-#'   NULL value will adjust position to the highest y value.
-#' @param labels A named list with strings for the various plot labels: 'title'
-#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
-#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
-#'   facet. If any label is not set, the names of the variables will be used.
-#'   Setting a label explicitly to NA will set an empty label.
-#' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
-#'   will draw a line graph of the results.
-#' @param draw.legend Logical. Whether or not to draw legend on the graph.
-#' @param dodge A numeric value indicating the amount each point on the graph
-#'   should be shifted left or right, which can help for readability when points
-#'   are close together. Default value is 0, with .1 or .2 probably sufficient
-#'   in most cases.
-#' @param exp Logical. If TRUE, the exponential function \code{exp()} will be
-#'   used to transform the y-axis (i.e., e to the power of y). Useful for
-#'   logistic regressions or for converting log-transformed y-values to their
-#'   original units.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return A ggplot object of the plotted variables in the model.
-#' @seealso \code{\link{graph_model.lm}}
-#' @examples
-#' # iris data
-#' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
-#' graph_model_q(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
+#' @describeIn graph_model_q Graphing linear models.
 #' @export
 graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
@@ -174,7 +177,7 @@ graph_model_q.lm <- function(model, y, x, lines=NULL, split=NULL,
 }
 
 
-#' @rdname graph_model.lm
+#' @describeIn graph_model Graphing ANOVA.
 #' @export
 graph_model.aov <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
@@ -196,7 +199,7 @@ graph_model.aov <- function(model, y, x, lines=NULL, split=NULL,
 }
 
 
-#' @rdname graph_model_q.lm
+#' @describeIn graph_model_q Graphing ANOVA.
 #' @export
 graph_model_q.aov <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
@@ -208,58 +211,7 @@ graph_model_q.aov <- function(model, y, x, lines=NULL, split=NULL,
 }
 
 
-#' Graph general linear interactions.
-#' 
-#' \code{graph_model.glm} provides an easy way to graph interactions in general
-#' linear models. Selected variables will be graphed at +/- 1 SD (if continuous)
-#' or at each level of the factor (if categorical).
-#' 
-#' If there are additional covariates in the model other than what is indicated
-#' to be graphed by the function, these variables will be plotted at their
-#' respective means. In the case of a categorical covariate, the results will be
-#' averaged across all its levels.
-#' 
-#' @param model A fitted linear model of type 'glm'.
-#' @param y The variable to be plotted on the y-axis. This variable is required
-#'   for the graph.
-#' @param x The variable to be plotted on the x-axis. This variable is required
-#'   for the graph.
-#' @param lines The variable to be plotted using separate lines (optional).
-#' @param split The variable to be split among separate graphs (optional).
-#' @param type The type of prediction required. The default 'link' is on the
-#'   scale of the linear predictors; the alternative 'response' is on the scale
-#'   of the response variable. For more information, see
-#'   \code{\link{predict.glm}}.
-#' @param errorbars A string indicating what kind of error bars to show.
-#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
-#'   error of the predicted means), or "none".
-#' @param ymin Number indicating the minimum value for the y-axis scale. Default
-#'   NULL value will adjust position to the lowest y value.
-#' @param ymax Number indicating the maximum value for the y-axis scale. Default
-#'   NULL value will adjust position to the highest y value.
-#' @param labels A named list with strings for the various plot labels: 'title'
-#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
-#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
-#'   facet. If any label is not set, the names of the variables will be used.
-#'   Setting a label explicitly to NA will set an empty label.
-#' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
-#'   will draw a line graph of the results.
-#' @param draw.legend Logical. Whether or not to draw legend on the graph.
-#' @param dodge A numeric value indicating the amount each point on the graph
-#'   should be shifted left or right, which can help for readability when points
-#'   are close together. Default value is 0, with .1 or .2 probably sufficient
-#'   in most cases.
-#' @param exp Logical. If TRUE, the exponential function \code{exp()} will be
-#'   used to transform the y-axis (i.e., e to the power of y). Useful for
-#'   logistic regressions or for converting log-transformed y-values to their
-#'   original units.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return A ggplot2 graph of the plotted variables in the model.
-#' @seealso \code{\link{graph_model.lm}}
-#' @examples
-#' # iris data
-#' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
-#' graph_model(model, y=Sepal.Width, x=Sepal.Length, lines=Species)
+#' @describeIn graph_model Graphing generalized linear models.
 #' @export
 graph_model.glm <- function(model, y, x, lines=NULL, split=NULL,
     type=c('link', 'response'), errorbars=c('CI', 'SE', 'none'), ymin=NULL,
@@ -282,63 +234,7 @@ graph_model.glm <- function(model, y, x, lines=NULL, split=NULL,
 }
 
 
-#' Graph general linear interactions.
-#' 
-#' \code{graph_model_q.glm} provides an easy way to graph interactions in
-#' general linear models. Selected variables will be graphed at +/- 1 SD (if
-#' continuous) or at each level of the factor (if categorical).
-#' 
-#' If there are additional covariates in the model other than what is indicated
-#' to be graphed by the function, these variables will be plotted at their
-#' respective means. In the case of a categorical covariate, the results will be
-#' averaged across all its levels.
-#' 
-#' Note that in most cases it is easier to use \code{\link{graph_model.glm}} and
-#' pass variable names in directly instead of strings of variable names.
-#' \code{graph_model_q.glm} uses standard evaluation in cases where such
-#' evaluation is easier.
-#' 
-#' @param model A fitted linear model of type 'glm'.
-#' @param y The variable to be plotted on the y-axis. This variable is required
-#'   for the graph.
-#' @param x The variable to be plotted on the x-axis. This variable is required
-#'   for the graph.
-#' @param lines The variable to be plotted using separate lines (optional).
-#' @param split The variable to be split among separate graphs (optional).
-#' @param type The type of prediction required. The default 'link' is on the
-#'   scale of the linear predictors; the alternative 'response' is on the scale
-#'   of the response variable. For more information, see
-#'   \code{\link{predict.glm}}.
-#' @param errorbars A string indicating what kind of error bars to show.
-#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
-#'   error of the predicted means), or "none".
-#' @param ymin Number indicating the minimum value for the y-axis scale. Default
-#'   NULL value will adjust position to the lowest y value.
-#' @param ymax Number indicating the maximum value for the y-axis scale. Default
-#'   NULL value will adjust position to the highest y value.
-#' @param labels A named list with strings for the various plot labels: 'title'
-#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
-#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
-#'   facet. If any label is not set, the names of the variables will be used.
-#'   Setting a label explicitly to NA will set an empty label.
-#' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
-#'   will draw a line graph of the results.
-#' @param draw.legend Logical. Whether or not to draw legend on the graph.
-#' @param dodge A numeric value indicating the amount each point on the graph
-#'   should be shifted left or right, which can help for readability when points
-#'   are close together. Default value is 0, with .1 or .2 probably sufficient
-#'   in most cases.
-#' @param exp Logical. If TRUE, the exponential function \code{exp()} will be
-#'   used to transform the y-axis (i.e., e to the power of y). Useful for
-#'   logistic regressions or for converting log-transformed y-values to their
-#'   original units.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return A ggplot object of the plotted variables in the model.
-#' @seealso \code{\link{graph_model.glm}}, \code{\link{graph_model_q.lm}}
-#' @examples
-#' # iris data
-#' model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
-#' graph_model_q(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
+#' @describeIn graph_model_q Graphing generalized linear models.
 #' @export
 graph_model_q.glm <- function(model, y, x, lines=NULL, split=NULL,
     type=c('link', 'response'), errorbars=c('CI', 'SE', 'none'), ymin=NULL,
@@ -488,62 +384,7 @@ graph_model_q.glm <- function(model, y, x, lines=NULL, split=NULL,
 }
 
 
-#' Graph multi-level model interactions.
-#' 
-#' \code{graph_model.lme} provides an easy way to graph interactions in
-#' multi-level models. Selected variables will be graphed at +/- 1 SD (if
-#' continuous) or at each level of the factor (if categorical).
-#' 
-#' This function only deals with fixed effects of the model, after the random
-#' effects have been accounted for. To look at the lower-level effects, consider
-#' using \code{\link{predict.lme}} to generate predicted values at the desired
-#' level.
-#' 
-#' If there are additional covariates in the model other than what is indicated
-#' to be graphed by the function, these variables will be plotted at their
-#' respective means. In the case of a categorical covariate, the results will be
-#' averaged across all its levels.
-#' 
-#' @param model A fitted linear model of type 'lme'.
-#' @param y The variable to be plotted on the y-axis. This variable is required
-#'   for the graph.
-#' @param x The variable to be plotted on the x-axis. This variable is required
-#'   for the graph.
-#' @param lines The variable to be plotted using separate lines (optional).
-#' @param split The variable to be split among separate graphs (optional).
-#' @param errorbars A string indicating what kind of error bars to show.
-#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
-#'   error of the predicted means), or "none".
-#' @param ymin Number indicating the minimum value for the y-axis scale. Default
-#'   NULL value will adjust position to the lowest y value.
-#' @param ymax Number indicating the maximum value for the y-axis scale. Default
-#'   NULL value will adjust position to the highest y value.
-#' @param labels A named list with strings for the various plot labels: 'title'
-#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
-#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
-#'   facet. If any label is not set, the names of the variables will be used.
-#'   Setting a label explicitly to NA will set an empty label.
-#' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
-#'   will draw a line graph of the results.
-#' @param draw.legend Logical. Whether or not to draw legend on the graph.
-#' @param dodge A numeric value indicating the amount each point on the graph
-#'   should be shifted left or right, which can help for readability when points
-#'   are close together. Default value is 0, with .1 or .2 probably sufficient
-#'   in most cases.
-#' @param exp Logical. If TRUE, the exponential function \code{exp()} will be
-#'   used to transform the y-axis (i.e., e to the power of y). Useful for
-#'   logistic regressions or for converting log-transformed y-values to their
-#'   original units.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return A ggplot2 graph of the plotted variables in the model.
-#' @seealso \code{\link{graph_model.merMod}}, \code{\link{graph_model.lm}}
-#' @examples
-#' # Orthodont data
-#' if (require(nlme, quietly=TRUE)) {
-#'     model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
-#'     graph_model(model, y=distance, x=age, lines=Sex)
-#' }
-#' @importFrom nlme lme
+#' @describeIn graph_model Graphing hierarchical linear models (nlme).
 #' @export
 graph_model.lme <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
@@ -565,67 +406,7 @@ graph_model.lme <- function(model, y, x, lines=NULL, split=NULL,
 }
 
 
-#' Graph multi-level model interactions.
-#' 
-#' \code{graph_model_q.lme} provides an easy way to graph interactions in
-#' multi-level models. Selected variables will be graphed at +/- 1 SD (if
-#' continuous) or at each level of the factor (if categorical).
-#' 
-#' This function only deals with fixed effects of the model, after the random
-#' effects have been accounted for. To look at the lower-level effects, consider
-#' using \code{\link{predict.lme}} to generate predicted values at the desired
-#' level.
-#' 
-#' If there are additional covariates in the model other than what is indicated
-#' to be graphed by the function, these variables will be plotted at their
-#' respective means. In the case of a categorical covariate, the results will be
-#' averaged across all its levels.
-#' 
-#' Note that in most cases it is easier to use \code{\link{graph_model.lme}} and
-#' pass variable names in directly instead of strings of variable names.
-#' \code{graph_model_q.lme} uses standard evaluation in cases where such
-#' evaluation is easier.
-#' 
-#' @param model A fitted linear model of type 'lme'.
-#' @param y The variable to be plotted on the y-axis. This variable is required
-#'   for the graph.
-#' @param x The variable to be plotted on the x-axis. This variable is required
-#'   for the graph.
-#' @param lines The variable to be plotted using separate lines (optional).
-#' @param split The variable to be split among separate graphs (optional).
-#' @param errorbars A string indicating what kind of error bars to show.
-#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
-#'   error of the predicted means), or "none".
-#' @param ymin Number indicating the minimum value for the y-axis scale. Default
-#'   NULL value will adjust position to the lowest y value.
-#' @param ymax Number indicating the maximum value for the y-axis scale. Default
-#'   NULL value will adjust position to the highest y value.
-#' @param labels A named list with strings for the various plot labels: 'title'
-#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
-#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
-#'   facet. If any label is not set, the names of the variables will be used.
-#'   Setting a label explicitly to NA will set an empty label.
-#' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
-#'   will draw a line graph of the results.
-#' @param draw.legend Logical. Whether or not to draw legend on the graph.
-#' @param dodge A numeric value indicating the amount each point on the graph
-#'   should be shifted left or right, which can help for readability when points
-#'   are close together. Default value is 0, with .1 or .2 probably sufficient
-#'   in most cases.
-#' @param exp Logical. If TRUE, the exponential function \code{exp()} will be
-#'   used to transform the y-axis (i.e., e to the power of y). Useful for
-#'   logistic regressions or for converting log-transformed y-values to their
-#'   original units.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return A ggplot2 graph of the plotted variables in the model.
-#' @seealso \code{\link{graph_model.lme}}, \code{\link{graph_model_q.merMod}},
-#'   \code{\link{graph_model_q.lm}}
-#' @examples
-#' # Orthodont data
-#' if (require(nlme, quietly=TRUE)) {
-#'     model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
-#'     graph_model_q(model, y='distance', x='age', lines='Sex')
-#' }
+#' @describeIn graph_model_q Graphing hierarchical linear models (nlme).
 #' @export
 graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
@@ -779,61 +560,7 @@ graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
 }
 
 
-#' Graph multi-level model interactions.
-#' 
-#' \code{graph_model.merMod} provides an easy way to graph interactions in
-#' multi-level models. Selected variables will be graphed at +/- 1 SD (if
-#' continuous) or at each level of the factor (if categorical).
-#' 
-#' This function only deals with fixed effects of the model, after the random
-#' effects have been accounted for. To look at the lower-level effects, consider
-#' using \code{\link{predict.merMod}} to generate predicted values at the
-#' desired level.
-#' 
-#' If there are additional covariates in the model other than what is indicated
-#' to be graphed by the function, these variables will be plotted at their
-#' respective means. In the case of a categorical covariate, the results will be
-#' averaged across all its levels.
-#' 
-#' @param model A fitted linear model of type 'merMod' (from the 'lme4' package).
-#' @param y The variable to be plotted on the y-axis. This variable is required
-#'   for the graph.
-#' @param x The variable to be plotted on the x-axis. This variable is required
-#'   for the graph.
-#' @param lines The variable to be plotted using separate lines (optional).
-#' @param split The variable to be split among separate graphs (optional).
-#' @param errorbars A string indicating what kind of error bars to show.
-#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
-#'   error of the predicted means), or "none".
-#' @param ymin Number indicating the minimum value for the y-axis scale. Default
-#'   NULL value will adjust position to the lowest y value.
-#' @param ymax Number indicating the maximum value for the y-axis scale. Default
-#'   NULL value will adjust position to the highest y value.
-#' @param labels A named list with strings for the various plot labels: 'title'
-#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
-#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
-#'   facet. If any label is not set, the names of the variables will be used.
-#'   Setting a label explicitly to NA will set an empty label.
-#' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
-#'   will draw a line graph of the results.
-#' @param draw.legend Logical. Whether or not to draw legend on the graph.
-#' @param dodge A numeric value indicating the amount each point on the graph
-#'   should be shifted left or right, which can help for readability when points
-#'   are close together. Default value is 0, with .1 or .2 probably sufficient
-#'   in most cases.
-#' @param exp Logical. If TRUE, the exponential function \code{exp()} will be
-#'   used to transform the y-axis (i.e., e to the power of y). Useful for
-#'   logistic regressions or for converting log-transformed y-values to their
-#'   original units.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return A ggplot2 graph of the plotted variables in the model.
-#' @seealso \code{\link{graph_model.lme}}, \code{\link{graph_model.lm}}
-#' @examples
-#' # Arabidopsis data
-#' if (require(lme4, quietly=TRUE)) {
-#'     model <- lmer(total.fruits ~ nutrient * amd + rack + (1|gen), data=Arabidopsis)
-#'     graph_model(model, y=total.fruits, x=nutrient, lines=amd)
-#' }
+#' @describeIn graph_model Graphing hierarchical linear models (lme4).
 #' @export
 graph_model.merMod <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,
@@ -855,67 +582,7 @@ graph_model.merMod <- function(model, y, x, lines=NULL, split=NULL,
 }
 
 
-#' Graph multi-level model interactions.
-#' 
-#' \code{graph_model_q.merMod} provides an easy way to graph interactions in
-#' multi-level models. Selected variables will be graphed at +/- 1 SD (if
-#' continuous) or at each level of the factor (if categorical).
-#' 
-#' This function only deals with fixed effects of the model, after the random
-#' effects have been accounted for. To look at the lower-level effects, consider
-#' using \code{\link{predict.merMod}} to generate predicted values at the
-#' desired level.
-#' 
-#' If there are additional covariates in the model other than what is indicated
-#' to be graphed by the function, these variables will be plotted at their
-#' respective means. In the case of a categorical covariate, the results will be
-#' averaged across all its levels.
-#' 
-#' Note that in most cases it is easier to use \code{\link{graph_model.merMod}}
-#' and pass variable names in directly instead of strings of variable names.
-#' \code{graph_model_q.merMod} uses standard evaluation in cases where such
-#' evaluation is easier.
-#' 
-#' @param model A fitted linear model of type 'merMod' (from the 'lme4' package).
-#' @param y The variable to be plotted on the y-axis. This variable is required
-#'   for the graph.
-#' @param x The variable to be plotted on the x-axis. This variable is required
-#'   for the graph.
-#' @param lines The variable to be plotted using separate lines (optional).
-#' @param split The variable to be split among separate graphs (optional).
-#' @param errorbars A string indicating what kind of error bars to show.
-#'   Acceptable values are "CI" (95% confidence intervals), "SE" (+/-1 standard
-#'   error of the predicted means), or "none".
-#' @param ymin Number indicating the minimum value for the y-axis scale. Default
-#'   NULL value will adjust position to the lowest y value.
-#' @param ymax Number indicating the maximum value for the y-axis scale. Default
-#'   NULL value will adjust position to the highest y value.
-#' @param labels A named list with strings for the various plot labels: 'title'
-#'   will set the graph title, 'y' sets the y-axis label, 'x' sets the x-axis
-#'   label, 'lines' sets the legend label, and 'split' sets the label for the 
-#'   facet. If any label is not set, the names of the variables will be used.
-#'   Setting a label explicitly to NA will set an empty label.
-#' @param bargraph Logical. TRUE will draw a bar graph of the results; FALSE
-#'   will draw a line graph of the results.
-#' @param draw.legend Logical. Whether or not to draw legend on the graph.
-#' @param dodge A numeric value indicating the amount each point on the graph
-#'   should be shifted left or right, which can help for readability when points
-#'   are close together. Default value is 0, with .1 or .2 probably sufficient
-#'   in most cases.
-#' @param exp Logical. If TRUE, the exponential function \code{exp()} will be
-#'   used to transform the y-axis (i.e., e to the power of y). Useful for
-#'   logistic regressions or for converting log-transformed y-values to their
-#'   original units.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return A ggplot2 graph of the plotted variables in the model.
-#' @seealso \code{\link{graph_model.merMod}}, \code{\link{graph_model_q.lme}},
-#'   \code{\link{graph_model_q.lm}}
-#' @examples
-#' # Arabidopsis data
-#' if (require(lme4, quietly=TRUE)) {
-#'     model <- lmer(total.fruits ~ nutrient * amd + rack + (1|gen), data=Arabidopsis)
-#'     graph_model_q(model, y='total.fruits', x='nutrient', lines='amd')
-#' }
+#' @describeIn graph_model_q Graphing hierarchical linear models (lme4).
 #' @export
 graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
     errorbars=c('CI', 'SE', 'none'), ymin=NULL, ymax=NULL, labels=NULL,

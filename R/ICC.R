@@ -1,44 +1,33 @@
 #' Intra-class correlation.
 #' 
-#' \code{ICC} is a generic function for calculating the intra-class correlation
-#' (ICC) for a fitted model.
+#' \code{ICC} calculates the intra-class correlation (ICC) from a fitted
+#' hierarchical linear model using the 'nlme' or 'lme4' packages.
 #' 
-#' @param model A fitted linear model of type 'lme' (nlme) or 'merMod' (lme4).
-#' @param ... Additional arguments to be passed to the particular method for the
-#'   given model.
-#' @return The form of the value returned by \code{ICC} depends on the class of
-#'   its argument. See the documentation of the particular methods for details
-#'   of what is produced by that method.
-#' @seealso \code{\link{ICC.lme}}, \code{\link{ICC.merMod}}
+#' The ICC is the proportion of variance that is between-person variance. For
+#' more information, see
+#' \href{http://davidakenny.net/papers/k&h/MLM_R.pdf}{Hoyt & Kenny (2013)}.
+#' 
+#' @param model A fitted linear model of type 'lme' (nlme) or 'merMod' (lme4;
+#'   linear, generalized, or nonlinear).
+#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
+#' @return The intra-class correlation of the model.
 #' @examples
-#' # iris data
+#' # iris data, showing use with lme()
 #' if (require(nlme, quietly=TRUE)) {
 #'     model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
+#'     ICC(model)  # .49 of variance is between-subjects
+#' }
+#' 
+#' # iris data, showing use with lmer()
+#' if (require(lme4, quietly=TRUE)) {
+#'     model <- lmer(Sepal.Width ~ 1 + (1|Species), data=iris)
 #'     ICC(model)  # .49 of variance is between-subjects
 #' }
 #' @export
 ICC <- function(model, ...) UseMethod('ICC')
 
 
-#' Intra-class correlation.
-#' 
-#' \code{ICC.lme} calculates the intra-class correlation (ICC) from a fitted
-#' multi-level model using the 'nlme' package.
-#' 
-#' The ICC is the proportion of variance that is between-person variance. For
-#' more information, see
-#' \href{http://davidakenny.net/papers/k&h/MLM_R.pdf}{Hoyt & Kenny (2013)}.
-#' 
-#' @param model A fitted model of type 'lme'.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return The intra-class correlation of the model.
-#' @seealso \code{\link{ICC.merMod}}
-#' @examples
-#' # iris data
-#' if (require(nlme, quietly=TRUE)) {
-#'     model <- lme(Sepal.Width ~ 1, random=~1|Species, data=iris)
-#'     ICC(model)  # .49 of variance is between-subjects
-#' }
+#' @describeIn ICC Intra-class correlation for lme (nlme).
 #' @export
 ICC.lme <- function(model, ...) {
     variance <- nlme::VarCorr(model)
@@ -48,26 +37,7 @@ ICC.lme <- function(model, ...) {
 }
 
 
-#' Intra-class correlation.
-#' 
-#' \code{ICC.merMod} calculates the intra-class correlation (ICC) from a fitted
-#' multi-level model using the 'lme4' package.
-#' 
-#' The ICC is the proportion of variance that is between-person variance. For
-#' more information, see
-#' \href{http://davidakenny.net/papers/k&h/MLM_R.pdf}{Hoyt & Kenny (2013)}.
-#' 
-#' @param model A fitted model of type 'merMod' (linear, generalized, or
-#'   nonlinear).
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
-#' @return The intra-class correlation of the model.
-#' @seealso \code{\link{ICC.lme}}
-#' @examples
-#' # iris data
-#' if (require(lme4, quietly=TRUE)) {
-#'     model <- lmer(Sepal.Width ~ 1 + (1|Species), data=iris)
-#'     ICC(model)  # .49 of variance is between-subjects
-#' }
+#' @describeIn ICC Intra-class correlation for lmer (lme4).
 #' @export
 ICC.merMod <- function(model, ...) {
     variance <- as.data.frame(lme4::VarCorr(model))
