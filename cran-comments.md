@@ -1,21 +1,17 @@
+## Submission notes
+
+This updated version fixes the errors found in the recent CRAN package check.
+
 ## Test environments
 
-* local Windows install, R 3.3.3
-* ubuntu 12.04 (on travis-ci), R 3.3.3
+* local Windows install, R 3.4.2
+* ubuntu 12.04 (on travis-ci), R 3.5.0
 * win-builder (devel and release)
 
 
 ## R CMD check results
 
-There were no ERRORs or WARNINGs. 
-
-There was 1 NOTE:
-
-* checking CRAN incoming feasibility ... NOTE
-Maintainer: 'Jeffrey Hughes <jeff.hughes@gmail.com>'
-
-New submission
-
+There were no ERRORs, WARNINGs or NOTEs.
 
 ## Downstream dependencies
 
