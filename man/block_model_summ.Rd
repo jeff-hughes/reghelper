@@ -21,8 +21,12 @@
 \usage{
 \method{summary}{block_lm}(object, ...)
 
-\method{print}{block_lm_summary}(x, digits = max(3L, getOption("digits") -
-  3L), signif.stars = getOption("show.signif.stars"), ...)
+\method{print}{block_lm_summary}(
+  x,
+  digits = max(3L, getOption("digits") - 3L),
+  signif.stars = getOption("show.signif.stars"),
+  ...
+)
 
 \method{coef}{block_lm}(object, num = NULL, ...)
 
@@ -32,8 +36,12 @@
 
 \method{summary}{block_aov}(object, ...)
 
-\method{print}{block_aov_summary}(x, digits = max(3L, getOption("digits") -
-  3L), signif.stars = getOption("show.signif.stars"), ...)
+\method{print}{block_aov_summary}(
+  x,
+  digits = max(3L, getOption("digits") - 3L),
+  signif.stars = getOption("show.signif.stars"),
+  ...
+)
 
 \method{coef}{block_aov}(object, num = NULL, ...)
 
@@ -43,8 +51,12 @@
 
 \method{summary}{block_glm}(object, ...)
 
-\method{print}{block_glm_summary}(x, digits = max(3L, getOption("digits") -
-  3L), signif.stars = getOption("show.signif.stars"), ...)
+\method{print}{block_glm_summary}(
+  x,
+  digits = max(3L, getOption("digits") - 3L),
+  signif.stars = getOption("show.signif.stars"),
+  ...
+)
 
 \method{coef}{block_glm}(object, num = NULL, ...)
 

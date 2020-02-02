@@ -1,21 +1,17 @@
+## Submission notes
+
+This updated version is a very minor bug fix.
+
 ## Test environments
 
-* local Windows install, R 3.3.3
-* ubuntu 12.04 (on travis-ci), R 3.3.3
-* win-builder (devel and release)
+* local Arch Linux install, R 3.6.2
+* Ubuntu 16.04 (on travis-ci), R 3.6.2
+* win-builder (devel, release, and oldrelease)
 
 
 ## R CMD check results
 
-There were no ERRORs or WARNINGs. 
-
-There was 1 NOTE:
-
-* checking CRAN incoming feasibility ... NOTE
-Maintainer: 'Jeffrey Hughes <jeff.hughes@gmail.com>'
-
-New submission
-
+There were no ERRORs, WARNINGs or NOTEs.
 
 ## Downstream dependencies
 

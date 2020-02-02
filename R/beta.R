@@ -174,13 +174,13 @@ beta.merMod <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
 #' @param skip A string vector indicating any variables you do \emph{not} wish
 #'   to be standarized.
 #' @return Returns a list with new formula and new data.
+#' @noRd
 .create_formula <- function(model, vars, skip) {
-    modelClass <- class(model)
-    if(modelClass[1] %in% c('lm', 'aov', 'glm')) {
+    if(inherits(model, c('lm', 'aov', 'glm'))) {
         data <- model$model
-    } else if (modelClass == 'lme') {
+    } else if (inherits(model, 'lme')) {
         data <- model$data
-    } else if (modelClass == 'lmerMod') {
+    } else if (inherits(model, 'lmerMod')) {
         data <- model@frame
     }
     

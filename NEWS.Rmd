@@ -13,6 +13,11 @@ knitr::opts_chunk$set(
   fig.path = "NEWS-"
 )
 ```
+# reghelper 0.3.5
+
+This is a patch release to fix a bug in the beta() function, to allow use of
+lmerTest models.
+
 # reghelper 0.3.4
 
 This is a patch release to cover changes made to the ggplot2 package.

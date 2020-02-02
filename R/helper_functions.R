@@ -11,6 +11,7 @@
 #' @param sstest Logical. Whether or not to insert 'sstest' as a factor level.
 #' @return A list with all the factor points for each variable in the
 #'   interaction.
+#' @noRd
 .set_factors <- function(model, int_vars, user_levels=NULL, sstest=TRUE) {
     factors <- list()
     for (term in int_vars) {
@@ -61,6 +62,7 @@
 #' @return The value of the variable at the offset point. For example, for a
 #'   standard normal distribution, an offset point of -1 would return a value of
 #'   -1.
+#' @noRd
 .offset_point <- function(var, offset_sd, digits=6) {
     point <- mean(var, na.rm=TRUE) + offset_sd * sd(var, na.rm=TRUE)
     return(round(point, digits))
@@ -79,6 +81,7 @@
 #' @param num_remove The number of columns to remove.
 #' @param new_cols A data frame of new columns to be added.
 #' @return A new data frame with the modifications made.
+#' @noRd
 .df_splice <- function(df, splice_point, num_remove=0, new_cols=NULL) {
     old_colnames <- colnames(df)
     
@@ -126,6 +129,7 @@
 #' @param new_rows A data frame of new rows to be added.
 #' @param reset_rownames Whether or not to renumber rownames when finished.
 #' @return A new data frame with the modifications made.
+#' @noRd
 .df_row_splice <- function(df, splice_point, num_remove=0, new_rows=NULL,
     reset_rownames=FALSE) {
     old_rownames <- rownames(df)

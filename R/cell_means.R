@@ -238,6 +238,7 @@ cell_means_q.glm <- function(model, vars=NULL, levels=NULL,
 #'   aggregated over.
 #' @return A data frame combining the grid and predicted values, aggregated over
 #'   all variables in \code{agg_vars}.
+#' @noRd
 .aggregate_grid <- function(grid, predicted, agg_vars) {
     vars <- names(grid)
     non_agg_vars <- vars[-match(agg_vars, vars)]

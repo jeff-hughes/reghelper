@@ -13,8 +13,7 @@ cell_means(model, ...)
 
 \method{cell_means}{aov}(model, ..., levels = NULL)
 
-\method{cell_means}{glm}(model, ..., levels = NULL, type = c("link",
-  "response"))
+\method{cell_means}{glm}(model, ..., levels = NULL, type = c("link", "response"))
 }
 \arguments{
 \item{model}{A fitted linear model of type 'lm', 'aov', or 'glm'.}

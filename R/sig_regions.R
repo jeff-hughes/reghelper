@@ -140,6 +140,7 @@ sig_regions.glm <- function(model, alpha=.05, precision=4, ...) {
 #'   level (e.g., precision=5 would look for regions of significance at .05000).
 #' @return A predictor value in the sequence, if any, for which the p-value is
 #'   at the alpha level, rounded to the requested value of precision.
+#' @noRd
 .search_sequence <- function(model, int_vars, start=NULL, end=NULL,
                              alpha=.05, precision=4) {
     

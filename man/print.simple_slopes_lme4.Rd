@@ -4,8 +4,7 @@
 \alias{print.simple_slopes_lme4}
 \title{Print simple slopes.}
 \usage{
-\method{print}{simple_slopes_lme4}(x, digits = max(3L, getOption("digits") -
-  3L), ...)
+\method{print}{simple_slopes_lme4}(x, digits = max(3L, getOption("digits") - 3L), ...)
 }
 \arguments{
 \item{x}{An object of class "\code{simple_slopes_lme4}", usually, a result

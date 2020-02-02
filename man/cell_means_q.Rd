@@ -13,8 +13,13 @@ cell_means_q(model, ...)
 
 \method{cell_means_q}{aov}(model, vars = NULL, levels = NULL, ...)
 
-\method{cell_means_q}{glm}(model, vars = NULL, levels = NULL,
-  type = c("link", "response"), ...)
+\method{cell_means_q}{glm}(
+  model,
+  vars = NULL,
+  levels = NULL,
+  type = c("link", "response"),
+  ...
+)
 }
 \arguments{
 \item{model}{A fitted linear model of type 'lm', 'aov', or 'glm'.}

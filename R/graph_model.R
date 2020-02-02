@@ -771,6 +771,7 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
 #'   logistic regressions or for converting log-transformed y-values to their
 #'   original units.
 #' @return A ggplot object of the plotted variables in the model.
+#' @noRd
 .build_plot <- function(grid, y, x, lines=NULL, split=NULL, errors=TRUE,
     ymin=NULL, ymax=NULL, labels=NULL, bargraph=FALSE, draw.legend=TRUE,
     dodge=0, exp=FALSE) {
