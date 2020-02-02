@@ -3,7 +3,6 @@
 \docType{package}
 \name{reghelper}
 \alias{reghelper}
-\alias{reghelper-package}
 \title{reghelper: A package to help with running regression analyses.}
 \description{
 The reghelper package offers numerous functions to make some aspects of

@@ -488,6 +488,7 @@ print.simple_slopes_lme4 <- function(
 #'   interaction.
 #' @return A data frame with one line for each simple slope test, indicating
 #'   what point each variable is set to in the test.
+#' @noRd
 .create_grids <- function(data, factors) {
     grid <- with(data, expand.grid(factors))
     

@@ -4,8 +4,12 @@
 \alias{print.simple_slopes}
 \title{Print simple slopes.}
 \usage{
-\method{print}{simple_slopes}(x, digits = max(3L, getOption("digits") - 3L),
-  signif.stars = getOption("show.signif.stars"), ...)
+\method{print}{simple_slopes}(
+  x,
+  digits = max(3L, getOption("digits") - 3L),
+  signif.stars = getOption("show.signif.stars"),
+  ...
+)
 }
 \arguments{
 \item{x}{An object of class "\code{simple_slopes}", usually, a result

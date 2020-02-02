@@ -1,12 +1,12 @@
 ## Submission notes
 
-This updated version fixes the errors found in the recent CRAN package check.
+This updated version is a very minor bug fix.
 
 ## Test environments
 
-* local Windows install, R 3.4.2
-* ubuntu 12.04 (on travis-ci), R 3.5.0
-* win-builder (devel and release)
+* local Arch Linux install, R 3.6.2
+* Ubuntu 16.04 (on travis-ci), R 3.6.2
+* win-builder (devel, release, and oldrelease)
 
 
 ## R CMD check results

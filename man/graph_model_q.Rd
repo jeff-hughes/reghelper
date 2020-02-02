@@ -11,30 +11,91 @@
 \usage{
 graph_model_q(model, ...)
 
-\method{graph_model_q}{lm}(model, y, x, lines = NULL, split = NULL,
-  errorbars = c("CI", "SE", "none"), ymin = NULL, ymax = NULL,
-  labels = NULL, bargraph = FALSE, draw.legend = TRUE, dodge = 0,
-  exp = FALSE, ...)
+\method{graph_model_q}{lm}(
+  model,
+  y,
+  x,
+  lines = NULL,
+  split = NULL,
+  errorbars = c("CI", "SE", "none"),
+  ymin = NULL,
+  ymax = NULL,
+  labels = NULL,
+  bargraph = FALSE,
+  draw.legend = TRUE,
+  dodge = 0,
+  exp = FALSE,
+  ...
+)
 
-\method{graph_model_q}{aov}(model, y, x, lines = NULL, split = NULL,
-  errorbars = c("CI", "SE", "none"), ymin = NULL, ymax = NULL,
-  labels = NULL, bargraph = FALSE, draw.legend = TRUE, dodge = 0,
-  exp = FALSE, ...)
+\method{graph_model_q}{aov}(
+  model,
+  y,
+  x,
+  lines = NULL,
+  split = NULL,
+  errorbars = c("CI", "SE", "none"),
+  ymin = NULL,
+  ymax = NULL,
+  labels = NULL,
+  bargraph = FALSE,
+  draw.legend = TRUE,
+  dodge = 0,
+  exp = FALSE,
+  ...
+)
 
-\method{graph_model_q}{glm}(model, y, x, lines = NULL, split = NULL,
-  type = c("link", "response"), errorbars = c("CI", "SE", "none"),
-  ymin = NULL, ymax = NULL, labels = NULL, bargraph = FALSE,
-  draw.legend = TRUE, dodge = 0, exp = FALSE, ...)
+\method{graph_model_q}{glm}(
+  model,
+  y,
+  x,
+  lines = NULL,
+  split = NULL,
+  type = c("link", "response"),
+  errorbars = c("CI", "SE", "none"),
+  ymin = NULL,
+  ymax = NULL,
+  labels = NULL,
+  bargraph = FALSE,
+  draw.legend = TRUE,
+  dodge = 0,
+  exp = FALSE,
+  ...
+)
 
-\method{graph_model_q}{lme}(model, y, x, lines = NULL, split = NULL,
-  errorbars = c("CI", "SE", "none"), ymin = NULL, ymax = NULL,
-  labels = NULL, bargraph = FALSE, draw.legend = TRUE, dodge = 0,
-  exp = FALSE, ...)
+\method{graph_model_q}{lme}(
+  model,
+  y,
+  x,
+  lines = NULL,
+  split = NULL,
+  errorbars = c("CI", "SE", "none"),
+  ymin = NULL,
+  ymax = NULL,
+  labels = NULL,
+  bargraph = FALSE,
+  draw.legend = TRUE,
+  dodge = 0,
+  exp = FALSE,
+  ...
+)
 
-\method{graph_model_q}{merMod}(model, y, x, lines = NULL, split = NULL,
-  errorbars = c("CI", "SE", "none"), ymin = NULL, ymax = NULL,
-  labels = NULL, bargraph = FALSE, draw.legend = TRUE, dodge = 0,
-  exp = FALSE, ...)
+\method{graph_model_q}{merMod}(
+  model,
+  y,
+  x,
+  lines = NULL,
+  split = NULL,
+  errorbars = c("CI", "SE", "none"),
+  ymin = NULL,
+  ymax = NULL,
+  labels = NULL,
+  bargraph = FALSE,
+  draw.legend = TRUE,
+  dodge = 0,
+  exp = FALSE,
+  ...
+)
 }
 \arguments{
 \item{model}{A fitted linear model of type 'lm', 'aov', 'glm', 'lme', or
