@@ -1,7 +1,7 @@
 ---
 output:
   md_document:
-    variant: markdown_github
+    variant: gfm
 ---
 
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
@@ -13,6 +13,11 @@ knitr::opts_chunk$set(
   fig.path = "NEWS-"
 )
 ```
+# reghelper 0.3.6
+
+This release deprecates the `beta()` method for nlme and lme4 models. See the
+README for more details: https://github.com/jeff-hughes/reghelper
+
 # reghelper 0.3.5
 
 This is a patch release to fix a bug in the beta() function, to allow use of

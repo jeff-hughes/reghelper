@@ -10,8 +10,7 @@
 #' variables separately, rather than using the standard deviation of the
 #' interaction term itself).
 #' 
-#' @param model A fitted linear model of type 'lm', 'glm', 'aov', 'lme', or
-#'   'merMod'.
+#' @param model A fitted linear model of type 'lm', 'glm', or 'aov'.
 #' @param x Logical. Whether or not to standardize predictor variables.
 #' @param y Logical. Whether or not to standardize criterion variables.
 #' @param skip A string vector indicating any variables you do \emph{not} wish
@@ -32,22 +31,6 @@
 #' # mtcars data, showing use with glm()
 #' model1 <- glm(vs ~ wt + hp, data=mtcars, family='binomial')
 #' beta(model1)  # wt and hp standardized, vs is not by default
-#' 
-#' # iris data, showing use with lme()
-#' if (require(nlme, quietly=TRUE)) {
-#'     model <- lme(Sepal.Width ~ Sepal.Length + Petal.Length, random=~1|Species, data=iris)
-#'     beta(model)  # all three variables standardized
-#' 
-#'     beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
-#' }
-#' 
-#' # iris data, showing use with lmer()
-#' if (require(lme4, quietly=TRUE)) {
-#'     model <- lmer(Sepal.Width ~ Sepal.Length + Petal.Length + (1|Species), data=iris)
-#'     beta(model)  # all variables standardized
-#' 
-#'     beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
-#' }
 #' @export
 beta <- function(model, ...) UseMethod('beta')
 
@@ -99,6 +82,11 @@ beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL, ...) {
 #' @describeIn beta Standardized coefficients for a hierarchical linear model (nlme).
 #' @export
 beta.lme <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
+    warning("The beta() function has been deprecated for multilevel models and is no longer
+supported. It will be removed in a future version. For more information on the
+reasons for this change, see the README on the package Github page here:
+https://github.com/jeff-hughes/reghelper")
+    
     call <- model$call
     vars <- names(model$data)
     formula <- format(formula(model))
@@ -127,6 +115,11 @@ beta.lme <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
 #' @describeIn beta Standardized coefficients for a hierarchical linear model (lme4).
 #' @export
 beta.merMod <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
+    warning("The beta() function has been deprecated for multilevel models and is no longer
+supported. It will be removed in a future version. For more information on the
+reasons for this change, see the README on the package Github page here:
+https://github.com/jeff-hughes/reghelper")
+    
     call <- model@call
     vars <- names(model@frame)
     formula <- format(formula(model))
