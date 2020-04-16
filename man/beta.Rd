@@ -22,8 +22,7 @@ beta(model, ...)
 \method{beta}{merMod}(model, x = TRUE, y = TRUE, skip = NULL, ...)
 }
 \arguments{
-\item{model}{A fitted linear model of type 'lm', 'glm', 'aov', 'lme', or
-'merMod'.}
+\item{model}{A fitted linear model of type 'lm', 'glm', or 'aov'.}
 
 \item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
 
@@ -76,20 +75,4 @@ beta(model2, skip='Species')  # all variables except Species standardized
 # mtcars data, showing use with glm()
 model1 <- glm(vs ~ wt + hp, data=mtcars, family='binomial')
 beta(model1)  # wt and hp standardized, vs is not by default
-
-# iris data, showing use with lme()
-if (require(nlme, quietly=TRUE)) {
-    model <- lme(Sepal.Width ~ Sepal.Length + Petal.Length, random=~1|Species, data=iris)
-    beta(model)  # all three variables standardized
-
-    beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
-}
-
-# iris data, showing use with lmer()
-if (require(lme4, quietly=TRUE)) {
-    model <- lmer(Sepal.Width ~ Sepal.Length + Petal.Length + (1|Species), data=iris)
-    beta(model)  # all variables standardized
-
-    beta(model, skip='Petal.Length')  # all variables except Petal.Length standardized
-}
 }

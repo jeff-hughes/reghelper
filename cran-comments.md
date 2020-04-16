@@ -1,6 +1,7 @@
 ## Submission notes
 
-This updated version is a very minor bug fix.
+This updated version primarily serves to deprecate two methods, to be removed
+in a future release.
 
 ## Test environments
 
