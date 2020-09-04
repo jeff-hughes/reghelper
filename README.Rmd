@@ -19,7 +19,7 @@ The `reghelper` R package includes a set of functions used to automate commonly
 used methods in regression analysis. This includes plotting interactions,
 calculating simple slopes, calculating standardized coefficients, etc.
 
-Version 0.3.6 has been released. The most recent stable release is available on
+Version 1.0.0 has been released. The most recent stable release is available on
 CRAN, and can be installed like so:
 ```R
 install.packages("reghelper")
@@ -28,7 +28,7 @@ install.packages("reghelper")
 You can also install the stable release from Github:
 ```R
 install.packages("devtools")
-devtools::install_github("jeff-hughes/reghelper@v0.3.6")
+devtools::install_github("jeff-hughes/reghelper@v1.0.0")
 ```
 
 If you would like to install the latest development version, you can do so with
@@ -114,13 +114,13 @@ appears as a fixed effect and random effect, what should happen to this variable
 Surprising users with models where some variables end up standardized and others
 are not is not a suitable result.
 
-As a consequence, the `beta()` function has been deprecated in v0.3.6 and will
-be removed in a future version. It will still remain implemented for lm, glm,
-and aov models. Researchers who wish to obtain standardized effects for their
-multilevel models should manually standardize the variables that are appropriate
-given their model structure and theory. However, consideration should be given
-to the centering strategy used in their model as well. For further discussion on
-these issues, please see the references below.
+As a consequence, the `beta()` function was deprecated in v0.3.6 and later removed.
+It will still remain implemented for `lm`, `glm`, and `aov` models. Researchers who
+wish to obtain standardized effects for their multilevel models should manually
+standardize the variables that are appropriate given their model structure and
+theory. However, consideration should be given to the centering strategy used in
+their model as well. For further discussion on these issues, please see the
+references below.
 
 ### References
 

@@ -13,9 +13,39 @@ knitr::opts_chunk$set(
   fig.path = "NEWS-"
 )
 ```
+# reghelper 1.0.0
+
+Just a note: While reghelper has officially reached version 1.0.0, the fact is
+that it has been stable and relatively feature complete quite some time. The change
+from v0.3.6 to v1.0.0 is not drastic, but does involve some minor breaking changes,
+hence an increase to the major version number. But quite frankly, it should have
+been bumped to v1.x a long time ago.
+
+BREAKING CHANGES
+
+* The `beta()` method has now been removed for `nlme` and `lme4` models. These
+  had been deprecated in the previous release. See the README for more details:
+  https://github.com/jeff-hughes/reghelper
+* Minor breaking changes. These should not impact most users, but could impact
+  those who are extracting elements from the output of these functions in a 
+  programmatic fashion:
+  * `simple_slopes()` for an `lme4` model now returns a data frame of class
+    `simple_slopes` rather than `simple_slopes_lme4`
+  * When running `simple_slopes()` with categorical variables with more than two
+    levels (i.e. a factor variable with two or more contrasts), the output now
+    provides the name of the contrast in the parentheses after the `sstest`
+    label. Users who are extracting values should use `startsWith(value, 'sstest')`
+    rather than `value == 'sstest'` to match appropriately.
+
+BUG FIXES
+
+* Fixes issues with incorrect variable labels in `simple_slopes()` output when
+  there is more than one categorical variable with more than two levels.
+* Provides better support for `lmerTest` models in `simple_slopes()`
+
 # reghelper 0.3.6
 
-This release deprecates the `beta()` method for nlme and lme4 models. See the
+This release deprecates the `beta()` method for `nlme` and `lme4` models. See the
 README for more details: https://github.com/jeff-hughes/reghelper
 
 # reghelper 0.3.5

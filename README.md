@@ -1,33 +1,28 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# reghelper
+reghelper
+=========
 
 The `reghelper` R package includes a set of functions used to automate
 commonly used methods in regression analysis. This includes plotting
 interactions, calculating simple slopes, calculating standardized
 coefficients, etc.
 
-Version 0.3.6 has been released. The most recent stable release is
+Version 1.0.0 has been released. The most recent stable release is
 available on CRAN, and can be installed like so:
 
-``` r
-install.packages("reghelper")
-```
+    install.packages("reghelper")
 
 You can also install the stable release from Github:
 
-``` r
-install.packages("devtools")
-devtools::install_github("jeff-hughes/reghelper@v0.3.6")
-```
+    install.packages("devtools")
+    devtools::install_github("jeff-hughes/reghelper@v1.0.0")
 
 If you would like to install the latest development version, you can do
 so with the following code:
 
-``` r
-install.packages("devtools")
-devtools::install_github("jeff-hughes/reghelper")
-```
+    install.packages("devtools")
+    devtools::install_github("jeff-hughes/reghelper")
 
 ### Installation Issues
 
@@ -39,43 +34,43 @@ starting with two backslashes, but you will need to convert that to a
 path starting with a drive letter (e.g., ‘C:’, ‘D:’). From there, use
 the following code:
 
-``` r
-install.packages("devtools")
-devtools::install_github("jeff-hughes/reghelper", args=c('--library="N:/path/to/libraries/"'))
-```
+    install.packages("devtools")
+    devtools::install_github("jeff-hughes/reghelper", args=c('--library="N:/path/to/libraries/"'))
 
 Obviously, change the path to the path where your R libraries are
 stored.
 
-## Summary of helper functions
+Summary of helper functions
+---------------------------
 
-  - `beta` Calculates standardized beta coefficients.
-  - `build_model` Allows variables to be added to a series of regression
+-   `beta` Calculates standardized beta coefficients.
+-   `build_model` Allows variables to be added to a series of regression
     models sequentially (similar to SPSS).
-  - `ICC` Calculates the intra-class correlation for a multi-level
+-   `ICC` Calculates the intra-class correlation for a multi-level
     model.
-  - `cell_means` Calculates the estimated means for a fitted model.
-  - `graph_model` Easily graph interactions at +/- 1 SD (uses ggplot2
+-   `cell_means` Calculates the estimated means for a fitted model.
+-   `graph_model` Easily graph interactions at +/- 1 SD (uses ggplot2
     package).
-  - `sig_regions` Calculate the Johnson-Neyman regions of significance
+-   `sig_regions` Calculate the Johnson-Neyman regions of significance
     for an interaction.
-  - `simple_slopes` Easily calculate the simple effects of an
+-   `simple_slopes` Easily calculate the simple effects of an
     interaction.
 
 The table below shows the current types of models for which each
 function has been implemented:
 
-| Function       | lm | glm | aov | lme | lmer |
-| :------------- | :-: | :-: | :-: | :-: | :--: |
-| beta           | ✓  |  ✓  |  ✓  |  –  |  –   |
-| build\_model   | ✓  |  ✓  |  ✓  |     |      |
-| ICC            | –  |  –  |  –  |  ✓  |  ✓   |
-| cell\_means    | ✓  |  ✓  |  ✓  |     |      |
-| graph\_model   | ✓  |  ✓  |  ✓  |  ✓  |  ✓   |
-| sig\_regions   | ✓  |  ✓  |  –  |     |      |
-| simple\_slopes | ✓  |  ✓  |  ✓  |  ✓  |  ✓   |
+| Function       | lm  | glm | aov | lme | lmer |
+|:---------------|:---:|:---:|:---:|:---:|:----:|
+| beta           |  ✓  |  ✓  |  ✓  |  –  |  –   |
+| build\_model   |  ✓  |  ✓  |  ✓  |     |      |
+| ICC            |  –  |  –  |  –  |  ✓  |  ✓   |
+| cell\_means    |  ✓  |  ✓  |  ✓  |     |      |
+| graph\_model   |  ✓  |  ✓  |  ✓  |  ✓  |  ✓   |
+| sig\_regions   |  ✓  |  ✓  |  –  |     |      |
+| simple\_slopes |  ✓  |  ✓  |  ✓  |  ✓  |  ✓   |
 
-## Removal of beta() function for multilevel models (nlme and lme4)
+Removal of beta() function for multilevel models (nlme and lme4)
+----------------------------------------------------------------
 
 Strategies for how to center Level 1 variables in multilevel models has
 been a topic of discussion among methodologists, with a variety of
@@ -114,14 +109,14 @@ and random effect, what should happen to this variable? Surprising users
 with models where some variables end up standardized and others are not
 is not a suitable result.
 
-As a consequence, the `beta()` function has been deprecated in v0.3.6
-and will be removed in a future version. It will still remain
-implemented for lm, glm, and aov models. Researchers who wish to obtain
-standardized effects for their multilevel models should manually
-standardize the variables that are appropriate given their model
-structure and theory. However, consideration should be given to the
-centering strategy used in their model as well. For further discussion
-on these issues, please see the references below.
+As a consequence, the `beta()` function was deprecated in v0.3.6 and
+later removed. It will still remain implemented for `lm`, `glm`, and
+`aov` models. Researchers who wish to obtain standardized effects for
+their multilevel models should manually standardize the variables that
+are appropriate given their model structure and theory. However,
+consideration should be given to the centering strategy used in their
+model as well. For further discussion on these issues, please see the
+references below.
 
 ### References
 

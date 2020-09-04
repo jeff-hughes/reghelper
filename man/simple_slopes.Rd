@@ -62,7 +62,8 @@ can be overridden with the \code{levels} parameter.
 
 If a categorical variable with more than two levels is being tested, you may
 see multiple rows for that test. One row will be shown for each contrast for
-that variable; the order is in the same order shown in \code{contrasts()}.
+that variable; the name of the contrast is identified in parentheses after 
+the `sstest` label.
 }
 \section{Methods (by class)}{
 \itemize{
