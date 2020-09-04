@@ -16,7 +16,8 @@
 #' 
 #' If a categorical variable with more than two levels is being tested, you may
 #' see multiple rows for that test. One row will be shown for each contrast for
-#' that variable; the order is in the same order shown in \code{contrasts()}.
+#' that variable; the name of the contrast is identified in parentheses after 
+#' the `sstest` label.
 #' 
 #' @param model A fitted linear model of type 'lm', 'glm', 'aov', 'lme' (nlme),
 #'   or 'merMod' (lme4), with at least one interaction term.
@@ -115,7 +116,7 @@ simple_slopes.lm <- function(model, levels=NULL, ...) {
     
     for (i in 1:nrow(template)) {
         new_form <- form
-        test_var_name <- names(template)[which(template[i, ] == 'sstest')]
+        test_var_name <- names(template)[which(startsWith(as.character(template[i, ]), 'sstest'))]
         test_var <- mdata[[test_var_name]]
         
         for (j in 1:ncol(template)) {
@@ -236,7 +237,7 @@ simple_slopes.lme <- function(model, levels=NULL, ...) {
     
     for (i in 1:nrow(template)) {
         new_form <- form
-        test_var_name <- names(template)[which(template[i, ] == 'sstest')]
+        test_var_name <- names(template)[which(startsWith(as.character(template[i, ]), 'sstest'))]
         test_var <- mdata[[test_var_name]]
         
         for (j in 1:ncol(template)) {
@@ -351,7 +352,7 @@ simple_slopes.merMod <- function(model, levels=NULL, ...) {
     
     for (i in 1:nrow(template)) {
         new_form <- form
-        test_var_name <- names(template)[which(template[i, ] == 'sstest')]
+        test_var_name <- names(template)[which(startsWith(as.character(template[i, ]), 'sstest'))]
         test_var <- mdata[[test_var_name]]
         
         for (j in 1:ncol(template)) {
@@ -538,9 +539,9 @@ print.simple_slopes_lme4 <- function(
             dupe_values <- dupe_values[dupe_values$Freq > 1, ]
             for (i in dupe_values$rep_index) {
                 indices <- which(rep_index == as.character(i))
-                rep_index[indices] <- paste0(i, letters[1:length(indices)])
+                new_grid[indices, var] <- paste0('sstest (', colnames(contr), ')')
             }
-            rownames(new_grid) <- rep_index
+            rownames(new_grid) <- 1:nrow(new_grid)
         }
     }
     
