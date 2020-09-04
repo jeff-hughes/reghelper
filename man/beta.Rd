@@ -5,8 +5,6 @@
 \alias{beta.lm}
 \alias{beta.aov}
 \alias{beta.glm}
-\alias{beta.lme}
-\alias{beta.merMod}
 \title{Standardized coefficients of a model.}
 \usage{
 beta(model, ...)
@@ -16,10 +14,6 @@ beta(model, ...)
 \method{beta}{aov}(model, x = TRUE, y = TRUE, skip = NULL, ...)
 
 \method{beta}{glm}(model, x = TRUE, y = FALSE, skip = NULL, ...)
-
-\method{beta}{lme}(model, x = TRUE, y = TRUE, skip = NULL, ...)
-
-\method{beta}{merMod}(model, x = TRUE, y = TRUE, skip = NULL, ...)
 }
 \arguments{
 \item{model}{A fitted linear model of type 'lm', 'glm', or 'aov'.}
@@ -58,10 +52,6 @@ interaction term itself).
 \item \code{aov}: Standardized coefficients for ANOVA.
 
 \item \code{glm}: Standardized coefficients for a generalized linear model.
-
-\item \code{lme}: Standardized coefficients for a hierarchical linear model (nlme).
-
-\item \code{merMod}: Standardized coefficients for a hierarchical linear model (lme4).
 }}
 
 \examples{
