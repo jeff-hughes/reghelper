@@ -337,7 +337,16 @@ simple_slopes.merMod <- function(model, levels=NULL, ...) {
     
     template <- grids[[1]]
     models <- grids[[2]]
-    models[, c('Test Estimate', 'Std. Error', 't value')] <- NA
+    
+    # distinguish between lmer and lmerTest models
+    if ('lmerModLmerTest' %in% class(model)) {
+        models[, c('Test Estimate', 'Std. Error', 'df', 't value', 'Pr(>|t|)')] <- NA
+        coef_cols <- 5
+    } else {
+        models[, c('Test Estimate', 'Std. Error', 't value')] <- NA
+        coef_cols <- 3
+    }
+
     est_count <- 1
     
     for (i in 1:nrow(template)) {
@@ -389,17 +398,17 @@ simple_slopes.merMod <- function(model, levels=NULL, ...) {
             
             for (est in 1:nrow(estimates)) {
                 models[est_count,
-                    (ncol(models)-2):ncol(models)] <- estimates[est, ]
+                    (ncol(models)-coef_cols+1):ncol(models)] <- estimates[est, ]
                 est_count <- est_count + 1
             }
         } else {
             models[est_count,
-                (ncol(models)-2):ncol(models)
+                (ncol(models)-coef_cols+1):ncol(models)
                 ] <- coef(summary(new_model))[test_var_name, ]
             est_count <- est_count + 1
         }
     }
-    class(models) <- c('simple_slopes_lme4', 'data.frame')
+    class(models) <- c('simple_slopes', 'data.frame')
     return(models)
 }
 
@@ -431,19 +440,23 @@ print.simple_slopes <- function(
     
     index <- c('Test Estimate', 'Std. Error', 't value', 'df')
     for (i in index) {
-        model[, i] <- round(model[, i], digits=digits)
+        if (i %in% colnames(model)) {
+            model[, i] <- round(model[, i], digits=digits)
+        }
     }
     
-    if (signif.stars) {
-        stars <- symnum(as.numeric(model[, 'Pr(>|t|)']), corr=FALSE, na=FALSE,
-            numeric.x=TRUE, cutpoints=c(0, 0.001, 0.01, 0.05, 0.1, 1), 
-            symbols=c("***", "**", "*", ".", " "))
-    }
-    
-    model[, 'Pr(>|t|)'] <- format.pval(as.numeric(model[, 'Pr(>|t|)']), digits=digits)
-    
-    if (signif.stars) {
-        model[, 'Sig.'] <- as.character(stars)
+    if ('Pr(>|t|)' %in% colnames(model)) {
+        if (signif.stars) {
+            stars <- symnum(as.numeric(model[, 'Pr(>|t|)']), corr=FALSE, na=FALSE,
+                numeric.x=TRUE, cutpoints=c(0, 0.001, 0.01, 0.05, 0.1, 1), 
+                symbols=c("***", "**", "*", ".", " "))
+        }
+        
+        model[, 'Pr(>|t|)'] <- format.pval(as.numeric(model[, 'Pr(>|t|)']), digits=digits)
+        
+        if (signif.stars) {
+            model[, 'Sig.'] <- as.character(stars)
+        }
     }
     
     print.data.frame(model, quote=FALSE, right=TRUE, na.print='NA')
@@ -511,31 +524,23 @@ print.simple_slopes_lme4 <- function(
     for (var in names(factors)) {
         variable <- data[[var]]
         if (is.factor(variable) && length(levels(variable)) > 2) {
-            find_rows <- which(grid[, var] == 'sstest')
+            find_rows <- which(new_grid[, var] == 'sstest')
             contr <- contrasts(variable)
             
-            adj_find_rows <- find_rows +
-                (ncol(contr)-1) * 0:(length(find_rows)-1)
-                # adjust find_rows, since we are going to be adding rows in
-                # between as we loop through
+            # count up number of times we should be repeating each row
+            num_rep <- ifelse(1:nrow(new_grid) %in% find_rows, ncol(contr), 1)
+            rep_index <- rep(row.names(new_grid), num_rep)
             
-            for (row in 1:length(find_rows)) {
-                old_row <- grid[find_rows[row], ]
-                new_rows <- as.data.frame(t(sapply(1:ncol(contr), function(x) {
-                    old_row
-                })))  # kind of hacky way to copy rows
-                
-                # change rownames to letter subscripts, e.g., '4a', '4b'
-                rownames(new_rows) <- paste0(
-                    rownames(old_row),
-                    letters[1:nrow(new_rows)])
-                
-                new_grid <- .df_row_splice(
-                    new_grid,
-                    adj_find_rows[row],
-                    num_remove=1,
-                    new_rows=new_rows)
+            new_grid <- new_grid[rep_index, ]
+            
+            # change rownames to letter subscripts, e.g., '4a', '4b'
+            dupe_values <- data.frame(table(rep_index))
+            dupe_values <- dupe_values[dupe_values$Freq > 1, ]
+            for (i in dupe_values$rep_index) {
+                indices <- which(rep_index == as.character(i))
+                rep_index[indices] <- paste0(i, letters[1:length(indices)])
             }
+            rownames(new_grid) <- rep_index
         }
     }
     
