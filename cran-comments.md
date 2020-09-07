@@ -1,5 +1,9 @@
 ## Submission notes
 
+Resubmit of submission from a few days ago -- fixing broken URL and adding a
+citation for one technique to the description, as requested.
+
+Notes from original submission:
 This updated version includes a couple breaking changes (including removal of two
 previously deprecated functions), but mostly provides a bug fix and some minor
 quality of life improvements. 
