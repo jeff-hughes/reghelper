@@ -10,7 +10,7 @@
 #' use the \code{\link{simple_slopes}} function instead.
 #' 
 #' For more information about regions of significance, see
-#' \href{http://ssrn.com/abstract=2208103}{Spiller, Fitzsimons, Lynch, &
+#' \href{https://ssrn.com/abstract=2208103}{Spiller, Fitzsimons, Lynch, &
 #' McClelland (2012)}.
 #' 
 #' @param model A fitted linear model of type 'lm' or 'glm' with one two-way

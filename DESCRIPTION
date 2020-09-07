@@ -6,8 +6,9 @@ Date: 2020-09-04
 Authors@R: person("Jeffrey", "Hughes", email="jeff.hughes@gmail.com",
     role=c("aut", "cre"))
 Description: A set of functions used to automate commonly used methods in
-    regression analysis. This includes plotting interactions, calculating simple
-    slopes, calculating standardized coefficients, etc. See the reghelper
+    regression analysis. This includes plotting interactions, and calculating
+    simple slopes, standardized coefficients, regions of significance
+    (Johnson & Neyman, 1936; cf. Spiller et al., 2012), etc. See the reghelper
     documentation for more information, documentation, and examples.
 License: GPL-3
 URL: 
