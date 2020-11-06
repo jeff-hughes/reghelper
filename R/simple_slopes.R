@@ -145,6 +145,9 @@ simple_slopes.lm <- function(model, levels=NULL, ...) {
         }
         call[['formula']] <- new_form
         call[['data']] <- quote(mdata)
+        if(!is.null(call[['weights']])) {
+            call[['weights']] <- quote(`(weights)`)
+        }
         new_model <- eval(call)
         
         if (is.factor(test_var)) {
@@ -379,8 +382,12 @@ simple_slopes.merMod <- function(model, levels=NULL, ...) {
                 }
             }
         }
+
         call[['formula']] <- as.formula(new_form)
         call[['data']] <- quote(mdata)
+        if(!is.null(call[['weights']])) {
+            call[['weights']] <- quote(`(weights)`)
+        }
         new_model <- eval(call)
         
         if (is.factor(test_var)) {

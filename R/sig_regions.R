@@ -10,7 +10,7 @@
 #' use the \code{\link{simple_slopes}} function instead.
 #' 
 #' For more information about regions of significance, see
-#' \href{https://ssrn.com/abstract=2208103}{Spiller, Fitzsimons, Lynch, &
+#' \href{https://www.ssrn.com/abstract=2208103}{Spiller, Fitzsimons, Lynch, &
 #' McClelland (2012)}.
 #' 
 #' @param model A fitted linear model of type 'lm' or 'glm' with one two-way
@@ -179,6 +179,9 @@ sig_regions.glm <- function(model, alpha=.05, precision=4, ...) {
         
         call[['formula']] <- new_form
         call[['data']] <- quote(mdata)
+        if(!is.null(call[['weights']])) {
+            call[['weights']] <- quote(`(weights)`)
+        }
         new_model <- eval(call)
         pvalues[counter] <- coef(summary(new_model))[dummy_name, 4]
             # pull out p-value for factor variable

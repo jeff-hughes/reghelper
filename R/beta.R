@@ -59,6 +59,9 @@ beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
     call[['formula']] <- formula[['formula']]
     call[['data']] <- quote(data)  # need this so data doesn't get output
                                    # directly in the summary
+    if(!is.null(call[['weights']])) {
+        call[['weights']] <- quote(`(weights)`)
+    }
     return(summary(eval(call)))
 }
 
