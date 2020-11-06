@@ -1,28 +1,33 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-reghelper
-=========
+# reghelper
 
 The `reghelper` R package includes a set of functions used to automate
 commonly used methods in regression analysis. This includes plotting
 interactions, calculating simple slopes, calculating standardized
 coefficients, etc.
 
-Version 1.0.0 has been released. The most recent stable release is
+Version 1.0.1 has been released. The most recent stable release is
 available on CRAN, and can be installed like so:
 
-    install.packages("reghelper")
+``` r
+install.packages("reghelper")
+```
 
 You can also install the stable release from Github:
 
-    install.packages("devtools")
-    devtools::install_github("jeff-hughes/reghelper@v1.0.0")
+``` r
+install.packages("devtools")
+devtools::install_github("jeff-hughes/reghelper@v1.0.1")
+```
 
 If you would like to install the latest development version, you can do
 so with the following code:
 
-    install.packages("devtools")
-    devtools::install_github("jeff-hughes/reghelper")
+``` r
+install.packages("devtools")
+devtools::install_github("jeff-hughes/reghelper")
+```
 
 ### Installation Issues
 
@@ -34,43 +39,43 @@ starting with two backslashes, but you will need to convert that to a
 path starting with a drive letter (e.g., ‘C:’, ‘D:’). From there, use
 the following code:
 
-    install.packages("devtools")
-    devtools::install_github("jeff-hughes/reghelper", args=c('--library="N:/path/to/libraries/"'))
+``` r
+install.packages("devtools")
+devtools::install_github("jeff-hughes/reghelper", args=c('--library="N:/path/to/libraries/"'))
+```
 
 Obviously, change the path to the path where your R libraries are
 stored.
 
-Summary of helper functions
----------------------------
+## Summary of helper functions
 
--   `beta` Calculates standardized beta coefficients.
--   `build_model` Allows variables to be added to a series of regression
+  - `beta` Calculates standardized beta coefficients.
+  - `build_model` Allows variables to be added to a series of regression
     models sequentially (similar to SPSS).
--   `ICC` Calculates the intra-class correlation for a multi-level
+  - `ICC` Calculates the intra-class correlation for a multi-level
     model.
--   `cell_means` Calculates the estimated means for a fitted model.
--   `graph_model` Easily graph interactions at +/- 1 SD (uses ggplot2
+  - `cell_means` Calculates the estimated means for a fitted model.
+  - `graph_model` Easily graph interactions at +/- 1 SD (uses ggplot2
     package).
--   `sig_regions` Calculate the Johnson-Neyman regions of significance
+  - `sig_regions` Calculate the Johnson-Neyman regions of significance
     for an interaction.
--   `simple_slopes` Easily calculate the simple effects of an
+  - `simple_slopes` Easily calculate the simple effects of an
     interaction.
 
 The table below shows the current types of models for which each
 function has been implemented:
 
-| Function       | lm  | glm | aov | lme | lmer |
-|:---------------|:---:|:---:|:---:|:---:|:----:|
-| beta           |  ✓  |  ✓  |  ✓  |  –  |  –   |
-| build\_model   |  ✓  |  ✓  |  ✓  |     |      |
-| ICC            |  –  |  –  |  –  |  ✓  |  ✓   |
-| cell\_means    |  ✓  |  ✓  |  ✓  |     |      |
-| graph\_model   |  ✓  |  ✓  |  ✓  |  ✓  |  ✓   |
-| sig\_regions   |  ✓  |  ✓  |  –  |     |      |
-| simple\_slopes |  ✓  |  ✓  |  ✓  |  ✓  |  ✓   |
+| Function       | lm | glm | aov | lme | lmer |
+| :------------- | :-: | :-: | :-: | :-: | :--: |
+| beta           | ✓  |  ✓  |  ✓  |  –  |  –   |
+| build\_model   | ✓  |  ✓  |  ✓  |     |      |
+| ICC            | –  |  –  |  –  |  ✓  |  ✓   |
+| cell\_means    | ✓  |  ✓  |  ✓  |     |      |
+| graph\_model   | ✓  |  ✓  |  ✓  |  ✓  |  ✓   |
+| sig\_regions   | ✓  |  ✓  |  –  |     |      |
+| simple\_slopes | ✓  |  ✓  |  ✓  |  ✓  |  ✓   |
 
-Removal of beta() function for multilevel models (nlme and lme4)
-----------------------------------------------------------------
+## Removal of beta() function for multilevel models (nlme and lme4)
 
 Strategies for how to center Level 1 variables in multilevel models has
 been a topic of discussion among methodologists, with a variety of

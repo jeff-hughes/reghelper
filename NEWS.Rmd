@@ -13,6 +13,14 @@ knitr::opts_chunk$set(
   fig.path = "NEWS-"
 )
 ```
+# reghelper 1.0.1
+
+BUG FIX
+
+* Fixes error raised when weights were used in `lm` and `lme4` models. This
+  occurred in several functions, including `beta()`, `simple_slopes()`, and
+  `sig_regions()`. Weights should now properly be applied without issue.
+
 # reghelper 1.0.0
 
 Just a note: While reghelper has officially reached version 1.0.0, the fact is
