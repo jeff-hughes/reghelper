@@ -5,7 +5,8 @@ This update is just a bug fix for cases when model weights are applied.
 ## Test environments
 
 * local Arch Linux install, R 4.0.3
-* Ubuntu 16.04 (on travis-ci), R 4.0.2
+* macOS Catalina 10.15 (Github CI runner), R 3.6.3, R 4.0.2
+* Ubuntu 18.04 (Github CI runner), R 3.6.3, R 4.0.2
 * win-builder (devel, release, and oldrelease)
 
 
