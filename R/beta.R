@@ -106,8 +106,14 @@ beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL, ...) {
         if (!(vars[i] %in% skip)) {
             
             # handle factor variables specially
-            if (is.factor(data[, vars[i]])) {
-                contrasts <- contrasts(data[, vars[i]])
+            if (is.factor(data[, vars[i]]) || is.character(data[, vars[i]])) {
+                v <- data[, vars[i]]
+                # R will silently convert character vectors to factors when they
+                # are put into a model; we need to do the same here
+                if (is.character(data[, vars[i]])) {
+                    v <- factor(data[, vars[i]])
+                }
+                contrasts <- contrasts(v)
                 var_replace <- ''
                 
                 # need to break apart contrasts of factors, creating each dummy
@@ -119,6 +125,8 @@ beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL, ...) {
                     } else {
                         var_name <- paste0(vars[i], colnames(contrasts)[j], '.z')
                     }
+                    var_name <- make.names(var_name)  # make sure resulting var name has no illegal characters
+                    
                     if (ncol(contrasts) > 1) {
                         var_replace <- paste0(var_replace, ' + ', var_name)
                     } else {
@@ -126,7 +134,7 @@ beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL, ...) {
                     }
                     
                     # add dummy code to data frame
-                    data[, var_name] <- data[, vars[i]]
+                    data[, var_name] <- v
                     levels(data[, var_name]) <- contrasts[, j]
                     data[, var_name] <- as.numeric(
                         as.character(data[, var_name]))

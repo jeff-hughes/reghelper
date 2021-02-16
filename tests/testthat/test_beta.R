@@ -269,5 +269,71 @@ test_that('binomial glm with continuous predictor works', {
 })
 
 
+test_that('categorical predictor with invalid level names works', {
+    x <- c(rep("this is first", 50), rep("this-is-second", 50), rep("well maybe *one* more", 50))
+    
+    set.seed(234)
+    x <- factor(x)
+    y <- (as.numeric(x)-1) + rnorm(150)
+    
+    model <- lm(y ~ x)
+    beta_model <- beta(model)
+    
+    expect_equal(get_var_names(beta_model), c('y.z', 'xthis.is.second.z', 'xwell.maybe..one..more.z'))
+    
+    expect_equal(beta_model$r.squared, summary(model)$r.squared)
+    
+    # check coefficients
+    expect_equal(get_coef(beta_model, 'xthis.is.second.z'), 0.450)
+    expect_equal(get_coef(beta_model, 'xwell.maybe..one..more.z'), 0.722)
+    
+    # p-values should still match
+    expect_equal(coef(beta_model)[2, 4], coef(summary(model))[2, 4])
+    expect_equal(coef(beta_model)[3, 4], coef(summary(model))[3, 4])
+})
+
+
+test_that('character vector as factor works', {
+    x <- c(rep("first", 50), rep("second", 50), rep("third", 50))
+    
+    set.seed(234)
+    y <- (as.numeric(factor(x))-1) + rnorm(150)
+    
+    model <- lm(y ~ x)
+    beta_model <- beta(model)
+    
+    expect_equal(get_var_names(beta_model), c('y.z', 'xsecond.z', 'xthird.z'))
+    
+    expect_equal(beta_model$r.squared, summary(model)$r.squared)
+    
+    # check coefficients
+    expect_equal(get_coef(beta_model, 'xsecond.z'), 0.450)
+    expect_equal(get_coef(beta_model, 'xthird.z'), 0.722)
+    
+    # p-values should still match
+    expect_equal(coef(beta_model)[2, 4], coef(summary(model))[2, 4])
+    expect_equal(coef(beta_model)[3, 4], coef(summary(model))[3, 4])
+})
+
+
+test_that('boolean vector as factor works', {
+    x <- c(rep(FALSE, 50), rep(TRUE, 50))
+    
+    set.seed(234)
+    y <- as.numeric(x) + rnorm(100)
+    
+    model <- lm(y ~ x)
+    beta_model <- beta(model)
+    
+    expect_equal(get_var_names(beta_model), c('y.z', 'x.z'))
+    
+    expect_equal(beta_model$r.squared, summary(model)$r.squared)
+    
+    expect_equal(get_coef(beta_model, 'x.z'), 0.528)
+    expect_equal(coef(beta_model)[2, 4], coef(summary(model))[2, 4])
+        # p-values should still match
+})
+
+
 
 

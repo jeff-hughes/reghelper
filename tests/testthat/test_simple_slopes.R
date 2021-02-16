@@ -390,4 +390,41 @@ test_that('lmer with interaction works', {
 })
 
 
+test_that('character vector works', {
+    set.seed(123)
+    x1 <- rnorm(100)
+    
+    x2 <- c(rep("first", 50), rep("second", 50))
+    
+    set.seed(345)
+    y <- x1 * (as.numeric(factor(x2))-1) + rnorm(100)
+    
+    data <- data.frame(x1, x2, y)
+    
+    model <- lm(y ~ x1 * x2, data)
+    slopes <- simple_slopes(model)
+    
+    model_x1_m1 <- summary(lm(y ~ I((x1 - mean(x1)) + sd(x1)) * x2, data))
+    expect_equal(round(slopes[1, 'Test Estimate'], 3),
+                 get_coef(model_x1_m1, 'x2second'))
+    
+    model_x1_0 <- summary(lm(y ~ I(x1 - mean(x1)) * x2, data))
+    expect_equal(round(slopes[2, 'Test Estimate'], 3),
+                 get_coef(model_x1_0, 'x2second'))
+    
+    model_x1_p1 <- summary(lm(y ~ I((x1 - mean(x1)) - sd(x1)) * x2, data))
+    expect_equal(round(slopes[3, 'Test Estimate'], 3),
+                 get_coef(model_x1_p1, 'x2second'))
+    
+    model_x2_0 <- summary(lm(y ~ x1 * x2, data))
+    expect_equal(round(slopes[4, 'Test Estimate'], 3),
+                 get_coef(model_x2_0, 'x1'))
+    
+    data$x2 <- factor(data$x2)
+    contrasts(data$x2) <- c(1, 0)
+    model_x2_1 <- summary(lm(y ~ x1 * x2, data))
+    expect_equal(round(slopes[5, 'Test Estimate'], 3),
+                 get_coef(model_x2_1, 'x1'))
+})
+
 

@@ -86,19 +86,21 @@ simple_slopes.lm <- function(model, levels=NULL, ...) {
     int_vars <- names(which(attr(terms(model), 'factors')[, int_term] == 1))
         # get location of variables in the interaction
     
-    # figure out which variables are categorical
-    factor_vars_log <- vapply(int_vars, function(v) {
-        is.factor(mdata[, v])
-    }, logical(1))
-    factor_vars <- names(factor_vars_log)[which(factor_vars_log == 1)]
-    
+    # figure out which variables are categorical, and pull their contrasts;
+    # we also deal with characte vectors here, which are normally silently
+    # converted to factors when used in a model
+    factor_vars <- c()
     original_contrasts <- list()
-    if (length(factor_vars) > 0) {
-        for (i in 1:length(factor_vars)) {
-            original_contrasts[[factor_vars[i]]] <- contrasts(mdata[, factor_vars[i]])
+    for (v in 1:length(int_vars)) {
+        var <- int_vars[v]
+        if (is.character(mdata[, var])) {
+            mdata[, var] <- factor(mdata[, var])
+        }
+        if (is.factor(mdata[, var])) {
+            factor_vars <- c(factor_vars, var)
+            original_contrasts[[var]] <- contrasts(mdata[, var])
         }
     }
-    
     
     # get points at which to test each variable
     factors <- .set_factors(mdata, int_vars, levels)

@@ -114,6 +114,10 @@ cell_means_q.lm <- function(model, vars=NULL, levels=NULL, ...) {
                 # predictions for each level, then average across them
                 duplicate[length(duplicate)+1] <- term
                 factors[[term]] <- levels(model$model[[term]])
+            } else if (is.character(model$model[[term]])) {
+                # do the same thing as the factor, but convert first
+                duplicate[length(duplicate)+1] <- term
+                factors[[term]] <- levels(factor(model$model[[term]]))
             } else {
                 factors[[term]] <- mean(model$model[[term]])
             }
@@ -201,6 +205,10 @@ cell_means_q.glm <- function(model, vars=NULL, levels=NULL,
                 # predictions for each level, then average across them
                 duplicate[length(duplicate)+1] <- term
                 factors[[term]] <- levels(model$model[[term]])
+            } else if (is.character(model$model[[term]])) {
+                # do the same thing as the factor, but convert first
+                duplicate[length(duplicate)+1] <- term
+                factors[[term]] <- levels(factor(model$model[[term]]))
             } else {
                 factors[[term]] <- mean(model$model[[term]])
             }

@@ -254,6 +254,9 @@ graph_model_q.glm <- function(model, y, x, lines=NULL, split=NULL,
         if (!is.null(term)) {
             if (is.factor(data[[term]])) {
                 factors[[i]] <- levels(data[[term]])
+            } else if (is.character(data[[term]])) {
+                data[[term]] <- factor(data[[term]])
+                factors[[i]] <- levels(data[[term]])
             } else {
                 factors[[i]] <- c(
                     mean(data[[term]], na.rm=TRUE)+sd(data[[term]], na.rm=TRUE),
@@ -292,17 +295,21 @@ graph_model_q.glm <- function(model, y, x, lines=NULL, split=NULL,
     factor_name <- NULL
     for (i in 1:length(variables)) {
         if (!(variables[[i]] %in% colnames(grid))) {
-            if (is.factor(data[[variables[[i]]]])) {
+            v <- data[[variables[[i]]]]
+            if (is.character(v)) {
+                data[[variables[[i]]]] <- factor(v)
+            }
+            
+            if (is.factor(v)) {
                 # if factor, must include all levels in model for
                 # predict() to work properly
                 temp_list <- lapply(as.list(grid), unique)
                     # get unique values and put into list format
-                temp_list[[variables[[i]]]] <- levels(data[[variables[[i]]]])
+                temp_list[[variables[[i]]]] <- levels(v)
                 grid <- expand.grid(temp_list)
                 factor_name <- variables[[i]]
             } else {
-                grid[[variables[[i]]]] <- mean(data[[variables[[i]]]],
-                    na.rm=TRUE)  # if continuous, include in model at mean
+                grid[[variables[[i]]]] <- mean(v, na.rm=TRUE)  # if continuous, include in model at mean
             }
         }
     }
@@ -424,6 +431,9 @@ graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
         if (!is.null(term)) {
             if (is.factor(data[[term]])) {
                 factors[[i]] <- levels(data[[term]])
+            } else if (is.character(data[[term]])) {
+                data[[term]] <- factor(data[[term]])
+                factors[[i]] <- levels(data[[term]])
             } else {
                 factors[[i]] <- c(
                     mean(data[[term]], na.rm=TRUE)+sd(data[[term]], na.rm=TRUE),
@@ -462,17 +472,21 @@ graph_model_q.lme <- function(model, y, x, lines=NULL, split=NULL,
     factor_name <- NULL
     for (i in 1:length(variables)) {
         if (!(variables[[i]] %in% colnames(grid))) {
-            if (is.factor(data[[variables[[i]]]])) {
+            v <- data[[variables[[i]]]]
+            if (is.character(v)) {
+                data[[variables[[i]]]] <- factor(v)
+            }
+
+            if (is.factor(v)) {
                 # if factor, must include all levels in model for
                 # predict() to work properly
                 temp_list <- lapply(as.list(grid), unique)
                     # get unique values and put into list format
-                temp_list[[variables[[i]]]] <- levels(data[[variables[[i]]]])
+                temp_list[[variables[[i]]]] <- levels(v)
                 grid <- expand.grid(temp_list)
                 factor_name <- variables[[i]]
             } else {
-                grid[[variables[[i]]]] <- mean(data[[variables[[i]]]],
-                    na.rm=TRUE)  # if continuous, include in model at mean
+                grid[[variables[[i]]]] <- mean(v, na.rm=TRUE)  # if continuous, include in model at mean
             }
         }
     }
@@ -600,6 +614,9 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
         if (!is.null(term)) {
             if (is.factor(data[[term]])) {
                 factors[[i]] <- levels(data[[term]])
+            } else if (is.character(data[[term]])) {
+                data[[term]] <- factor(data[[term]])
+                factors[[i]] <- levels(data[[term]])
             } else {
                 factors[[i]] <- c(
                     mean(data[[term]], na.rm=TRUE)+sd(data[[term]], na.rm=TRUE),
@@ -638,17 +655,21 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
     factor_name <- NULL
     for (i in 1:length(variables)) {
         if (!(variables[[i]] %in% colnames(grid))) {
-            if (is.factor(data[[variables[[i]]]])) {
+            v <- data[[variables[[i]]]]
+            if (is.character(v)) {
+                data[[variables[[i]]]] <- factor(v)
+            }
+            
+            if (is.factor(v)) {
                 # if factor, must include all levels in model for
                 # predict() to work properly
                 temp_list <- lapply(as.list(grid), unique)
                     # get unique values and put into list format
-                temp_list[[variables[[i]]]] <- levels(data[[variables[[i]]]])
+                temp_list[[variables[[i]]]] <- levels(v)
                 grid <- expand.grid(temp_list)
                 factor_name <- variables[[i]]
             } else {
-                grid[[variables[[i]]]] <- mean(data[[variables[[i]]]],
-                    na.rm=TRUE)  # if continuous, include in model at mean
+                grid[[variables[[i]]]] <- mean(v, na.rm=TRUE)  # if continuous, include in model at mean
             }
         }
     }
