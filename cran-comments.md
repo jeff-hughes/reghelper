@@ -1,6 +1,12 @@
 ## Submission notes
 
-This update is just a bug fix for cases when model weights are applied. 
+This update includes a few bug fixes:
+
+* Fixes errors in `beta()` and `simple_slopes()` resulting from factor variables
+  that have spaces or other special characters
+* Adds support for character vectors added to models, where R silently converts
+  them to factors
+* Fixes error in `graph_model()` documentation
 
 ## Test environments
 

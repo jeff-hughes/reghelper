@@ -153,7 +153,7 @@ of the response variable. For more information, see
 A ggplot2 graph of the plotted variables in the model.
 }
 \description{
-\code{graph_model} provides an easy way to graph interactions in fitted
+\code{graph_model_q} provides an easy way to graph interactions in fitted
 models (linear, generalized linear, hierarchical linear, or ANOVA). Selected
 variables will be graphed at +/- 1 SD (if continuous) or at each level of the
 factor (if categorical).
@@ -185,18 +185,18 @@ evaluation is easier.
 \examples{
 # iris data
 model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)
-graph_model(model, y=Sepal.Width, x=Sepal.Length, lines=Species)
+graph_model_q(model, y='Sepal.Width', x='Sepal.Length', lines='Species')
 
 # Orthodont data
 if (require(nlme, quietly=TRUE)) {
     model <- lme(distance ~ age * Sex, data=Orthodont, random=~1|Subject)
-    graph_model(model, y=distance, x=age, lines=Sex)
+    graph_model_q(model, y='distance', x='age', lines='Sex')
 }
 
 # Arabidopsis data
 if (require(lme4, quietly=TRUE)) {
     model <- lmer(total.fruits ~ nutrient * amd + rack + (1|gen), data=Arabidopsis)
-    graph_model(model, y=total.fruits, x=nutrient, lines=amd)
+    graph_model_q(model, y='total.fruits', x='nutrient', lines='amd')
 }
 }
 \seealso{

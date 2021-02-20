@@ -1,8 +1,8 @@
 Package: reghelper
 Type: Package
 Title: Helper Functions for Regression Analysis
-Version: 1.0.1
-Date: 2020-11-06
+Version: 1.0.2
+Date: 2021-02-19
 Authors@R: person("Jeffrey", "Hughes", email="jeff.hughes@gmail.com",
     role=c("aut", "cre"))
 Description: A set of functions used to automate commonly used methods in
