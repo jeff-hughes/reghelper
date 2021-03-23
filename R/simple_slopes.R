@@ -233,6 +233,7 @@ simple_slopes.lme <- function(model, levels=NULL, ...) {
     grids <- .create_grids(mdata, factors)
     
     form <- format(formula(model))
+    form <- paste(trimws(form), collapse=" ")
     
     template <- grids[[1]]
     models <- grids[[2]]
