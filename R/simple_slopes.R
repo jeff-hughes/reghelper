@@ -77,9 +77,14 @@ simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 
 #' @describeIn simple_slopes Simple slopes for linear models.
 #' @export
-simple_slopes.lm <- function(model, levels=NULL, ...) {
+simple_slopes.lm <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, ...) {
     call <- model$call
     mdata <- model$model
+    
+   if(confint==TRUE){
+      lower.name <- paste(100*(1-ci.width)/2,"%",sep="")
+      upper.name <- paste(100*(1+ci.width)/2,"%",sep="")
+   }
     
     int_term <- which.max(attr(terms(model), 'order'))
         # get location of highest interaction term
@@ -112,8 +117,14 @@ simple_slopes.lm <- function(model, levels=NULL, ...) {
     
     template <- grids[[1]]
     models <- grids[[2]]
-    models[, c('Test Estimate', 'Std. Error',
-               't value', 'Pr(>|t|)', 'df')] <- NA
+    
+    if(confint==TRUE){
+    models[, c('Test Estimate', 'Std. Error', lower.name, upper.name, 'df', 't value', 'Pr(>|t|)')] <- NA
+    }
+    else{
+    models[, c('Test Estimate', 'Std. Error','t value', 'Pr(>|t|)', 'df')] <- NA  
+    }
+
     est_count <- 1
     
     for (i in 1:nrow(template)) {
@@ -152,6 +163,10 @@ simple_slopes.lm <- function(model, levels=NULL, ...) {
         }
         new_model <- eval(call)
         
+        if(confint==TRUE){
+        new_confint <- confint(new_model,level = ci.width, ...)  
+        }
+        
         if (is.factor(test_var)) {
             contr <- original_contrasts[[test_var_name]]
             
@@ -167,46 +182,57 @@ simple_slopes.lm <- function(model, levels=NULL, ...) {
             estimates$df <- new_model$df.residual
             
             for (est in 1:nrow(estimates)) {
-                models[est_count, (ncol(models)-4):ncol(models)] <- estimates[est, ]
-                est_count <- est_count + 1
+              if(confint==TRUE){
+                models[est_count, (ncol(models)-6):ncol(models)] <- c(estimates[est,1:2 ], new_confint[dummy_names,],estimates$df, estimates[est,3:4 ])
+              }
+              else{
+               models[est_count, (ncol(models)-4):ncol(models)] <- estimates[est, ]
+              }
+               est_count <- est_count + 1
             }
         } else {
-            models[est_count, (ncol(models)-4):ncol(models)] <- c(
-                summary(new_model)$coefficients[test_var_name, ],
-                new_model$df.residual
-            )
+          
+          if(confint==TRUE){
+          models[est_count, (ncol(models)-6):ncol(models)] <- c(summary(new_model)$coefficients[test_var_name,1:2 ],
+                                                                new_confint[test_var_name,], 
+                                                                new_model$df.residual,
+                                                                summary(new_model)$coefficients[test_var_name,3:4 ] )
+          }
+          else{
+          models[est_count, (ncol(models)-4):ncol(models)] <- c(summary(new_model)$coefficients[test_var_name, ], new_model$df.residual  )
+          }
             est_count <- est_count + 1
         }
     }
     
+    if(confint!=TRUE){
     # flip order so p-values come last
     columns <- ncol(models)
     models <- models[, c(1:(columns-2), columns, columns-1)]
+    }
     
     class(models) <- c('simple_slopes', 'data.frame')
     return(models)
 }
 
 
-#' @describeIn simple_slopes Simple slopes for ANOVA.
-#' @export
-simple_slopes.aov <- function(model, levels=NULL, ...) {
-    simple_slopes.lm(model, levels)
-}
-
-
 #' @describeIn simple_slopes Simple slopes for generalized linear models.
 #' @export
-simple_slopes.glm <- function(model, levels=NULL, ...) {
-    simple_slopes.lm(model, levels)
+simple_slopes.glm <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, ...) {
+    simple_slopes.lm(model, levels, confint, ci.width, ...)
 }
 
 
 #' @describeIn simple_slopes Simple slopes for hierarchical linear models (nlme).
 #' @export
-simple_slopes.lme <- function(model, levels=NULL, ...) {
+simple_slopes.lme <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, ...) {
     call <- model$call
     mdata <- model$data
+    
+   if(confint==TRUE){
+      lower.name <- paste(100*(1-ci.width)/2,"%",sep="")
+      upper.name <- paste(100*(1+ci.width)/2,"%",sep="")
+   }
     
     int_term <- which.max(attr(terms(model), 'order'))
         # get location of highest interaction term
@@ -233,12 +259,16 @@ simple_slopes.lme <- function(model, levels=NULL, ...) {
     grids <- .create_grids(mdata, factors)
     
     form <- format(formula(model))
-    form <- paste(trimws(form), collapse=" ")
     
     template <- grids[[1]]
     models <- grids[[2]]
-    models[, c('Test Estimate', 'Std. Error',
-        'df', 't value', 'Pr(>|t|)')] <- NA
+    
+    if(confint==TRUE){
+    models[, c('Test Estimate', 'Std. Error', lower.name, upper.name, 'df', 't value', 'Pr(>|t|)')] <- NA
+    }
+    else{
+    models[, c('Test Estimate', 'Std. Error','df', 't value', 'Pr(>|t|)')] <- NA
+    }
     est_count <- 1
     
     for (i in 1:nrow(template)) {
@@ -273,6 +303,12 @@ simple_slopes.lme <- function(model, levels=NULL, ...) {
         call[['fixed']] <- as.formula(new_form)
         call[['data']] <- quote(mdata)
         new_model <- eval(call)
+
+        if(confint==TRUE){
+        #new_confint <- confint(new_model,level = ci.width, confint.method=confint.method, ...) #confint method not implemented
+        #recommended alternative:
+        new_confint <- intervals(new_model,level=ci.width,which = "fixed",...)$fixed[,-2]
+        }
         
         if (is.factor(test_var)) {
             contr <- original_contrasts[[test_var_name]]
@@ -289,21 +325,32 @@ simple_slopes.lme <- function(model, levels=NULL, ...) {
             }
             
             for (est in 1:nrow(estimates)) {
-                models[est_count,
-                    (ncol(models)-4):ncol(models)] <- estimates[est, ]
-                est_count <- est_count + 1
+              if(confint==TRUE){
+                models[est_count, (ncol(models)-6):ncol(models)] <- c(estimates[est,1:2 ], new_confint[dummy_names,], estimates[est,3:5 ])
+              }
+              else{
+               models[est_count, (ncol(models)-4):ncol(models)] <- estimates[est, ]
+              }              
+               est_count <- est_count + 1
             }
         } else {
-            models[est_count,
-                (ncol(models)-4):ncol(models)
-            ] <- summary(new_model)$tTable[test_var_name, ]
-            est_count <- est_count + 1
+          if(confint==TRUE){
+            models[est_count,(ncol(models)-6):ncol(models)] <-c(summary(new_model)$tTable[test_var_name, 1:2 ],
+                                                                new_confint[test_var_name,], 
+                                                                summary(new_model)$tTable[test_var_name, 3:5] )
+          }
+          else{
+           models[est_count,(ncol(models)-4):ncol(models)] <- summary(new_model)$tTable[test_var_name, ]
+           }
+           est_count <- est_count + 1
         }
     }
     
+    if(confint!=TRUE){
     # flip order to keep consistent with simple_slopes.lm
     columns <- ncol(models)
     models <- models[, c(1:(columns-3), columns-1, columns-2, columns)]
+    }
     
     class(models) <- c('simple_slopes', 'data.frame')
     return(models)
@@ -312,10 +359,15 @@ simple_slopes.lme <- function(model, levels=NULL, ...) {
 
 #' @describeIn simple_slopes Simple slopes for hierarchical linear models (lme4).
 #' @export
-simple_slopes.merMod <- function(model, levels=NULL, ...) {
+simple_slopes.merMod <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, confint.method="Wald", ...) {
     call <- model@call
     mdata <- model@frame
     
+    if(confint==TRUE){
+      lower.name <- paste(100*(1-ci.width)/2,"%",sep="")
+      upper.name <- paste(100*(1+ci.width)/2,"%",sep="")
+    }
+
     int_term <- which.max(attr(terms(model), 'order'))
     # get location of highest interaction term
     int_vars <- names(which(attr(terms(model), 'factors')[, int_term] == 1))
@@ -333,7 +385,7 @@ simple_slopes.merMod <- function(model, levels=NULL, ...) {
             original_contrasts[[factor_vars[i]]] <- contrasts(mdata[, factor_vars[i]])
         }
     }
-    
+
     # get points at which to test each variable
     factors <- .set_factors(mdata, int_vars, levels)
     
@@ -347,13 +399,24 @@ simple_slopes.merMod <- function(model, levels=NULL, ...) {
     
     # distinguish between lmer and lmerTest models
     if ('lmerModLmerTest' %in% class(model)) {
-        models[, c('Test Estimate', 'Std. Error', 'df', 't value', 'Pr(>|t|)')] <- NA
-        coef_cols <- 5
+        if(confint==TRUE){
+           models[, c('Test Estimate', 'Std. Error', lower.name, upper.name, 'df', 't value', 'Pr(>|t|)')] <- NA
+           coef_cols <- 7
+        }
+        else{
+         models[, c('Test Estimate', 'Std. Error', 'df', 't value', 'Pr(>|t|)')] <- NA
+         coef_cols <- 5
+        }
     } else {
+        if(confint==TRUE){
+           models[, c('Test Estimate', 'Std. Error', lower.name, upper.name,'t value')] <- NA
+           coef_cols <- 5
+        }
+        else{
         models[, c('Test Estimate', 'Std. Error', 't value')] <- NA
         coef_cols <- 3
+        }
     }
-
     est_count <- 1
     
     for (i in 1:nrow(template)) {
@@ -393,6 +456,10 @@ simple_slopes.merMod <- function(model, levels=NULL, ...) {
         }
         new_model <- eval(call)
         
+        if(confint==TRUE){
+        new_confint <- confint(new_model,method=confint.method,level = ci.width, ...)
+        }
+        
         if (is.factor(test_var)) {
             contr <- original_contrasts[[test_var_name]]
             dummy_names <- paste0(test_var_name, colnames(contr))
@@ -408,14 +475,25 @@ simple_slopes.merMod <- function(model, levels=NULL, ...) {
             }
             
             for (est in 1:nrow(estimates)) {
-                models[est_count,
+                if(confint==TRUE){
+                  models[est_count,
+                    (ncol(models)-coef_cols+1):ncol(models)] <- c(estimates[est, 1:2 ], new_confint[dummy_names,], estimates[est, 3:(coef_cols-2) ]) 
+                }
+                else{
+                    models[est_count,
                     (ncol(models)-coef_cols+1):ncol(models)] <- estimates[est, ]
+                }
                 est_count <- est_count + 1
             }
-        } else {
-            models[est_count,
-                (ncol(models)-coef_cols+1):ncol(models)
-                ] <- coef(summary(new_model))[test_var_name, ]
+        } 
+        else {
+            if(confint==TRUE){
+                 models[est_count,(ncol(models)-coef_cols+1):ncol(models)] <- 
+                 c(coef(summary(new_model))[test_var_name,1:2], new_confint[test_var_name,], coef(summary(new_model))[test_var_name,3:(coef_cols-2) ]) 
+         }
+       else{
+                models[est_count,(ncol(models)-coef_cols+1):ncol(models) ] <- coef(summary(new_model))[test_var_name, ]
+           }
             est_count <- est_count + 1
         }
     }
@@ -437,10 +515,10 @@ simple_slopes.merMod <- function(model, levels=NULL, ...) {
 #' @seealso \code{\link{simple_slopes}}
 #' @export
 print.simple_slopes <- function(
-    x,
-    digits=max(3L, getOption('digits') - 3L),
-    signif.stars=getOption('show.signif.stars'),
-    ...) {
+    x, 
+    digits=max(3L, getOption('digits') - 3L), 
+    signif.stars=getOption('show.signif.stars'), 
+    ...){
     
     model <- x
 
@@ -449,7 +527,7 @@ print.simple_slopes <- function(
         signif.stars <- TRUE
     }
     
-    index <- c('Test Estimate', 'Std. Error', 't value', 'df')
+    index <- c('Test Estimate', 'Std. Error',colnames(model)[endsWith(colnames(model),"%")], 't value', 'df')
     for (i in index) {
         if (i %in% colnames(model)) {
             model[, i] <- round(model[, i], digits=digits)
@@ -468,33 +546,6 @@ print.simple_slopes <- function(
         if (signif.stars) {
             model[, 'Sig.'] <- as.character(stars)
         }
-    }
-    
-    print.data.frame(model, quote=FALSE, right=TRUE, na.print='NA')
-    invisible(model)
-}
-
-
-#' Print simple slopes.
-#' 
-#' \code{print} method for class "\code{simple_slopes_lme4}".
-#' 
-#' @param x An object of class "\code{simple_slopes_lme4}", usually, a result
-#'   of a call to \code{\link{simple_slopes}}.
-#' @param digits The number of significant digits to use when printing.
-#' @param ... Further arguments passed to or from other methods.
-#' @seealso \code{\link{simple_slopes}}
-#' @export
-print.simple_slopes_lme4 <- function(
-    x,
-    digits=max(3L, getOption('digits') - 3L),
-    ...) {
-    
-    model <- x
-    
-    index <- c('Test Estimate', 'Std. Error', 't value')
-    for (i in index) {
-        model[, i] <- round(model[, i], digits=digits)
     }
     
     print.data.frame(model, quote=FALSE, right=TRUE, na.print='NA')
@@ -557,7 +608,6 @@ print.simple_slopes_lme4 <- function(
     
     return(list(grid, new_grid))
 }
-
 
 
 
