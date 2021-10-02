@@ -258,7 +258,7 @@ simple_slopes.lme <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, 
     # create grid of all tests to be done
     grids <- .create_grids(mdata, factors)
     
-    form <- format(formula(model))
+    form <- paste(trimws(form), collapse=" ")
     
     template <- grids[[1]]
     models <- grids[[2]]
