@@ -76,15 +76,11 @@ simple_slopes <- function(model, ...) UseMethod('simple_slopes')
 
 
 #' @describeIn simple_slopes Simple slopes for linear models.
+#' @import MASS
 #' @export
 simple_slopes.lm <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, ...) {
     call <- model$call
     mdata <- model$model
-    
-   if(confint==TRUE){
-      lower.name <- paste(100*(1-ci.width)/2,"%",sep="")
-      upper.name <- paste(100*(1+ci.width)/2,"%",sep="")
-   }
     
     int_term <- which.max(attr(terms(model), 'order'))
         # get location of highest interaction term
@@ -92,7 +88,7 @@ simple_slopes.lm <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, .
         # get location of variables in the interaction
     
     # figure out which variables are categorical, and pull their contrasts;
-    # we also deal with characte vectors here, which are normally silently
+    # we also deal with character vectors here, which are normally silently
     # converted to factors when used in a model
     factor_vars <- c()
     original_contrasts <- list()
@@ -118,15 +114,17 @@ simple_slopes.lm <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, .
     template <- grids[[1]]
     models <- grids[[2]]
     
-    if(confint==TRUE){
-    models[, c('Test Estimate', 'Std. Error', lower.name, upper.name, 'df', 't value', 'Pr(>|t|)')] <- NA
+    if(confint){
+        lower.name <- paste(100*(1-ci.width)/2,"%",sep="")
+        upper.name <- paste(100*(1+ci.width)/2,"%",sep="")
+        models[, c('Test Estimate', 'Std. Error', 't value', 'Pr(>|t|)', 'df', lower.name, upper.name)] <- NA
     }
     else{
-    models[, c('Test Estimate', 'Std. Error','t value', 'Pr(>|t|)', 'df')] <- NA  
+        models[, c('Test Estimate', 'Std. Error', 't value', 'Pr(>|t|)', 'df')] <- NA
     }
 
     est_count <- 1
-    
+
     for (i in 1:nrow(template)) {
         new_form <- form
         test_var_name <- names(template)[which(startsWith(as.character(template[i, ]), 'sstest'))]
@@ -163,8 +161,8 @@ simple_slopes.lm <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, .
         }
         new_model <- eval(call)
         
-        if(confint==TRUE){
-        new_confint <- confint(new_model,level = ci.width, ...)  
+        if(confint){
+            new_confint <- confint(new_model, level = ci.width, ...)
         }
         
         if (is.factor(test_var)) {
@@ -178,38 +176,35 @@ simple_slopes.lm <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, .
             
             estimates <- as.data.frame(
                 summary(new_model)$coefficients[dummy_names, , drop=FALSE])
-
             estimates$df <- new_model$df.residual
+            if (confint) {
+                estimates <- cbind(estimates, new_confint[dummy_names, , drop=FALSE])
+            }
             
             for (est in 1:nrow(estimates)) {
-              if(confint==TRUE){
-                models[est_count, (ncol(models)-6):ncol(models)] <- c(estimates[est,1:2 ], new_confint[dummy_names,],estimates$df, estimates[est,3:4 ])
-              }
-              else{
-               models[est_count, (ncol(models)-4):ncol(models)] <- estimates[est, ]
-              }
-               est_count <- est_count + 1
+                models[est_count, (ncol(models)-ncol(estimates)+1):ncol(models)] <- estimates[est, ]
+                est_count <- est_count + 1
             }
         } else {
-          
-          if(confint==TRUE){
-          models[est_count, (ncol(models)-6):ncol(models)] <- c(summary(new_model)$coefficients[test_var_name,1:2 ],
-                                                                new_confint[test_var_name,], 
-                                                                new_model$df.residual,
-                                                                summary(new_model)$coefficients[test_var_name,3:4 ] )
-          }
-          else{
-          models[est_count, (ncol(models)-4):ncol(models)] <- c(summary(new_model)$coefficients[test_var_name, ], new_model$df.residual  )
-          }
+            estimate <- c(summary(new_model)$coefficients[test_var_name, ], new_model$df.residual)
+            if (confint) {
+                estimate <- c(estimate, new_confint[test_var_name, ])
+            }
+
+            models[est_count, (ncol(models)-length(estimate)+1):ncol(models)] <- estimate
             est_count <- est_count + 1
         }
     }
     
-    if(confint!=TRUE){
-    # flip order so p-values come last
-    columns <- ncol(models)
-    models <- models[, c(1:(columns-2), columns, columns-1)]
+    # adjust order of columns; should always be:
+    # Test Estimate, Std. Error, [CI low, CI high,] t value, df, Pr(>|t|)
+    if (confint) {
+        col_order <- c('Test Estimate', 'Std. Error', lower.name, upper.name, 't value', 'df', 'Pr(>|t|)')
+    } else {
+        col_order <- c('Test Estimate', 'Std. Error', 't value', 'df', 'Pr(>|t|)')
     }
+    var_names <- colnames(models)[1:(ncol(models)-length(col_order))]
+    models <- models[, c(var_names, col_order)]
     
     class(models) <- c('simple_slopes', 'data.frame')
     return(models)
@@ -228,11 +223,6 @@ simple_slopes.glm <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, 
 simple_slopes.lme <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, ...) {
     call <- model$call
     mdata <- model$data
-    
-   if(confint==TRUE){
-      lower.name <- paste(100*(1-ci.width)/2,"%",sep="")
-      upper.name <- paste(100*(1+ci.width)/2,"%",sep="")
-   }
     
     int_term <- which.max(attr(terms(model), 'order'))
         # get location of highest interaction term
@@ -258,16 +248,19 @@ simple_slopes.lme <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, 
     # create grid of all tests to be done
     grids <- .create_grids(mdata, factors)
     
+    form <- format(formula(model))
     form <- paste(trimws(form), collapse=" ")
     
     template <- grids[[1]]
     models <- grids[[2]]
     
-    if(confint==TRUE){
-    models[, c('Test Estimate', 'Std. Error', lower.name, upper.name, 'df', 't value', 'Pr(>|t|)')] <- NA
+    if(confint){
+        lower.name <- paste(100*(1-ci.width)/2,"%",sep="")
+        upper.name <- paste(100*(1+ci.width)/2,"%",sep="")
+        models[, c('Test Estimate', 'Std. Error', 'df', 't value', 'Pr(>|t|)', lower.name, upper.name)] <- NA
     }
     else{
-    models[, c('Test Estimate', 'Std. Error','df', 't value', 'Pr(>|t|)')] <- NA
+        models[, c('Test Estimate', 'Std. Error', 'df', 't value', 'Pr(>|t|)')] <- NA
     }
     est_count <- 1
     
@@ -303,11 +296,11 @@ simple_slopes.lme <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, 
         call[['fixed']] <- as.formula(new_form)
         call[['data']] <- quote(mdata)
         new_model <- eval(call)
-
-        if(confint==TRUE){
-        #new_confint <- confint(new_model,level = ci.width, confint.method=confint.method, ...) #confint method not implemented
-        #recommended alternative:
-        new_confint <- intervals(new_model,level=ci.width,which = "fixed",...)$fixed[,-2]
+        
+        if(confint){
+            #new_confint <- confint(new_model,level = ci.width, confint.method=confint.method, ...) #confint method not implemented
+            #recommended alternative:
+            new_confint <- nlme::intervals(new_model,level=ci.width,which = "fixed",...)$fixed[,-2]
         }
         
         if (is.factor(test_var)) {
@@ -324,33 +317,34 @@ simple_slopes.lme <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, 
                 rownames(estimates) <- 1
             }
             
+            if (confint) {
+                estimates <- cbind(estimates, new_confint[dummy_names, , drop=FALSE])
+            }
+            
             for (est in 1:nrow(estimates)) {
-              if(confint==TRUE){
-                models[est_count, (ncol(models)-6):ncol(models)] <- c(estimates[est,1:2 ], new_confint[dummy_names,], estimates[est,3:5 ])
-              }
-              else{
-               models[est_count, (ncol(models)-4):ncol(models)] <- estimates[est, ]
-              }              
-               est_count <- est_count + 1
+                models[est_count, (ncol(models)-ncol(estimates)+1):ncol(models)] <- estimates[est, ]
+                est_count <- est_count + 1
             }
         } else {
-          if(confint==TRUE){
-            models[est_count,(ncol(models)-6):ncol(models)] <-c(summary(new_model)$tTable[test_var_name, 1:2 ],
-                                                                new_confint[test_var_name,], 
-                                                                summary(new_model)$tTable[test_var_name, 3:5] )
-          }
-          else{
-           models[est_count,(ncol(models)-4):ncol(models)] <- summary(new_model)$tTable[test_var_name, ]
-           }
-           est_count <- est_count + 1
+            estimate <- summary(new_model)$tTable[test_var_name, ]
+            if (confint) {
+                estimate <- c(estimate, new_confint[test_var_name, ])
+            }
+            
+            models[est_count, (ncol(models)-length(estimate)+1):ncol(models)] <- estimate
+            est_count <- est_count + 1
         }
     }
     
-    if(confint!=TRUE){
-    # flip order to keep consistent with simple_slopes.lm
-    columns <- ncol(models)
-    models <- models[, c(1:(columns-3), columns-1, columns-2, columns)]
+    # adjust order of columns; should always be:
+    # Test Estimate, Std. Error, [CI low, CI high,] t value, df, Pr(>|t|)
+    if (confint) {
+        col_order <- c('Test Estimate', 'Std. Error', lower.name, upper.name, 't value', 'df', 'Pr(>|t|)')
+    } else {
+        col_order <- c('Test Estimate', 'Std. Error', 't value', 'df', 'Pr(>|t|)')
     }
+    var_names <- colnames(models)[1:(ncol(models)-length(col_order))]
+    models <- models[, c(var_names, col_order)]
     
     class(models) <- c('simple_slopes', 'data.frame')
     return(models)
@@ -359,19 +353,22 @@ simple_slopes.lme <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, 
 
 #' @describeIn simple_slopes Simple slopes for hierarchical linear models (lme4).
 #' @export
-simple_slopes.merMod <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, confint.method="Wald", ...) {
+simple_slopes.merMod <- function(
+    model,
+    levels=NULL,
+    confint=FALSE,
+    ci.width=0.95,
+    confint.method=c("Wald", "profile", "boot"),
+    ...) {
+    
     call <- model@call
     mdata <- model@frame
-    
-    if(confint==TRUE){
-      lower.name <- paste(100*(1-ci.width)/2,"%",sep="")
-      upper.name <- paste(100*(1+ci.width)/2,"%",sep="")
-    }
+    confint.method <- match.arg(confint.method)
 
     int_term <- which.max(attr(terms(model), 'order'))
-    # get location of highest interaction term
+        # get location of highest interaction term
     int_vars <- names(which(attr(terms(model), 'factors')[, int_term] == 1))
-    # get location of variables in the interaction
+        # get location of variables in the interaction
     
     # figure out which variables are categorical
     factor_vars_log <- vapply(int_vars, function(v) {
@@ -399,24 +396,17 @@ simple_slopes.merMod <- function(model, levels=NULL, confint=FALSE, ci.width=0.9
     
     # distinguish between lmer and lmerTest models
     if ('lmerModLmerTest' %in% class(model)) {
-        if(confint==TRUE){
-           models[, c('Test Estimate', 'Std. Error', lower.name, upper.name, 'df', 't value', 'Pr(>|t|)')] <- NA
-           coef_cols <- 7
-        }
-        else{
-         models[, c('Test Estimate', 'Std. Error', 'df', 't value', 'Pr(>|t|)')] <- NA
-         coef_cols <- 5
-        }
+        column_names <- c('Test Estimate', 'Std. Error', 'df', 't value', 'Pr(>|t|)')
     } else {
-        if(confint==TRUE){
-           models[, c('Test Estimate', 'Std. Error', lower.name, upper.name,'t value')] <- NA
-           coef_cols <- 5
-        }
-        else{
-        models[, c('Test Estimate', 'Std. Error', 't value')] <- NA
-        coef_cols <- 3
-        }
+        column_names <- c('Test Estimate', 'Std. Error', 't value')
     }
+
+    if(confint){
+        lower.name <- paste(100*(1-ci.width)/2,"%",sep="")
+        upper.name <- paste(100*(1+ci.width)/2,"%",sep="")
+        column_names <- c(column_names, lower.name, upper.name)
+    }
+    models[, column_names] <- NA
     est_count <- 1
     
     for (i in 1:nrow(template)) {
@@ -448,7 +438,7 @@ simple_slopes.merMod <- function(model, levels=NULL, confint=FALSE, ci.width=0.9
                 }
             }
         }
-
+        
         call[['formula']] <- as.formula(new_form)
         call[['data']] <- quote(mdata)
         if(!is.null(call[['weights']])) {
@@ -456,8 +446,8 @@ simple_slopes.merMod <- function(model, levels=NULL, confint=FALSE, ci.width=0.9
         }
         new_model <- eval(call)
         
-        if(confint==TRUE){
-        new_confint <- confint(new_model,method=confint.method,level = ci.width, ...)
+        if(confint){
+            new_confint <- confint(new_model,method=confint.method,level = ci.width, ...)
         }
         
         if (is.factor(test_var)) {
@@ -474,29 +464,38 @@ simple_slopes.merMod <- function(model, levels=NULL, confint=FALSE, ci.width=0.9
                 rownames(estimates) <- 1
             }
             
+            if (confint) {
+                estimates <- cbind(estimates, new_confint[dummy_names, , drop=FALSE])
+            }
+            
             for (est in 1:nrow(estimates)) {
-                if(confint==TRUE){
-                  models[est_count,
-                    (ncol(models)-coef_cols+1):ncol(models)] <- c(estimates[est, 1:2 ], new_confint[dummy_names,], estimates[est, 3:(coef_cols-2) ]) 
-                }
-                else{
-                    models[est_count,
-                    (ncol(models)-coef_cols+1):ncol(models)] <- estimates[est, ]
-                }
+                models[est_count, (ncol(models)-ncol(estimates)+1):ncol(models)] <- estimates[est, ]
                 est_count <- est_count + 1
             }
         } 
         else {
-            if(confint==TRUE){
-                 models[est_count,(ncol(models)-coef_cols+1):ncol(models)] <- 
-                 c(coef(summary(new_model))[test_var_name,1:2], new_confint[test_var_name,], coef(summary(new_model))[test_var_name,3:(coef_cols-2) ]) 
-         }
-       else{
-                models[est_count,(ncol(models)-coef_cols+1):ncol(models) ] <- coef(summary(new_model))[test_var_name, ]
-           }
+            estimate <- coef(summary(new_model))[test_var_name, ]
+            if (confint) {
+                estimate <- c(estimate, new_confint[test_var_name, ])
+            }
+            models[est_count, (ncol(models)-length(estimate)+1):ncol(models)] <- estimate
             est_count <- est_count + 1
         }
     }
+    
+    # adjust order of columns; should always be:
+    # Test Estimate, Std. Error, [CI low, CI high,] t value, df, Pr(>|t|)
+    if ('lmerModLmerTest' %in% class(model)) {
+        col_order <- c('Test Estimate', 'Std. Error', 'df', 't value', 'Pr(>|t|)')
+    } else {
+        col_order <- c('Test Estimate', 'Std. Error', 't value')
+    }
+    if (confint) {
+        col_order <- c(col_order[1:2], lower.name, upper.name, col_order[3:length(col_order)])
+    }
+    var_names <- colnames(models)[1:(ncol(models)-length(col_order))]
+    models <- models[, c(var_names, col_order)]
+
     class(models) <- c('simple_slopes', 'data.frame')
     return(models)
 }
@@ -521,7 +520,7 @@ print.simple_slopes <- function(
     ...){
     
     model <- x
-
+    
     if (!is.logical(signif.stars) || is.na(signif.stars)) {
         warning("option \"show.signif.stars\" is invalid: assuming TRUE")
         signif.stars <- TRUE
