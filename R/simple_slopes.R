@@ -27,7 +27,13 @@
 #'   continuous variables) at which to test that variable. \strong{Note:} If you
 #'   do not include 'sstest' as one of these levels, the function will not test
 #'   the simple effects for that variable.
-#' @param ... Not currently implemented; used to ensure consistency with S3 generic.
+#' @param confint Whether or not to include confidence intervals for each estimate.
+#' @param ci.width If `confint` is TRUE, this represents the width of the
+#'   confidence intervals to calculate, as a proportion from 0 to 1.
+#' @param confint.method For `merMod` models only, specifies what method to use
+#'   for computing the confidence intervals.
+#' @param ... Additional parameters to be passed on to the `confint` method, if
+#'   `confint` is TRUE.
 #' @return A data frame with a row for each simple effect. The first few columns
 #'   identify the level at which each variable in your model was set for that
 #'   test. A 'sstest' value in a particular column indicates that the simple

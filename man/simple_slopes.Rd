@@ -3,7 +3,6 @@
 \name{simple_slopes}
 \alias{simple_slopes}
 \alias{simple_slopes.lm}
-\alias{simple_slopes.aov}
 \alias{simple_slopes.glm}
 \alias{simple_slopes.lme}
 \alias{simple_slopes.merMod}
@@ -11,21 +10,27 @@
 \usage{
 simple_slopes(model, ...)
 
-\method{simple_slopes}{lm}(model, levels = NULL, ...)
+\method{simple_slopes}{lm}(model, levels = NULL, confint = FALSE, ci.width = 0.95, ...)
 
-\method{simple_slopes}{aov}(model, levels = NULL, ...)
+\method{simple_slopes}{glm}(model, levels = NULL, confint = FALSE, ci.width = 0.95, ...)
 
-\method{simple_slopes}{glm}(model, levels = NULL, ...)
+\method{simple_slopes}{lme}(model, levels = NULL, confint = FALSE, ci.width = 0.95, ...)
 
-\method{simple_slopes}{lme}(model, levels = NULL, ...)
-
-\method{simple_slopes}{merMod}(model, levels = NULL, ...)
+\method{simple_slopes}{merMod}(
+  model,
+  levels = NULL,
+  confint = FALSE,
+  ci.width = 0.95,
+  confint.method = c("Wald", "profile", "boot"),
+  ...
+)
 }
 \arguments{
 \item{model}{A fitted linear model of type 'lm', 'glm', 'aov', 'lme' (nlme),
 or 'merMod' (lme4), with at least one interaction term.}
 
-\item{...}{Not currently implemented; used to ensure consistency with S3 generic.}
+\item{...}{Additional parameters to be passed on to the `confint` method, if
+`confint` is TRUE.}
 
 \item{levels}{A list with element names corresponding to some or all of the
 variables in the model. Each list element should be a vector with the names
@@ -33,6 +38,14 @@ of factor levels (for categorical variables) or numeric values (for
 continuous variables) at which to test that variable. \strong{Note:} If you
 do not include 'sstest' as one of these levels, the function will not test
 the simple effects for that variable.}
+
+\item{confint}{Whether or not to include confidence intervals for each estimate.}
+
+\item{ci.width}{If `confint` is TRUE, this represents the width of the
+confidence intervals to calculate, as a proportion from 0 to 1.}
+
+\item{confint.method}{For `merMod` models only, specifies what method to use
+for computing the confidence intervals.}
 }
 \value{
 A data frame with a row for each simple effect. The first few columns
@@ -68,8 +81,6 @@ the `sstest` label.
 \section{Methods (by class)}{
 \itemize{
 \item \code{lm}: Simple slopes for linear models.
-
-\item \code{aov}: Simple slopes for ANOVA.
 
 \item \code{glm}: Simple slopes for generalized linear models.
 
