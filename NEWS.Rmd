@@ -13,6 +13,15 @@ knitr::opts_chunk$set(
   fig.path = "NEWS-"
 )
 ```
+# reghelper 1.1.0
+
+* Adds David Beiner as a co-maintainer of the package
+* Support for confidence intervals for `simple_slopes()`
+
+BUG FIX
+
+* Fixes warning raised when using a long formula with `simple_slopes()` 
+
 # reghelper 1.0.2
 
 BUG FIXES

@@ -19,7 +19,7 @@ The `reghelper` R package includes a set of functions used to automate commonly
 used methods in regression analysis. This includes plotting interactions,
 calculating simple slopes, calculating standardized coefficients, etc.
 
-Version 1.0.2 has been released. The most recent stable release is available on
+Version 1.1.0 has been released. The most recent stable release is available on
 CRAN, and can be installed like so:
 ```R
 install.packages("reghelper")

@@ -1,5 +1,15 @@
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
 
+# reghelper 1.1.0
+
+-   Adds David Beiner as a co-maintainer of the package
+-   Support for confidence intervals for `simple_slopes()`
+
+BUG FIX
+
+-   Fixes warning raised when using a long formula with
+    `simple_slopes()`
+
 # reghelper 1.0.2
 
 BUG FIXES
@@ -69,7 +79,7 @@ This is a patch release to cover changes made to the ggplot2 package.
 
 BUG FIXES
 
--   Fixed simple\_slopes() to cover cases of contrasts that have no
+-   Fixed simple_slopes() to cover cases of contrasts that have no
     column names.
 
 # reghelper 0.3.3
@@ -106,7 +116,7 @@ BUG FIXES
 BUG FIXES
 
 -   Fixed bug with `simple_slopes` using incorrect contrasts for factor
-    variables. Resolves Issue \#2.
+    variables. Resolves Issue #2.
 
 # reghelper 0.3.1
 
@@ -160,7 +170,7 @@ NEW FEATURES
 BUG FIXES
 
 -   Fixed bug with passing variables names to `build_model`,
-    `cell_means`, and `graph_model`. Resolves Issue \#1.
+    `cell_means`, and `graph_model`. Resolves Issue #1.
 
 # reghelper 0.1.0
 

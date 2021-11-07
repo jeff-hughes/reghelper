@@ -7,7 +7,7 @@ commonly used methods in regression analysis. This includes plotting
 interactions, calculating simple slopes, calculating standardized
 coefficients, etc.
 
-Version 1.0.2 has been released. The most recent stable release is
+Version 1.1.0 has been released. The most recent stable release is
 available on CRAN, and can be installed like so:
 
 ``` r
@@ -65,15 +65,15 @@ stored.
 The table below shows the current types of models for which each
 function has been implemented:
 
-| Function       | lm  | glm | aov | lme | lmer |
-|:---------------|:---:|:---:|:---:|:---:|:----:|
-| beta           |  ✓  |  ✓  |  ✓  |  –  |  –   |
-| build\_model   |  ✓  |  ✓  |  ✓  |     |      |
-| ICC            |  –  |  –  |  –  |  ✓  |  ✓   |
-| cell\_means    |  ✓  |  ✓  |  ✓  |     |      |
-| graph\_model   |  ✓  |  ✓  |  ✓  |  ✓  |  ✓   |
-| sig\_regions   |  ✓  |  ✓  |  –  |     |      |
-| simple\_slopes |  ✓  |  ✓  |  ✓  |  ✓  |  ✓   |
+| Function      | lm  | glm | aov | lme | lmer |
+|:--------------|:---:|:---:|:---:|:---:|:----:|
+| beta          |  ✓  |  ✓  |  ✓  |  –  |  –   |
+| build_model   |  ✓  |  ✓  |  ✓  |     |      |
+| ICC           |  –  |  –  |  –  |  ✓  |  ✓   |
+| cell_means    |  ✓  |  ✓  |  ✓  |     |      |
+| graph_model   |  ✓  |  ✓  |  ✓  |  ✓  |  ✓   |
+| sig_regions   |  ✓  |  ✓  |  –  |     |      |
+| simple_slopes |  ✓  |  ✓  |  ✓  |  ✓  |  ✓   |
 
 ## Removal of beta() function for multilevel models (nlme and lme4)
 
