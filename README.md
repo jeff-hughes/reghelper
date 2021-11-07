@@ -18,7 +18,7 @@ You can also install the stable release from Github:
 
 ``` r
 install.packages("devtools")
-devtools::install_github("jeff-hughes/reghelper@v1.0.2")
+devtools::install_github("jeff-hughes/reghelper@v1.1.0")
 ```
 
 If you would like to install the latest development version, you can do
