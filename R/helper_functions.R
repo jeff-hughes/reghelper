@@ -69,6 +69,19 @@
 }
 
 
+#' Convert an expression-like function input into a string.
+#' 
+#' Helper function to assist with non-standard evaluation, converting expressions
+#' and symbols into strings.
+#' 
+#' @param expr The expression to change.
+#' @return A string version of the expression.
+#' @noRd
+.expr_to_str <- function(expr) {
+    # we need the paste because `deparse` will insert line breaks for
+    # long expressions, which is definitely not useful to us
+    return(paste(deparse(expr, width.cutoff=500), collapse=""))
+}
 
 
 

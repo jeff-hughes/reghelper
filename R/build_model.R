@@ -45,7 +45,7 @@ build_model <- function(dv, ..., data=NULL, opts=NULL, model='lm') {
     
     if (length(call_list) > 0) {
         # turn variable names into strings
-        blocks <- sapply(call_list, deparse)
+        blocks <- sapply(call_list, .expr_to_str)
         
         # because we can have vectors or lists of variables designating a block,
         # we need to pull out the individual variable names and store in a list

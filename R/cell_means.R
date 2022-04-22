@@ -91,7 +91,7 @@ cell_means.lm <- function(model, ..., levels=NULL) {
     var_names <- NULL
     if (length(call_list) > 0) {
         # turn variable names into strings
-        var_names <- sapply(call_list, deparse)
+        var_names <- sapply(call_list, .expr_to_str)
     }    
     return(cell_means_q.lm(model, var_names, levels))
 }
@@ -153,7 +153,7 @@ cell_means.aov <- function(model, ..., levels=NULL) {
     var_names <- NULL
     if (length(call_list) > 0) {
         # turn variable names into strings
-        var_names <- sapply(call_list, deparse)
+        var_names <- sapply(call_list, .expr_to_str)
     }    
     return(cell_means_q.aov(model, var_names, levels))
 }
@@ -178,7 +178,7 @@ cell_means.glm <- function(model, ..., levels=NULL,
     var_names <- NULL
     if (length(call_list) > 0) {
         # turn variable names into strings
-        var_names <- sapply(call_list, deparse)
+        var_names <- sapply(call_list, .expr_to_str)
     }    
     return(cell_means_q.glm(model, var_names, levels, type))
 }
