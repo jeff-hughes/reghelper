@@ -153,6 +153,9 @@ graph_model.lm <- function(model, y, x, lines=NULL, split=NULL,
     # convert variable names to strings
     call$y <- deparse(substitute(y))
     call$x <- deparse(substitute(x))
+    if (call$y == "" || call$x == "") {
+        stop("y and x variables must be specified")
+    }
     if (!is.null(call$lines)) {
         call$lines <- deparse(substitute(lines))
     }
@@ -188,6 +191,9 @@ graph_model.aov <- function(model, y, x, lines=NULL, split=NULL,
     # convert variable names to strings
     call$y <- deparse(substitute(y))
     call$x <- deparse(substitute(x))
+    if (call$y == "" || call$x == "") {
+        stop("y and x variables must be specified")
+    }
     if (!is.null(call$lines)) {
         call$lines <- deparse(substitute(lines))
     }
@@ -223,6 +229,9 @@ graph_model.glm <- function(model, y, x, lines=NULL, split=NULL,
     # convert variable names to strings
     call$y <- deparse(substitute(y))
     call$x <- deparse(substitute(x))
+    if (call$y == "" || call$x == "") {
+        stop("y and x variables must be specified")
+    }
     if (!is.null(call$lines)) {
         call$lines <- deparse(substitute(lines))
     }
@@ -402,6 +411,9 @@ graph_model.lme <- function(model, y, x, lines=NULL, split=NULL,
     # convert variable names to strings
     call$y <- deparse(substitute(y))
     call$x <- deparse(substitute(x))
+    if (call$y == "" || call$x == "") {
+        stop("y and x variables must be specified")
+    }
     if (!is.null(call$lines)) {
         call$lines <- deparse(substitute(lines))
     }
@@ -585,6 +597,9 @@ graph_model.merMod <- function(model, y, x, lines=NULL, split=NULL,
     # convert variable names to strings
     call$y <- deparse(substitute(y))
     call$x <- deparse(substitute(x))
+    if (call$y == "" || call$x == "") {
+        stop("y and x variables must be specified")
+    }
     if (!is.null(call$lines)) {
         call$lines <- deparse(substitute(lines))
     }
