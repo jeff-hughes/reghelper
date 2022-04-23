@@ -1,5 +1,12 @@
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
 
+# reghelper 1.1.1
+
+-   Fixes bug with very long lists of variables in `build_model()` or
+    `cell_means()`
+-   Properly throws error for `graph_model()` when required inputs are
+    not specified
+
 # reghelper 1.1.0
 
 -   Adds David Beiner as a co-maintainer of the package
@@ -116,7 +123,7 @@ BUG FIXES
 BUG FIXES
 
 -   Fixed bug with `simple_slopes` using incorrect contrasts for factor
-    variables. Resolves Issue #2.
+    variables. Resolves Issue \#2.
 
 # reghelper 0.3.1
 
@@ -170,7 +177,7 @@ NEW FEATURES
 BUG FIXES
 
 -   Fixed bug with passing variables names to `build_model`,
-    `cell_means`, and `graph_model`. Resolves Issue #1.
+    `cell_means`, and `graph_model`. Resolves Issue \#1.
 
 # reghelper 0.1.0
 

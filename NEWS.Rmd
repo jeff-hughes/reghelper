@@ -13,6 +13,11 @@ knitr::opts_chunk$set(
   fig.path = "NEWS-"
 )
 ```
+# reghelper 1.1.1
+
+* Fixes bug with very long lists of variables in `build_model()` or `cell_means()`
+* Properly throws error for `graph_model()` when required inputs are not specified
+
 # reghelper 1.1.0
 
 * Adds David Beiner as a co-maintainer of the package
