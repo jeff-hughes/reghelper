@@ -20,7 +20,7 @@
             # if user specified levels, use those
             factors[[term]] <- user_levels[[term]]
         } else {
-            if (class(term_data) == 'factor') {
+            if (inherits(term_data, 'factor')) {
                 # factors are plotted at all levels
                 if (sstest == TRUE) {
                     factors[[term]] <- c('sstest', levels(term_data))
