@@ -43,14 +43,14 @@ beta.lm <- function(model, x=TRUE, y=TRUE, skip=NULL, ...) {
     formula <- format(formula(model))
     lhs <- attr(terms(model), 'response')  # index of criterion variable(s)
     if (x == FALSE) {
-        vars <- vars[lhs]  # get only variables on left-hand side
+        skip <- c(skip, vars[-lhs])  # skip variables on right-hand side
     }
     if (y == FALSE) {
-        vars <- vars[-lhs]  # get only variables on right-hand side
+        skip <- c(skip, vars[lhs])  # skip variables on left-hand side
     }
     
     # cover special case, where all variables are skipped
-    if (length(vars) == 0) {
+    if (length(skip) == length(vars)) {
         return(summary(model))
     }
     
