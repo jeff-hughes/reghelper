@@ -1,8 +1,8 @@
 Package: reghelper
 Type: Package
 Title: Helper Functions for Regression Analysis
-Version: 1.1.1
-Date: 2022-04-23
+Version: 1.1.2
+Date: 2023-09-02
 Authors@R: c(
     person("Jeffrey", "Hughes", email="jeff.hughes@gmail.com", role=c("aut", "cre")),
     person("David", "Beiner", email="beiner.reghelper@gmail.com", role=c("aut")))
