@@ -178,7 +178,6 @@ simple_slopes.lm <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, .
         
         if (is.factor(test_var)) {
             contr <- original_contrasts[[test_var_name]]
-            
             if (!is.null(colnames(contr))) {
                 dummy_names <- paste0(test_var_name, colnames(contr))
             } else {
@@ -239,7 +238,7 @@ simple_slopes.lme <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, 
         # get location of highest interaction term
     int_vars <- names(which(attr(terms(model), 'factors')[, int_term] == 1))
         # get location of variables in the interaction
-    
+
     # figure out which variables are categorical
     factor_vars_log <- vapply(int_vars, function(v) {
         is.factor(mdata[, v])
@@ -316,7 +315,11 @@ simple_slopes.lme <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, 
         
         if (is.factor(test_var)) {
             contr <- original_contrasts[[test_var_name]]
-            dummy_names <- paste0(test_var_name, colnames(contr))
+            if (!is.null(colnames(contr))) {
+                dummy_names <- paste0(test_var_name, colnames(contr))
+            } else {
+                dummy_names <- paste0(test_var_name, 1:ncol(contr))
+            }
             
             estimates <- as.data.frame(
                 summary(new_model)$tTable[dummy_names, ])
@@ -463,7 +466,11 @@ simple_slopes.merMod <- function(
         
         if (is.factor(test_var)) {
             contr <- original_contrasts[[test_var_name]]
-            dummy_names <- paste0(test_var_name, colnames(contr))
+            if (!is.null(colnames(contr))) {
+                dummy_names <- paste0(test_var_name, colnames(contr))
+            } else {
+                dummy_names <- paste0(test_var_name, 1:ncol(contr))
+            }
             
             estimates <- as.data.frame(
                 coef(summary(new_model))[dummy_names, ])
@@ -598,6 +605,11 @@ print.simple_slopes <- function(
         if (is.factor(variable) && length(levels(variable)) > 2) {
             find_rows <- which(new_grid[, var] == 'sstest')
             contr <- contrasts(variable)
+            if (!is.null(colnames(contr))) {
+                level_names <- colnames(contr)
+            } else {
+                level_names <- 1:ncol(contr)
+            }
             
             # count up number of times we should be repeating each row
             num_rep <- ifelse(1:nrow(new_grid) %in% find_rows, ncol(contr), 1)
@@ -610,7 +622,7 @@ print.simple_slopes <- function(
             dupe_values <- dupe_values[dupe_values$Freq > 1, ]
             for (i in dupe_values$rep_index) {
                 indices <- which(rep_index == as.character(i))
-                new_grid[indices, var] <- paste0('sstest (', colnames(contr), ')')
+                new_grid[indices, var] <- paste0('sstest (', level_names, ')')
             }
             rownames(new_grid) <- 1:nrow(new_grid)
         }
@@ -618,6 +630,5 @@ print.simple_slopes <- function(
     
     return(list(grid, new_grid))
 }
-
 
 
