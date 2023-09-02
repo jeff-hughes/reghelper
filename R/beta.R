@@ -93,12 +93,17 @@ beta.glm <- function(model, x=TRUE, y=FALSE, skip=NULL, ...) {
 #' @return Returns a list with new formula and new data.
 #' @noRd
 .create_formula <- function(model, vars, skip) {
-    if(inherits(model, c('lm', 'aov', 'glm'))) {
-        data <- model$model
-    } else if (inherits(model, 'lme')) {
-        data <- model$data
+    if (inherits(model, c('glm', 'lme'))) {
+        if (is.environment(model$data)) {
+            # we need to extract the data from the captured environment
+            data <- as.data.frame(mget(vars, envir=model$data))
+        } else {
+            data <- model$data
+        }
     } else if (inherits(model, 'lmerMod')) {
         data <- model@frame
+    } else if (inherits(model, c('lm', 'aov'))) {
+        data <- model$model
     }
     
     formula <- format(formula(model))
