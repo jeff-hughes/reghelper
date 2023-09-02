@@ -811,14 +811,14 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
 .build_plot <- function(grid, y, x, lines=NULL, split=NULL, errors=TRUE,
     ymin=NULL, ymax=NULL, labels=NULL, bargraph=FALSE, draw.legend=TRUE,
     dodge=0, exp=FALSE) {
-    
+
     # draw line graph
     if (bargraph == FALSE) {
         pd <- ggplot2::position_dodge(dodge)
         graph <- ggplot2::ggplot(
             data=grid,
             ggplot2::aes(x=.data[[x]], y=.data[[y]], colour=.data[[lines]],
-                         ymin=.data[[ymin]], ymax=.data[[ymax]]))
+                         ymin=ymin, ymax=ymax))
         graph <- graph + ggplot2::geom_point(position=pd) +
             ggplot2::geom_line(position=pd, ggplot2::aes(group=.data[[lines]]))
         
@@ -829,7 +829,7 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
         graph <- ggplot2::ggplot(
             data=grid,
             ggplot2::aes(x=.data[[x]], y=.data[[y]], fill=.data[[lines]],
-                         ymin=.data[[ymin]], ymax=.data[[ymax]]))
+                         ymin=ymin, ymax=ymax))
         graph <- graph + ggplot2::geom_bar(
             position=pd,
             stat='identity',
@@ -844,7 +844,7 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
     # add in error bars
     if (errors) {
         graph <- graph + ggplot2::geom_errorbar(
-            ggplot2::aes(ymax='error_upper', ymin='error_lower'),
+            ggplot2::aes(ymax=.data[['error_upper']], ymin=.data[['error_lower']]),
             width=0.1,
             position=pd)
     }

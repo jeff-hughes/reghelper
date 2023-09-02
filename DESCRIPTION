@@ -18,6 +18,7 @@ Depends:
     R (>= 3.1.0)
 Imports: 
     ggplot2 (>= 1.0.0),
+    rlang,
     stats,
     nlme,
     lme4,
@@ -26,4 +27,4 @@ Imports:
 Suggests: 
     testthat (>= 0.8.1)
 Encoding: UTF-8
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3

@@ -22,4 +22,5 @@
 #'
 #' @keywords internal
 #' @import stats
+#' @importFrom rlang .data
 "_PACKAGE"
