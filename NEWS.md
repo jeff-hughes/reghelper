@@ -1,16 +1,19 @@
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
 
+# reghelper 1.1.2
+
+- Fixes bug with `beta()` for glm models that include an offset value
+- Fixes bug with `simple_slopes()` when one variable name is a subset of
+  another variable name
+- Fixes bug with `simple_slopes()` when default contrast options are
+  changed
+
 # reghelper 1.1.1
 
 - Fixes bug with very long lists of variables in `build_model()` or
   `cell_means()`
 - Properly throws error for `graph_model()` when required inputs are not
   specified
-- Fixes bug with `beta()` for glm models that include an offset value
-- Fixes bug with `simple_slopes()` when one variable name is a subset of
-  another variable name
-- Fixes bug with `simple_slopes()` when default contrast options are
-  changed
 
 # reghelper 1.1.0
 
