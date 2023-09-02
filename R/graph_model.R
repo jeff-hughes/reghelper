@@ -817,9 +817,10 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
         pd <- ggplot2::position_dodge(dodge)
         graph <- ggplot2::ggplot(
             data=grid,
-            ggplot2::aes_string(x=x, y=y, colour=lines, ymin=ymin, ymax=ymax))
+            ggplot2::aes(x=.data[[x]], y=.data[[y]], colour=.data[[lines]],
+                         ymin=.data[[ymin]], ymax=.data[[ymax]]))
         graph <- graph + ggplot2::geom_point(position=pd) +
-            ggplot2::geom_line(position=pd, ggplot2::aes_string(group=lines))
+            ggplot2::geom_line(position=pd, ggplot2::aes(group=.data[[lines]]))
         
     # draw bar graph
     } else {
@@ -827,11 +828,12 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
                                                   # separate bars
         graph <- ggplot2::ggplot(
             data=grid,
-            ggplot2::aes_string(x=x, y=y, fill=lines, ymin=ymin, ymax=ymax))
+            ggplot2::aes(x=.data[[x]], y=.data[[y]], fill=.data[[lines]],
+                         ymin=.data[[ymin]], ymax=.data[[ymax]]))
         graph <- graph + ggplot2::geom_bar(
             position=pd,
             stat='identity',
-            ggplot2::aes_string(group=lines))
+            ggplot2::aes(group=.data[[lines]]))
     }
     
     # remove legend, if desired
@@ -842,7 +844,7 @@ graph_model_q.merMod <- function(model, y, x, lines=NULL, split=NULL,
     # add in error bars
     if (errors) {
         graph <- graph + ggplot2::geom_errorbar(
-            ggplot2::aes_string(ymax='error_upper', ymin='error_lower'),
+            ggplot2::aes(ymax='error_upper', ymin='error_lower'),
             width=0.1,
             position=pd)
     }
