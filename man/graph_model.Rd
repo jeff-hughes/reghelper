@@ -166,17 +166,17 @@ averaged across all its levels.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{lm}: Graphing linear models.
+\item \code{graph_model(lm)}: Graphing linear models.
 
-\item \code{aov}: Graphing ANOVA.
+\item \code{graph_model(aov)}: Graphing ANOVA.
 
-\item \code{glm}: Graphing generalized linear models.
+\item \code{graph_model(glm)}: Graphing generalized linear models.
 
-\item \code{lme}: Graphing hierarchical linear models (nlme).
+\item \code{graph_model(lme)}: Graphing hierarchical linear models (nlme).
 
-\item \code{merMod}: Graphing hierarchical linear models (lme4).
+\item \code{graph_model(merMod)}: Graphing hierarchical linear models (lme4).
+
 }}
-
 \examples{
 # iris data
 model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)

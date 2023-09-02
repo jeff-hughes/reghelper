@@ -80,15 +80,15 @@ the `sstest` label.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{lm}: Simple slopes for linear models.
+\item \code{simple_slopes(lm)}: Simple slopes for linear models.
 
-\item \code{glm}: Simple slopes for generalized linear models.
+\item \code{simple_slopes(glm)}: Simple slopes for generalized linear models.
 
-\item \code{lme}: Simple slopes for hierarchical linear models (nlme).
+\item \code{simple_slopes(lme)}: Simple slopes for hierarchical linear models (nlme).
 
-\item \code{merMod}: Simple slopes for hierarchical linear models (lme4).
+\item \code{simple_slopes(merMod)}: Simple slopes for hierarchical linear models (lme4).
+
 }}
-
 \examples{
 # linear model
 mtcars$am <- factor(mtcars$am)  # make 'am' categorical

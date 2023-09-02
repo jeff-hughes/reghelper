@@ -171,17 +171,17 @@ evaluation is easier.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{lm}: Graphing linear models.
+\item \code{graph_model_q(lm)}: Graphing linear models.
 
-\item \code{aov}: Graphing ANOVA.
+\item \code{graph_model_q(aov)}: Graphing ANOVA.
 
-\item \code{glm}: Graphing generalized linear models.
+\item \code{graph_model_q(glm)}: Graphing generalized linear models.
 
-\item \code{lme}: Graphing hierarchical linear models (nlme).
+\item \code{graph_model_q(lme)}: Graphing hierarchical linear models (nlme).
 
-\item \code{merMod}: Graphing hierarchical linear models (lme4).
+\item \code{graph_model_q(merMod)}: Graphing hierarchical linear models (lme4).
+
 }}
-
 \examples{
 # iris data
 model <- lm(Sepal.Width ~ Sepal.Length * Species, data=iris)

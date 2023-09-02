@@ -47,13 +47,13 @@ interaction term itself).
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{lm}: Standardized coefficients for a linear model.
+\item \code{beta(lm)}: Standardized coefficients for a linear model.
 
-\item \code{aov}: Standardized coefficients for ANOVA.
+\item \code{beta(aov)}: Standardized coefficients for ANOVA.
 
-\item \code{glm}: Standardized coefficients for a generalized linear model.
+\item \code{beta(glm)}: Standardized coefficients for a generalized linear model.
+
 }}
-
 \examples{
 # iris data, showing use with lm()
 model1 <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)

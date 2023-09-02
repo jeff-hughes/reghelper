@@ -47,11 +47,11 @@ McClelland (2012)}.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{lm}: Johnson-Neyman points for linear models.
+\item \code{sig_regions(lm)}: Johnson-Neyman points for linear models.
 
-\item \code{glm}: Johnson-Neyman points for generalized linear models.
+\item \code{sig_regions(glm)}: Johnson-Neyman points for generalized linear models.
+
 }}
-
 \examples{
 # mtcars data
 mtcars$am <- factor(mtcars$am)  # make 'am' categorical

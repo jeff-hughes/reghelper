@@ -32,11 +32,11 @@ more information, see
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{lme}: Intra-class correlation for lme (nlme).
+\item \code{ICC(lme)}: Intra-class correlation for lme (nlme).
 
-\item \code{merMod}: Intra-class correlation for lmer (lme4).
+\item \code{ICC(merMod)}: Intra-class correlation for lmer (lme4).
+
 }}
-
 \examples{
 # iris data, showing use with lme()
 if (require(nlme, quietly=TRUE)) {

@@ -53,13 +53,13 @@ all its levels.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{lm}: Estimated values for a linear model.
+\item \code{cell_means(lm)}: Estimated values for a linear model.
 
-\item \code{aov}: Estimated means for ANOVA.
+\item \code{cell_means(aov)}: Estimated means for ANOVA.
 
-\item \code{glm}: Estimated values for a generalized linear model.
+\item \code{cell_means(glm)}: Estimated values for a generalized linear model.
+
 }}
-
 \examples{
 # iris data
 model <- lm(Sepal.Length ~ Petal.Length + Petal.Width, iris)
