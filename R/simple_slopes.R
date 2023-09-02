@@ -150,7 +150,12 @@ simple_slopes.lm <- function(model, levels=NULL, confint=FALSE, ci.width=0.95, .
                     # for continuous, we replace the name of the variable in the
                     # formula to shift the 0 point
                     new_var <- paste0('I(', vname, ' - ', template[i, j], ')')
-                    new_form <- gsub(vname, new_var, new_form)
+                    new_form <- gsub(
+                        paste0("((?<=[^a-zA-Z0-9._])|^)", vname, "(?=([^a-zA-Z0-9._]|$))"),
+                        new_var, new_form, perl=TRUE)
+                        # this regex uses lookarounds to ensure that it does not
+                        # match a variable name that is a subset of another
+                        # variable name (e.g. two variables named "var1" and "var11")
                 }
             } else {
                 # when testing a factor effect, revert to original contrasts
